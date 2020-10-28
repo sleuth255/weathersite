@@ -1,0 +1,24 @@
+
+table#conditionstable tr td {
+  border-left: 3px solid black;
+  color: black
+}
+
+.compass{
+  display: block;
+  margin-right: auto;
+  width: 500px;
+}
+.compasspointer{
+  position: absolute;
+  display: inline-block;
+}
+.highlight{
+    font-weight: bold;
+    font-size: 45px;
+    color: #0087CC;
+}
+.vertical { 
+    border-left: 3px solid black; 
+    height: 550px; 
+} 

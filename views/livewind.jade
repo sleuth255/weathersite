@@ -1,0 +1,16 @@
+extends layout
+block content
+     div#wind
+       img.compass(src='./images/compassrose.png')
+       if (left > 0 && top > 0)
+         img.compasspointer(src='./images/compasspointer.png' style='left:#{left}px;top:#{top}px;transform: rotate(#{rotation}deg)')
+       table(style='width:500px')
+         tr
+           td(style='text-align: center;font: 25px sans-serif; font-weight: bold;color: #54a2c7;margin-left: 165px;')
+              |WIND SPEED
+         tr               
+           td(style='text-align: center;font: 35px sans-serif; font-weight: bold;color: #19516b;margin-left: 150px;')
+              |#{speed} MPH #{heading}         
+         tr               
+           td(style='text-align: center;font: 20px sans-serif; color: #19516b;margin-left: 150px;')
+              |CURRENT

@@ -1,0 +1,37 @@
+extends layout
+block content
+   body()
+     script(type='text/javascript')
+       |  window.onload = setupRefresh;
+       |  function setupRefresh()
+       |  {
+       |    setInterval("refreshWindBlock();",2500);
+       |    setInterval("refreshConditionsBlock();",31000);
+       |  }
+       |  function refreshWindBlock()
+       |  {
+       |     $('#wind').load("./livewind");
+       |  }
+       |  function refreshConditionsBlock()
+       |  {
+       |     $('#conditions').load("./liveconditions");
+       |  }
+     div#wind
+       img.compass(src='./images/compassrose.png')
+     div.vertical(style='position: absolute;left: 500px;top: 40px;')
+     div#conditions(style='position: absolute;left: 530px;top: 10px;')
+        table(cellpadding=0,cellspacing=0,style='width:360px')
+          tr
+            td(height=26,style='font: 25px sans-serif; font-weight: bold;color: #54a2c7;')
+               |WIND GUST:
+            td(height=26,style='font: 25px sans-serif; font-weight: bold;color: #19516b;')
+               | #{gustSpeed} MPH (#{gustDirection}&deg)
+          tr
+            td(height=26,style='font: 25px sans-serif; font-weight: bold;color: #54a2c7;')
+               |WIND SPEED:
+            td(height=26,style='font: 25px sans-serif; font-weight: bold;color: #19516b;')
+               | #{avgSpeed} MPH (#{avgDirection}&deg)
+          tr
+            td(colspan=2,style='text-align: center;font: 20px sans-serif; color: #19516b;margin-left: 150px;')
+               |10 minute average
+       
