@@ -1,16 +1,15 @@
 extends layout
 block content
-     div#wind
-       img.compass(src='./images/compassrose.png')
-       if (left > 0 && top > 0)
-         img.compasspointer(src='./images/compasspointer.png' style='left:#{left}px;top:#{top}px;transform: rotate(#{rotation}deg)')
-       table(style='width:500px')
-         tr
-           td.bigblue(style='text-align: center;margin-left: 165px;')
-              |WIND SPEED
-         tr               
-           td.bigblack(style='text-align: center;margin-left: 150px;')
-              |#{speed} MPH #{heading}         
-         tr               
-           td.smallblack(style='text-align: center;margin-left: 150px;')
-              |CURRENT
+    img.compass(src='./images/compassrose.png')
+    if (left > 0 && top > 0)
+      img.compasspointer(src='./images/compasspointer.png' style='left:#{left}px;top:#{top}px;transform: rotate(#{rotation}deg)')
+    table(style='width:500px')
+      tr
+        td.bigblue(style='text-align: center;margin-left: 165px;')
+           |WIND SPEED
+      tr               
+        td.biggerblack(style='text-align: center;margin-left: 150px;')
+           |#{speed} MPH #{heading}         
+      tr               
+        td.smallblack(style='text-align: center;margin-left: 150px;')
+           |CURRENT

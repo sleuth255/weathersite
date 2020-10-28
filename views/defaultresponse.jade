@@ -18,20 +18,87 @@ block content
        |  }
      div#wind
        img.compass(src='./images/compassrose.png')
+       if (left > 0 && top > 0)
+         img.compasspointer(src='./images/compasspointer.png' style='left:#{left}px;top:#{top}px;transform: rotate(#{rotation}deg)')
+       table(style='width:500px')
+         tr
+           td.bigblue(style='text-align: center;margin-left: 165px;')
+              |WIND SPEED
+         tr               
+           td.biggerblack(style='text-align: center;margin-left: 150px;')
+              |#{speed} MPH #{heading}         
+         tr               
+           td.smallblack(style='text-align: center;margin-left: 150px;')
+              |CURRENT
      div.vertical(style='position: absolute;left: 500px;top: 40px;')
-     div#conditions(style='position: absolute;left: 530px;top: 20px;')
+     div#conditions(style='position: absolute;left: 530px;top: 100px;')
         table(cellpadding=0,cellspacing=0,style='width:360px')
           tr
-            td(height=26,style='font: 25px sans-serif; font-weight: bold;color: #54a2c7;')
+            td.bigblue(height=26)
                |WIND GUST:
-            td(height=26,style='font: 25px sans-serif; font-weight: bold;color: #19516b;')
+            td.bigblack(height=26)
                | #{gustSpeed} MPH #{gustDirection}
           tr
-            td(height=26,style='font: 25px sans-serif; font-weight: bold;color: #54a2c7;')
+            td.bigblue(height=26)
                |WIND SPEED:
-            td(height=26,style='font: 25px sans-serif; font-weight: bold;color: #19516b;')
+            td.bigblack(height=26)
                | #{avgSpeed} MPH #{avgDirection}
           tr
-            td(colspan=2,style='text-align: center;font: 20px sans-serif; color: #19516b;margin-left: 150px;')
+            td.smallblack(colspan=2,style='text-align: center;')
                |10 minute average
-       
+          tr
+            td(height=30)
+          tr
+            td.bigblue(height=26)
+              |INSIDE:
+            td
+              table(cellspacing=0,cellpadding=0)
+                tr
+                  td.bigblack
+                    | #{inTemp}&deg<span style='font-size: 18px'>F</span>
+                  td
+                    |<span style='display: inline-block; width: 20px'></span>
+                  td.bigblack
+                    | #{inHum}%   
+          tr
+            td.bigblue(height=26)
+              |OUTSIDE:
+            td
+              table(cellspacing=0,cellpadding=0)
+                tr
+                  td.bigblack
+                    | #{outTemp}&deg<span style='font-size: 18px'>F</span>
+                  td
+                    |<span style='display: inline-block; width: 20px'></span>
+                  td.bigblack
+                    | #{outHum}%   
+          tr
+            td.smallblack(colspan=2,style='text-align: center;')
+               |Temperature, Humidity
+          tr
+            td(height=30)
+          tr
+            td.bigblue(height=26)
+              |DEWPOINT:
+            td.bigblack
+              | #{outDewPt}&deg  
+          tr
+            td.bigblue(height=26)
+              |WIND CHILL:
+            td.bigblack
+              | #{outWindChill}&deg   
+          tr
+            td.bigblue(height=26)
+              |HEAT INDEX:
+            td.bigblack
+              | #{outHeatIdx}&deg   
+          tr
+            td.bigblue(height=26)
+              |BAROMETER:
+            td.bigblack
+              | #{inBarometer}" <span style='font-size: 18px'> (#{inBarometerTrend})</span> 
+          tr
+            td.smallblack(colspan=2,style='text-align: center;')
+               |Current Conditions
+          tr
+            td(height=30)

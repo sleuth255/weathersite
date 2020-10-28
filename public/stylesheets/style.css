@@ -27,6 +27,10 @@ table#conditionstable tr td {
     color: #54a2c7;
 }
 .bigblack{
+	font: 25px sans-serif; font-weight: bold;
+	color: #19516b;
+}
+.biggerblack{
 	font: 35px sans-serif; font-weight: bold;
 	color: #19516b;
 }
