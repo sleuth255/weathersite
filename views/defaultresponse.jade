@@ -6,7 +6,7 @@ block content
        |  function setupRefresh()
        |  {
        |    setInterval("refreshWindBlock();",2500);
-       |    setInterval("refreshConditionsBlock();",31000);
+       |    setInterval("refreshConditionsBlock();",30000);
        |  }
        |  function refreshWindBlock()
        |  {
@@ -20,7 +20,7 @@ block content
        img.compass(src='./images/compassrose.png')
        if (left > 0 && top > 0)
          img.compasspointer(src='./images/compasspointer.png' style='left:#{left}px;top:#{top}px;transform: rotate(#{rotation}deg)')
-       table(style='width:500px')
+       table(cellspacing=0,cellpadding=0,style='width:500px')
          tr
            td.bigblue(style='text-align: center;margin-left: 165px;')
               |WIND SPEED
@@ -59,7 +59,7 @@ block content
                   td
                     |<span style='display: inline-block; width: 20px'></span>
                   td.bigblack
-                    | #{inHum}%   
+                    | #{inHum}<span style='font-size: 18px'>%</span>   
           tr
             td.bigblue(height=26)
               |OUTSIDE:
@@ -71,7 +71,7 @@ block content
                   td
                     |<span style='display: inline-block; width: 20px'></span>
                   td.bigblack
-                    | #{outHum}%   
+                    | #{outHum}<span style='font-size: 18px'>%</span>   
           tr
             td.smallblack(colspan=2,style='text-align: center;')
                |Temperature, Humidity

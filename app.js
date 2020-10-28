@@ -106,7 +106,7 @@ var inBarometerTrend;
 
 //process...
 app.get('/', function (req, res) {
-    res.render('defaultresponse',{speed:speed,left:makeCompassVector(direction).left,top:makeCompassVector(direction).top,rotation:makeCompassVector(direction).rotation,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('defaultresponse',{heading: makeCompassVector(direction).heading,speed:speed,left:makeCompassVector(direction).left,top:makeCompassVector(direction).top,rotation:makeCompassVector(direction).rotation,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/liveconditions', function (req, res) {
     res.render('liveconditions',{inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
@@ -129,11 +129,12 @@ server.on('listening',function(){
   console.log('UDP Server is : ' + family);
 });
 server.on('message',function(msg,info){
+	  //console.log(msg.toString());
 	  var obj = JSON.parse(msg);
 	  direction=obj.conditions[0].wind_dir_last;
-	  speed=obj.conditions[0].wind_speed_last;
+	  speed=Math.round(obj.conditions[0].wind_speed_last);
 	  gustDirection=obj.conditions[0].wind_dir_at_hi_speed_last_10_min;
-	  gustSpeed=obj.conditions[0].wind_speed_hi_last_10_min;
+	  gustSpeed=Math.round(obj.conditions[0].wind_speed_hi_last_10_min);
 });
 
 
@@ -189,8 +190,8 @@ setInterval(function(){
 		   })
 		   resp.on('end',function(){
 			   var obj = JSON.parse(data);
-			   avgSpeed = obj.data.conditions[0].wind_speed_avg_last_10_min;
-			   avgDirection = obj.data.conditions[0].wind_dir_scalar_avg_last_10_min;
+			   avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
+			   avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
 			   inTemp = Math.round(obj.data.conditions[2].temp_in);
 			   inHum = Math.round(obj.data.conditions[2].hum_in);
 			   outTemp = Math.round(obj.data.conditions[0].temp);
