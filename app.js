@@ -19,35 +19,19 @@ app.set('port', process.env.PORT || 5000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.favicon());
-app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.logger('dev'));
 
-/***************************************************************/
 
-let cookie = {};
-var direction = 0;
-var speed = 0;
-var gustSpeed = 0;
-var gustDirection = 0;
-var avgSpeed = 0
-var avgDirection = 0
-var currentConditions;
-//process...
-app.get('/', function (req, res) {
-    res.render('defaultresponse',{avgSpeed: Math.floor(avgSpeed),avgDirection: avgDirection,gustSpeed: gustSpeed,gustDirection: gustDirection})
-})
-app.get('/liveconditions', function (req, res) {
-    res.render('liveconditions',{avgSpeed: Math.floor(avgSpeed),avgDirection: avgDirection,gustSpeed: gustSpeed,gustDirection: gustDirection})
-})
-app.get('/livewind', function (req, res) {
-	var heading,left,top,rotation;
-    res.locals.err = false;
+function makeCompassVector(direction){
+	var left=top=rotation=0;
+	var heading='';
     switch(true){
     case (direction == 0):
-    	   heading='';left=top=rotation=0;
+    	   heading='';
            break;
        case (direction < 22.5):
  	       heading='N';left=220;top=100;rotation=0;
@@ -86,7 +70,7 @@ app.get('/livewind', function (req, res) {
     	   heading='WSW';left=117;top=273;rotation=247.5;
     	   break;
        case (direction < 292.5):
-    	   heading='W';left=90;top=230;rotation=270;
+    	   heading='W';left=94;top=230;rotation=270;
     	   break;
        case (direction < 315):
     	   heading='WNW';left=117;top=190;rotation=292.5;
@@ -101,7 +85,27 @@ app.get('/livewind', function (req, res) {
     	   heading='';left=top=rotation=0;
            break;
     }
-    res.render('livewind',{heading: heading,speed:speed,left:left,top:top,rotation:rotation})
+    return {heading: heading,left: left,top: top,rotation: rotation};
+}/***************************************************************/
+
+let cookie = {};
+var direction = 0;
+var speed = 0;
+var gustSpeed = 0;
+var gustDirection = 0;
+var avgSpeed = 0
+var avgDirection = 0
+var currentConditions;
+//process...
+app.get('/', function (req, res) {
+    res.render('defaultresponse',{avgSpeed: Math.floor(avgSpeed),avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+})
+app.get('/liveconditions', function (req, res) {
+    res.render('liveconditions',{avgSpeed: Math.floor(avgSpeed),avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+})
+app.get('/livewind', function (req, res) {
+    res.locals.err = false;
+    res.render('livewind',{heading: makeCompassVector(direction).heading,speed:speed,left:makeCompassVector(direction).left,top:makeCompassVector(direction).top,rotation:makeCompassVector(direction).rotation})
 })
 
 
@@ -154,26 +158,32 @@ http.get('http://weatherlinklive.tpg/v1/current_conditions',function(resp){
 
 
 setInterval(function(){
-	http.get('http://weatherlinklive.tpg/v1/current_conditions',function(resp){
-		data = '';
-		resp.on('data',function(chunk){
-			data+=chunk
-		})
-		resp.on('end',function(){
-			var obj = JSON.parse(data);
-			avgSpeed = obj.data.conditions[0].wind_speed_avg_last_10_min;
-			avgDirection = obj.data.conditions[0].wind_dir_scalar_avg_last_10_min;
-			http.get('http://weatherlinklive.tpg/v1/real_time?duration=300',function(resp){
-				data = '';
-				resp.on('data',function(chunk){
-					data+=chunk
-				})
-				resp.on('end',function(){
-					console.log(data.toString())
-				})
-			})
-		})
-	})
+	try{
+	   http.get('http://weatherlinklive.tpg/v1/current_conditions',function(resp){
+		   data = '';
+		   resp.on('data',function(chunk){
+			   data+=chunk
+		   })
+		   resp.on('end',function(){
+			   var obj = JSON.parse(data);
+			   avgSpeed = obj.data.conditions[0].wind_speed_avg_last_10_min;
+			   avgDirection = obj.data.conditions[0].wind_dir_scalar_avg_last_10_min;
+			   try{
+			      http.get('http://weatherlinklive.tpg/v1/real_time?duration=300',function(resp){
+				      data = '';
+				      resp.on('data',function(chunk){
+					      data+=chunk
+				      })
+				      resp.on('end',function(){
+					      console.log(data.toString())
+				      })
+			      })
+			   }
+			   catch(err){}
+		   })
+	   })
+	}
+	catch(err){}
 }, 300000); 
 
 

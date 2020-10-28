@@ -22,3 +22,15 @@ table#conditionstable tr td {
     border-left: 3px solid black; 
     height: 550px; 
 } 
+.bigblue{
+    font: 25px sans-serif; font-weight: bold;
+    color: #54a2c7;
+}
+.bigblack{
+	font: 35px sans-serif; font-weight: bold;
+	color: #19516b;
+}
+.smallblack{
+	font: 20px sans-serif; 
+	color: #19516b;
+}
