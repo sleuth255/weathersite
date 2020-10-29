@@ -1,9 +1,11 @@
 extends layout
 block content
-    img.compass(src='./images/compassrose.png')
+    //img.compass(src='./images/compassrose.png')
     if (left > 0 && top > 0)
       img.compasspointer(src='./images/compasspointer.png' style='left:#{left}px;top:#{top}px;transform: rotate(#{rotation}deg)')
-    table(cellspacing=0,cellpadding=0,style='width:500px')
+    table(cellspacing=0,cellpadding=0,style='width:500px;')
+      tr
+        td(height=500)
       tr
         td.bigblue(style='text-align: center;margin-left: 165px;')
            |WIND SPEED
