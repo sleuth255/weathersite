@@ -97,19 +97,21 @@ var avgDirection = 0
 var inTemp = 0;
 var inHum = 0;
 var outTemp = 0;
+var outTempLastReading = 0;
 var outHum = 0;
 var outDewPt = 0;
 var outWindChill = 0;
 var outHeatIdx = 0;
+var outTempTrend = 0;
 var inBarometer = 0;
 var inBarometerTrend;
 
 //process...
 app.get('/', function (req, res) {
-    res.render('defaultresponse',{heading: makeCompassVector(direction).heading,speed:speed,left:makeCompassVector(direction).left,top:makeCompassVector(direction).top,rotation:makeCompassVector(direction).rotation,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('defaultresponse',{outTempTrend: outTempTrend,heading: makeCompassVector(direction).heading,speed:speed,left:makeCompassVector(direction).left,top:makeCompassVector(direction).top,rotation:makeCompassVector(direction).rotation,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/liveconditions', function (req, res) {
-    res.render('liveconditions',{inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('liveconditions',{outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/livewind', function (req, res) {
     res.locals.err = false;
@@ -154,6 +156,7 @@ http.get('http://weatherlinklive.tpg/v1/current_conditions',function(resp){
 		inTemp = Math.round(obj.data.conditions[2].temp_in);
 		inHum = Math.round(obj.data.conditions[2].hum_in);
 		outTemp = Math.round(obj.data.conditions[0].temp);
+		outTempLastReading = obj.data.conditions[0].temp;
 		outHum = Math.round(obj.data.conditions[0].hum);
 		outDewPt = Math.round(obj.data.conditions[0].dew_point);
 		outWindChill = Math.round(obj.data.conditions[0].wind_chill);
@@ -208,6 +211,14 @@ setInterval(function(){
 					inBarometerTrend = 'Rising'
 				else
 					inBarometerTrend = 'Steady'
+			   if (obj.data.conditions[0].temp > outTempLastReading)
+					   outTempTrend = 1;
+			   else
+			   if (obj.data.conditions[0].temp < outTempLastReading)
+				   outTempTrend = -1;
+			   else
+				   outTempTrend = 0;
+			   outTempLastReading = obj.data.conditions[0].temp;
 			   try{
 			      http.get('http://weatherlinklive.tpg/v1/real_time?duration=300',function(resp){
 				      data = '';
