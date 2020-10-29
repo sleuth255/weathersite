@@ -16,13 +16,11 @@ block content
        |  {
        |     $('#conditions').load("./liveconditions");
        |  }
-     div#wind(style='background-image: url("/images/compassrose.png"); background-repeat: no-repeat; background-size: 500px')
+     div#wind(style='display: block; height: 800px; background-image: url("/images/compassrose.png"); background-repeat: no-repeat; background-size: 500px')
        if (left > 0 && top > 0)
          img.compasspointer(src='./images/compasspointer.png' style='left:#{left}px;top:#{top}px;transform: rotate(#{rotation}deg)')
        div
-         table(cellspacing=0,cellpadding=0,style='width:500px; ')
-           tr
-             td(height=500)
+         table(cellspacing=0,cellpadding=0,style='width:500px; position: absolute; top: 500px; ')
            tr
              td.bigblue(style='text-align: center;margin-left: 165px;')
                 |WIND SPEED
