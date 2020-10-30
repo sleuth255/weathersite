@@ -33,7 +33,7 @@ function makeCompassVector(direction){
     case (direction == 0):
            break;
        case (direction < 22.5):
- 	       heading='N';left=220;top=100;rotation=0;
+ 	       heading='N';left=220;top=110;rotation=0;
  	       break;
        case (direction < 45):
     	   heading='NNE';left=265;top=125;rotation=22.5;
@@ -69,7 +69,7 @@ function makeCompassVector(direction){
     	   heading='WSW';left=117;top=273;rotation=247.5;
     	   break;
        case (direction < 292.5):
-    	   heading='W';left=94;top=230;rotation=270;
+    	   heading='W';left=104;top=230;rotation=270;
     	   break;
        case (direction < 315):
     	   heading='WNW';left=117;top=190;rotation=292.5;
@@ -89,6 +89,7 @@ function makeCompassVector(direction){
 // globals
 let cookie = {};
 var direction = 0;
+var lastDirection3 = lastDirection2 = lastDirection1 = lastDirection = 0;
 var speed = 0;
 var gustSpeed = 0;
 var gustDirection = 0;
@@ -111,14 +112,27 @@ var rainStormRate = 0;
 
 //process...
 app.get('/', function (req, res) {
-    res.render('defaultresponse',{rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,heading: makeCompassVector(direction).heading,speed:speed,left:makeCompassVector(direction).left,top:makeCompassVector(direction).top,rotation:makeCompassVector(direction).rotation,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+	var directionObj = []
+	directionObj[0] = makeCompassVector(direction)
+	directionObj[1] = makeCompassVector(lastDirection);
+	directionObj[2] = makeCompassVector(lastDirection1);
+	directionObj[3] = makeCompassVector(lastDirection2);
+	directionObj[4] = makeCompassVector(lastDirection3);
+	
+    res.render('defaultresponse',{directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/liveconditions', function (req, res) {
     res.render('liveconditions',{rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/livewind', function (req, res) {
     res.locals.err = false;
-    res.render('livewind',{heading: makeCompassVector(direction).heading,speed:speed,left:makeCompassVector(direction).left,top:makeCompassVector(direction).top,rotation:makeCompassVector(direction).rotation})
+	var directionObj = []
+	directionObj[0] = makeCompassVector(direction)
+	directionObj[1] = makeCompassVector(lastDirection);
+	directionObj[2] = makeCompassVector(lastDirection1);
+	directionObj[3] = makeCompassVector(lastDirection2);
+	directionObj[4] = makeCompassVector(lastDirection3);
+    res.render('livewind',{directionObj: directionObj,speed:speed})
 })
 
 
@@ -137,6 +151,12 @@ server.on('message',function(msg,info){
 	  //console.log(msg.toString());
 	  var obj = JSON.parse(msg);
 	  direction=obj.conditions[0].wind_dir_last;
+	  if (direction != lastDirection){
+	     lastDirection3 = lastDirection2;
+	     lastDirection2 = lastDirection1;
+	     lastDirection1 = lastDirection;
+	     lastDirection = direction;
+      }
 	  speed=Math.round(obj.conditions[0].wind_speed_last);
 	  gustDirection=obj.conditions[0].wind_dir_at_hi_speed_last_10_min;
 	  gustSpeed=Math.round(obj.conditions[0].wind_speed_hi_last_10_min);

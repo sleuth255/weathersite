@@ -1,15 +1,20 @@
 extends layout
 block content
-    //img.compass(src='./images/compassrose.png')
-    if (left > 0 && top > 0)
-      img.compasspointer(src='./images/compasspointer.png' style='left:#{left}px;top:#{top}px;transform: rotate(#{rotation}deg)')
-    table(cellspacing=0,cellpadding=0,style='width:500px; position: absolute; top: 500px; ')
-      tr
-        td.bigblue(style='text-align: center;margin-left: 165px;')
-           |WIND SPEED
-      tr               
-        td.biggerblack(style='text-align: center;margin-left: 150px;')
-           |#{speed} MPH #{heading}         
-      tr               
-        td.smallblack(style='text-align: center;margin-left: 150px;')
-           |CURRENT
+       if (directionObj[0].left > 0 && directionObj[0].top > 0)
+         img.compasspointer(src='./images/compasspointer.png' style='left:#{directionObj[0].left}px;top:#{directionObj[0].top}px;transform: rotate(#{directionObj[0].rotation}deg); z-index: 5;')
+       - x = 1
+       while x < 4
+          if (directionObj[x].left > 0 && directionObj[x].top > 0) && !(directionObj[x].left == directionObj[0].left && directionObj[x].top == directionObj[0].top) 
+             img.compasspointer(src='./images/compasspointer-sm.png' style='left:#{directionObj[x].left}px;top:#{directionObj[x].top}px;transform: rotate(#{directionObj[x].rotation}deg);z-index: 1;')
+          - x++   
+       div
+         table(cellspacing=0,cellpadding=0,style='width:500px; position: absolute; top: 500px; ')
+           tr
+             td.bigblue(style='text-align: center;margin-left: 165px;')
+                |WIND SPEED
+           tr               
+             td.biggerblack(style='text-align: center;margin-left: 150px;')
+                |#{speed} MPH #{directionObj[0].heading}         
+           tr               
+             td.smallblack(style='text-align: center;margin-left: 150px;')
+                |CURRENT
