@@ -1,5 +1,8 @@
 extends layout
 block content
+   - offset = 100
+   if (rainStormStart.length > 0)
+      - offset = 50
    body(style='background-image: url("/images/sunnybackground.jpg"); background-repeat: no-repeat; background-size: 100%;')
      script(type='text/javascript')
        |  window.onload = setupRefresh;
@@ -31,8 +34,8 @@ block content
              td.smallblack(style='text-align: center;margin-left: 150px;')
                 |CURRENT
      div.vertical(style='position: absolute;left: 500px;top: 40px;')
-     div#conditions(style='position: absolute;left: 530px;top: 100px;')
-        table(cellpadding=0,cellspacing=0,style='width:360px')
+     div#conditions(style='position: absolute;left: 530px;top: 0px;width: 400px')
+        table(cellpadding=0,cellspacing=0,style='position: absolute;left: 0px;top: #{offset}px;')
           tr
             td.bigblue(height=26)
                |WIND GUST:
@@ -40,7 +43,7 @@ block content
                | #{gustSpeed} MPH #{gustDirection}
           tr
             td.bigblue(height=26)
-               |WIND SPEED:
+               |WIND SPEED:<span style='display: inline-block; width: 23px'></span>
             td.bigblack(height=26)
                | #{avgSpeed} MPH #{avgDirection}
           tr
@@ -105,11 +108,32 @@ block content
                |Current Conditions
           tr
             td(height=30)
+          if (rainStormStart.length > 0)
+             tr
+               td.bigblue(height=26)
+                 |START:
+               td.bigblack
+                 | #{rainStormStart}  
+             tr
+               td.bigblue(height=26)
+                 |RATE:
+               td.bigblack
+                 | #{rainStormRate}"<span style='font-size: 18px'>/hr</span>  
+             tr
+               td.bigblue(height=26)
+                 |TOTAL:
+               td.bigblack
+                 | #{rainStormAmt}"   
+             tr
+               td.smallblack(colspan=2,style='text-align: center;')
+                 |Rain Storm
+          tr
+            td(height=30)
         if (outTempTrend > 0)
-           div#tempguage(style='position: absolute;left: 224px;top: 146px;')
+           div#tempguage(style='position: absolute;left: 224px;top: #{146+offset}px;')
              img(src='images/warming-sm.png',style='height: 21px;')
         else
-           if (outTempTrend < 0)
-              div#tempguage(style='position: absolute;left: 224px;top: 146px;')
+            if (outTempTrend < 0)
+              div#tempguage(style='position: absolute;left: 224px;top: #{146+offset}px;')
                 img(src='images/cooling-sm.png',style='height: 21px;')
              

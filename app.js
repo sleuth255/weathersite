@@ -105,13 +105,16 @@ var outHeatIdx = 0;
 var outTempTrend = 0;
 var inBarometer = 0;
 var inBarometerTrend;
+var rainStormStart = '';
+var rainStormAmt = 0;
+var rainStormRate = 0;
 
 //process...
 app.get('/', function (req, res) {
-    res.render('defaultresponse',{outTempTrend: outTempTrend,heading: makeCompassVector(direction).heading,speed:speed,left:makeCompassVector(direction).left,top:makeCompassVector(direction).top,rotation:makeCompassVector(direction).rotation,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('defaultresponse',{rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,heading: makeCompassVector(direction).heading,speed:speed,left:makeCompassVector(direction).left,top:makeCompassVector(direction).top,rotation:makeCompassVector(direction).rotation,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/liveconditions', function (req, res) {
-    res.render('liveconditions',{outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('liveconditions',{rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/livewind', function (req, res) {
     res.locals.err = false;
@@ -137,6 +140,14 @@ server.on('message',function(msg,info){
 	  speed=Math.round(obj.conditions[0].wind_speed_last);
 	  gustDirection=obj.conditions[0].wind_dir_at_hi_speed_last_10_min;
 	  gustSpeed=Math.round(obj.conditions[0].wind_speed_hi_last_10_min);
+	  rainStormStart=obj.conditions[0].rain_storm_start_at
+	  rainStormAmt=obj.conditions[0].rain_storm *.01
+	  rainStormRate=obj.conditions[0].rain_rate_last *.01
+	  
+	  if (rainStormStart == null)
+		  rainStormStart = ''
+	  else
+		  rainStormStart = app.locals.moment.unix(rainStormStart).format('MMM Do, h:mm a')
 });
 
 
