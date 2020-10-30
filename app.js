@@ -143,7 +143,7 @@ server.on('message',function(msg,info){
 //Tell WLL to start send live data every 5 minutes and repeat request every 5 minutes
 
 console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
-http.get('http://weatherlinklive.tpg/v1/current_conditions',function(resp){
+http.get('http://10.0.0.42/v1/current_conditions',function(resp){
 	data = '';
 	resp.on('data',function(chunk){
 		data+=chunk
@@ -170,7 +170,7 @@ http.get('http://weatherlinklive.tpg/v1/current_conditions',function(resp){
 			inBarometerTrend = 'Rising'
 		else
 			inBarometerTrend = 'Steady'
-		http.get('http://weatherlinklive.tpg/v1/real_time?duration=300',function(resp){
+		http.get('http://10.0.0.42/v1/real_time?duration=300',function(resp){
 			data = '';
 			resp.on('data',function(chunk){
 				data+=chunk
@@ -186,7 +186,7 @@ http.get('http://weatherlinklive.tpg/v1/current_conditions',function(resp){
 setInterval(function(){
 	try{
 	   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
-	   http.get('http://weatherlinklive.tpg/v1/current_conditions',function(resp){
+	   http.get('http://10.0.0.42/v1/current_conditions',function(resp){
 		   data = '';
 		   resp.on('data',function(chunk){
 			   data+=chunk
@@ -220,7 +220,7 @@ setInterval(function(){
 				   outTempTrend = 0;
 			   outTempLastReading = obj.data.conditions[0].temp;
 			   try{
-			      http.get('http://weatherlinklive.tpg/v1/real_time?duration=300',function(resp){
+			      http.get('http://10.0.0.42/v1/real_time?duration=300',function(resp){
 				      data = '';
 				      resp.on('data',function(chunk){
 					      data+=chunk
