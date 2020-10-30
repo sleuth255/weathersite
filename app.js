@@ -153,16 +153,16 @@ http.get('http://10.0.0.42/v1/current_conditions',function(resp){
 		var obj = JSON.parse(data);
 		avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
 		avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
-		inTemp = Math.round(obj.data.conditions[2].temp_in);
-		inHum = Math.round(obj.data.conditions[2].hum_in);
+		inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
+		inHum = Math.round(obj.data.conditions[obj.data.conditions.length-2].hum_in);
 		outTemp = Math.round(obj.data.conditions[0].temp);
 		outTempLastReading = obj.data.conditions[0].temp;
 		outHum = Math.round(obj.data.conditions[0].hum);
 		outDewPt = Math.round(obj.data.conditions[0].dew_point);
 		outWindChill = Math.round(obj.data.conditions[0].wind_chill);
 		outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
-		inBarometer = Math.round((obj.data.conditions[3].bar_sea_level)*100)/100
-		inBarometerTrend = obj.data.conditions[3].bar_trend
+		inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
+		inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
 		if (inBarometerTrend < 0)
 			inBarometerTrend = 'Falling'
 		else
@@ -195,15 +195,15 @@ setInterval(function(){
 			   var obj = JSON.parse(data);
 			   avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
 			   avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
-			   inTemp = Math.round(obj.data.conditions[2].temp_in);
-			   inHum = Math.round(obj.data.conditions[2].hum_in);
+			   inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
+			   inHum = Math.round(obj.data.conditions[obj.data.conditions.length-2].hum_in);
 			   outTemp = Math.round(obj.data.conditions[0].temp);
 			   outHum = Math.round(obj.data.conditions[0].hum);
 			   outDewPt = Math.round(obj.data.conditions[0].dew_point);
 			   outWindChill = Math.round(obj.data.conditions[0].wind_chill);
 			   outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
-			   inBarometer = Math.round((obj.data.conditions[3].bar_sea_level)*100)/100
-			   inBarometerTrend = obj.data.conditions[3].bar_trend
+			   inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
+			   inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
 				if (inBarometerTrend < 0)
 					inBarometerTrend = 'Falling'
 				else
