@@ -72,8 +72,10 @@ block content
                   td.bigblack
                     if (outTempTrend == 0)
                       | #{outTemp}&deg<span style='font-size: 18px'>F</span>
+                    else if (outTempTrend) > 0
+                      | #{outTemp}&deg<img src='images/warming-sm.png'>
                     else
-                      | #{outTemp}&deg<span style='display: inline-block; width: 11px'></span>
+                      | #{outTemp}&deg<img src='images/cooling-sm.png'>
                   td
                     |<span style='display: inline-block; width: 20px'></span>
                   td.bigblack
@@ -129,11 +131,3 @@ block content
                  |Rain Storm
           tr
             td(height=30)
-        if (outTempTrend > 0)
-           div#tempguage(style='position: absolute;left: 224px;top: #{146+offset}px;')
-             img(src='images/warming-sm.png',style='height: 21px;')
-        else
-            if (outTempTrend < 0)
-              div#tempguage(style='position: absolute;left: 224px;top: #{146+offset}px;')
-                img(src='images/cooling-sm.png',style='height: 21px;')
-             
