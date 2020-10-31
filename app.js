@@ -33,52 +33,52 @@ function makeCompassVector(direction){
     case (direction == 0):
            break;
        case (direction < 22.5):
- 	       heading='N';left=220;top=110;rotation=0;
+ 	       heading='N';left=217;top=100;rotation=0;
  	       break;
        case (direction < 45):
-    	   heading='NNE';left=265;top=125;rotation=22.5;
+    	   heading='NNE';left=263;top=112;rotation=22.5;
     	   break;
        case (direction < 67.5):
-    	   heading='NE';left=310;top=150;rotation=45;
+    	   heading='NE';left=303;top=145;rotation=45;
     	   break;
        case (direction < 90):
-    	   heading='ENE';left=332;top=190;rotation=67.5;
+    	   heading='ENE';left=331;top=186;rotation=67.5;
     	   break;
        case (direction < 112.5):
-    	   heading='E';left=354;top=230;rotation=90;
+    	   heading='E';left=347;top=224;rotation=90;
     	   break;
        case (direction < 135):
-    	   heading='ESE';left=332;top=273;rotation=112.50;
+    	   heading='ESE';left=331;top=266;rotation=112.50;
     	   break;
        case (direction < 157.5):
-    	   heading='SE';left=310;top=315;rotation=135;
+    	   heading='SE';left=300;top=305;rotation=135;
     	   break;
        case (direction < 180):
-    	   heading='SSE';left=265;top=336;rotation=157.5;
+    	   heading='SSE';left=260;top=335;rotation=157.5;
     	   break;
        case (direction < 202.5):
-    	   heading='S';left=220;top=356;rotation=180;
+    	   heading='S';left=218;top=352;rotation=180;
     	   break;
        case (direction < 225):
-    	   heading='SSW';left=182;top=336;rotation=202.5;
+    	   heading='SSW';left=179;top=336;rotation=202.5;
     	   break;
        case (direction < 247.5):
-    	   heading='SW';left=144;top=315;rotation=225;
+    	   heading='SW';left=134;top=304;rotation=225;
     	   break;
        case (direction < 270):
-    	   heading='WSW';left=117;top=273;rotation=247.5;
+    	   heading='WSW';left=104;top=265;rotation=247.5;
     	   break;
        case (direction < 292.5):
-    	   heading='W';left=104;top=230;rotation=270;
+    	   heading='W';left=94;top=224;rotation=270;
     	   break;
        case (direction < 315):
-    	   heading='WNW';left=117;top=190;rotation=292.5;
+    	   heading='WNW';left=104;top=183;rotation=292.5;
     	   break;
        case (direction < 337.5):
-    	   heading='NW';left=144;top=150;rotation=315;
+    	   heading='NW';left=137;top=141;rotation=315;
     	   break;
        case (direction < 361):
-    	   heading='NNW';left=182;top=125;rotation=337.5;
+    	   heading='NNW';left=177;top=110;rotation=337.5;
     	   break;
        default:
            break;
