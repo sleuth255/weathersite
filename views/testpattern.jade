@@ -1,0 +1,7 @@
+extends layout
+block content
+     div#wind(style='display: block; height: 800px; background-image: url("/images/testpattern.png"); background-repeat: no-repeat;')
+       - x = 0
+       while x < directionObj.length
+          img.compasspointer(src='./images/compasspointer.png' style='left:#{directionObj[x].left}px;top:#{directionObj[x].top}px;transform: rotate(#{directionObj[x].rotation}deg); z-index: 1;')
+          - x++   

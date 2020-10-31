@@ -33,52 +33,52 @@ function makeCompassVector(direction){
     case (direction == 0):
            break;
        case (direction < 22.5):
- 	       heading='N';left=217;top=100;rotation=0;
+ 	       heading='N';left=226;top=103;rotation=0;
  	       break;
        case (direction < 45):
-    	   heading='NNE';left=263;top=112;rotation=22.5;
+    	   heading='NNE';left=276;top=113;rotation=22.5;
     	   break;
        case (direction < 67.5):
-    	   heading='NE';left=303;top=145;rotation=45;
+    	   heading='NE';left=318;top=142;rotation=45;
     	   break;
        case (direction < 90):
-    	   heading='ENE';left=331;top=186;rotation=67.5;
+    	   heading='ENE';left=346;top=185;rotation=67.5;
     	   break;
        case (direction < 112.5):
-    	   heading='E';left=347;top=224;rotation=90;
+    	   heading='E';left=355;top=235;rotation=90;
     	   break;
        case (direction < 135):
-    	   heading='ESE';left=331;top=266;rotation=112.50;
+    	   heading='ESE';left=345;top=283;rotation=112.50;
     	   break;
        case (direction < 157.5):
-    	   heading='SE';left=300;top=305;rotation=135;
+    	   heading='SE';left=316;top=325;rotation=135;
     	   break;
        case (direction < 180):
-    	   heading='SSE';left=260;top=335;rotation=157.5;
+    	   heading='SSE';left=273;top=353;rotation=157.5;
     	   break;
        case (direction < 202.5):
-    	   heading='S';left=218;top=352;rotation=180;
+    	   heading='S';left=224;top=362;rotation=180;
     	   break;
        case (direction < 225):
-    	   heading='SSW';left=179;top=336;rotation=202.5;
+    	   heading='SSW';left=174;top=351;rotation=202.5;
     	   break;
        case (direction < 247.5):
-    	   heading='SW';left=134;top=304;rotation=225;
+    	   heading='SW';left=132;top=323;rotation=225;
     	   break;
        case (direction < 270):
-    	   heading='WSW';left=104;top=265;rotation=247.5;
+    	   heading='WSW';left=104;top=280;rotation=247.5;
     	   break;
        case (direction < 292.5):
-    	   heading='W';left=94;top=224;rotation=270;
+    	   heading='W';left=95;top=231;rotation=270;
     	   break;
        case (direction < 315):
-    	   heading='WNW';left=104;top=183;rotation=292.5;
+    	   heading='WNW';left=105;top=183;rotation=292.5;
     	   break;
        case (direction < 337.5):
-    	   heading='NW';left=137;top=141;rotation=315;
+    	   heading='NW';left=133;top=141;rotation=315;
     	   break;
        case (direction < 361):
-    	   heading='NNW';left=177;top=110;rotation=337.5;
+    	   heading='NNW';left=176;top=112;rotation=337.5;
     	   break;
        default:
            break;
@@ -133,6 +133,16 @@ app.get('/livewind', function (req, res) {
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
     res.render('livewind',{directionObj: directionObj,speed:speed})
+})
+app.get('/testpattern', function (req, res) {
+    res.locals.err = false;
+	var directionObj = []
+	var y = 0
+	for (var x = 1;x<360;x+=22.5){
+	    directionObj[y++] = makeCompassVector(x)
+	}
+	console.log(directionObj.length)
+    res.render('testpattern',{directionObj: directionObj})
 })
 
 
