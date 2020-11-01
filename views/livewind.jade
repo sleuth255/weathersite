@@ -1,5 +1,5 @@
 extends layout
-block content
+block append content
        if (directionObj[0].left > 0 && directionObj[0].top > 0)
          img.compasspointer(src='./images/compasspointer.png' style='left:#{directionObj[0].left}px;top:#{directionObj[0].top}px;transform: rotate(#{directionObj[0].rotation}deg); z-index: 5;')
        - x = 1
@@ -10,11 +10,11 @@ block content
        div
          table(cellspacing=0,cellpadding=0,style='width:500px; position: absolute; top: 500px; ')
            tr
-             td.bigblue(style='text-align: center;margin-left: 165px;')
+             td.big.fontcolor(style='text-align: center;margin-left: 165px;')
                 |WIND SPEED
            tr               
-             td.biggerblack(style='text-align: center;margin-left: 150px;')
+             td.bigger.fontcolor(style='text-align: center;margin-left: 150px;')
                 |#{speed} MPH #{directionObj[0].heading}         
            tr               
-             td.smallblack(style='text-align: center;margin-left: 150px;')
+             td.small.fontcolor(style='text-align: center;margin-left: 150px;')
                 |CURRENT

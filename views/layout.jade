@@ -5,5 +5,12 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
     script
       |if (!window.jQuery) document.write('<script src="/modules/jquery.min.js"><\/script>');
+      if(day)
+         |$('body').css('background', 'url("/images/sunnybackground.jpg") no-repeat bottom fixed');
+         |$('.fontcolor').css('color','#000000');
+      else
+         |$('body').css('background', 'url("/images/starrybackground.jpg") no-repeat bottom fixed');
+         |$('.fontcolor').css('color','#ffffff');
+      
   block content  
  

@@ -1,9 +1,7 @@
 
-table#conditionstable tr td {
-  border-left: 3px solid black;
-  color: black
+.fontcolor{
+	color: #000000;
 }
-
 .compass{
   display: block;
   margin-right: auto;
@@ -24,21 +22,32 @@ table#conditionstable tr td {
 } 
 .bigblue{
     font: 25px sans-serif; font-weight: bold;
-    color: #54a2c7;
     color: #000000;
 }
 .bigblack{
 	font: 25px sans-serif; font-weight: bold;
-	color: #19516b;
     color: #000000;
 }
 .biggerblack{
 	font: 35px sans-serif; font-weight: bold;
-	color: #19516b;
     color: #000000;
 }
 .smallblack{
 	font: 20px sans-serif; 
-	color: #19516b;
     color: #000000;
+}
+.big{
+    font: 25px sans-serif; font-weight: bold;
+}
+.bigger{
+	font: 35px sans-serif; font-weight: bold;
+}
+.small{
+	font: 20px sans-serif; 
+}
+.black{
+	color: #000000;
+}
+.white{
+	color: #ffffff;
 }
