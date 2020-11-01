@@ -1,3 +1,8 @@
+// settings you need to change
+var myLatitude = 42.9764;
+var myLongitude = -88.1084;
+var myWLLIp = '10.0.0.42';
+
 var express = require('express')
 , request = require('request')
 , routes = require('routes')
@@ -116,6 +121,13 @@ var daytime = 1;
 
 //process...
 app.get('/', function (req, res) {
+	var now = new Date();
+	var obj = suncalc.getTimes(now,myLatitude,myLongitude)
+	if ((now > obj.dusk && now > obj.dawn) || (now < obj.dawn && now < obj.dusk))
+		daytime = 0;
+	else
+		daytime = 1;
+
 	var directionObj = []
 	directionObj[0] = makeCompassVector(direction)
 	directionObj[1] = makeCompassVector(lastDirection);
@@ -189,7 +201,7 @@ server.on('message',function(msg,info){
 //Tell WLL to start send live data every 5 minutes and repeat request every 5 minutes
 
 console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
-http.get('http://10.0.0.42/v1/current_conditions',function(resp){
+http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 	data = '';
 	resp.on('data',function(chunk){
 		data+=chunk
@@ -216,7 +228,7 @@ http.get('http://10.0.0.42/v1/current_conditions',function(resp){
 			inBarometerTrend = 'Rising'
 		else
 			inBarometerTrend = 'Steady'
-		http.get('http://10.0.0.42/v1/real_time?duration=300',function(resp){
+		http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
 			data = '';
 			resp.on('data',function(chunk){
 				data+=chunk
@@ -232,7 +244,7 @@ http.get('http://10.0.0.42/v1/current_conditions',function(resp){
 setInterval(function(){
 	try{
 	   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
-	   http.get('http://10.0.0.42/v1/current_conditions',function(resp){
+	   http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 		   data = '';
 		   resp.on('data',function(chunk){
 			   data+=chunk
@@ -266,7 +278,7 @@ setInterval(function(){
 				   outTempTrend = 0;
 			   outTempLastReading = obj.data.conditions[0].temp;
 			   try{
-			      http.get('http://10.0.0.42/v1/real_time?duration=300',function(resp){
+			      http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
 				      data = '';
 				      resp.on('data',function(chunk){
 					      data+=chunk
@@ -287,7 +299,7 @@ setInterval(function(){
 
 setInterval(function(){
 	var now = new Date();
-	var obj = suncalc.getTimes(now,42.9764,-88.1084)
+	var obj = suncalc.getTimes(now,myLatitude,myLongitude)
 	if ((now > obj.dusk && now > obj.dawn) || (now < obj.dawn && now < obj.dusk))
 		daytime = 0;
 	else
