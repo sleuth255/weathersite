@@ -288,10 +288,11 @@ setInterval(function(){
 setInterval(function(){
 	var now = new Date();
 	var obj = suncalc.getTimes(now,42.9764,-88.1084)
-	if (now > obj.dusk && now < obj.dawn)
+	if ((now > obj.dusk && now > obj.dawn) || (now < obj.dawn && now < obj.dusk))
 		daytime = 0;
 	else
 		daytime = 1;
+	//console.log(obj.dusk+' '+now+obj.dawn)
 }, 600000); 
 
 
