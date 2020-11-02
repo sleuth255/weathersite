@@ -119,6 +119,8 @@ var isCloudy = 0;
 var sunrise;
 var sunset;
 var now = new Date();
+var moonsize = suncalc.getMoonIllumination(now);
+moonsize = Math.floor((moonsize.phase*100)/8)
 var daytime = suncalc.getTimes(now,myLatitude,myLongitude);
 sunrise = daytime.sunrise;
 sunset = daytime.sunset;
@@ -162,7 +164,7 @@ app.get('/testpattern', function (req, res) {
 	    directionObj[y++] = makeCompassVector(x)
 	}
 	console.log(directionObj.length)
-    res.render('testpattern',{sunrise: sunrise,sunset: sunset,directionObj: directionObj})
+    res.render('testpattern',{moonsize: moonsize,sunrise: sunrise,sunset: sunset,directionObj: directionObj})
 })
 
 
@@ -314,7 +316,8 @@ setInterval(function(){
 		daytime = 1;
 	sunrise = obj.sunrise;
 	sunset = obj.sunset;
-	//console.log(obj.dusk+' '+now+obj.dawn)
+	obj = suncalc.getMoonIllumination(now);
+	moonsize = Math.floor((obj.phase*100)/8)
 }, 600000); 
 
 

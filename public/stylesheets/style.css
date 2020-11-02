@@ -12,6 +12,20 @@
 	z-index: 2;
 	
 }
+.floatingmoontile{
+	height: 150px;
+	width: 150px;
+	border-radius: 20%;
+	background: white url("/images/full.png") no-repeat center 34px;
+	background-size: 55%;
+	position: absolute;
+	display: inline-block;
+	border: 3px solid black;
+	right: 20px;
+	top: 190px;
+	z-index: 2;
+	
+}
 .fontcolor{
 	color: #000000;
 }
