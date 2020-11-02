@@ -93,8 +93,6 @@ function makeCompassVector(direction){
 }
 /***************************************************************/
 // globals
-const white = '#ffffff'
-const black = '#000000'
 let cookie = {};
 var direction = 0;
 var lastDirection3 = lastDirection2 = lastDirection1 = lastDirection = 0;

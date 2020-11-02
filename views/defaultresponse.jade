@@ -10,6 +10,14 @@ block append content
        |  {
        |    setInterval("refreshWindBlock();",2500);
        |    setInterval("refreshConditionsBlock();",30000);
+       if(day)
+         |$('body').css('background', 'url("/images/sunnybackground.jpg") no-repeat bottom fixed');
+         |$('body').css('background-size', 'cover');
+         |$('.fontcolor').css('color','#000000');
+       else
+         |$('body').css('background', 'url("/images/starrybackground.jpg") no-repeat bottom fixed');
+         |$('body').css('background-size', 'cover');
+         |$('.fontcolor').css('color','#ffffff');
        |  }
        |  function refreshWindBlock()
        |  {
@@ -19,8 +27,6 @@ block append content
        |  {
        |     $('#conditions').load("./liveconditions");
        |  }
-       |$('body').css('background', 'url("/images/sunnybackground.jpg") no-repeat bottom fixed');
-       |$('.fontcolor').css('color','#000000');
      div#wind(style='display: block; height: 700px; background-image: url("/images/compassrose.png"); background-repeat: no-repeat;')
        if (directionObj[0].left > 0 && directionObj[0].top > 0)
          img.compasspointer(src='./images/compasspointer.png' style='left:#{directionObj[0].left}px;top:#{directionObj[0].top}px;transform: rotate(#{directionObj[0].rotation}deg);z-index: 5;')
