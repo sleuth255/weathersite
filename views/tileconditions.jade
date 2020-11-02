@@ -20,4 +20,25 @@ block append content
            td(style='text-align: center')
              span.smaller.fontcolor
                 |#{moment(sunset).format('h:mm a')}
-            
+       div.floatingmoontile(style='	background: white url("/images/moonphase#{moonsize}.png") no-repeat center 40px;background-size: 50%;')
+        table(cellspacing = 0,cellpadding=0, style='width: 150px')
+          tr
+           td(height=6)
+          tr
+           td(style='text-align: center')
+             span.smallerbold.fontcolor
+                |Moon Phase
+          tr
+           td(height=100)
+          tr
+           td(style='text-align: center')
+             span.smaller.fontcolor
+                if (moonsize == 6)
+                   |Full Moon
+                else if (moonsize == 0)
+                   |New Moon
+                else if (moonsize < 6)
+                   |Waxing Crescent
+                else
+                   |Waning Crescent
+                
