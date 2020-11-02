@@ -115,17 +115,15 @@ var inBarometerTrend;
 var rainStormStart = '';
 var rainStormAmt = 0;
 var rainStormRate = 0;
-var daytime = 1;
+var now = new Date();
+var daytime = suncalc.getTimes(now,myLatitude,myLongitude);
+if ((now > daytime.dusk && now > daytime.dawn) || (now < daytime.dawn && now < daytime.dusk))
+	daytime = 0;
+else
+	daytime = 1;
 
 //process...
 app.get('/', function (req, res) {
-	var now = new Date();
-	var obj = suncalc.getTimes(now,myLatitude,myLongitude)
-	if ((now > obj.dusk && now > obj.dawn) || (now < obj.dawn && now < obj.dusk))
-		daytime = 0;
-	else
-		daytime = 1;
-
 	var directionObj = []
 	directionObj[0] = makeCompassVector(direction)
 	directionObj[1] = makeCompassVector(lastDirection);
