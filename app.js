@@ -116,8 +116,12 @@ var rainStormStart = '';
 var rainStormAmt = 0;
 var rainStormRate = 0;
 var isCloudy = 0;
+var sunrise;
+var sunset;
 var now = new Date();
 var daytime = suncalc.getTimes(now,myLatitude,myLongitude);
+sunrise = daytime.sunrise;
+sunset = daytime.sunset;
 if ((now > daytime.dusk && now > daytime.dawn) || (now < daytime.dawn && now < daytime.dusk))
 	daytime = 0;
 else
@@ -132,10 +136,10 @@ app.get('/', function (req, res) {
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
 	
-    res.render('defaultresponse',{cloudy: isCloudy,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('defaultresponse',{sunrise: sunrise,sunset: sunset,cloudy: isCloudy,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/liveconditions', function (req, res) {
-    res.render('liveconditions',{cloudy: isCloudy,day: daytime,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('liveconditions',{sunrise: sunrise,sunset: sunset,cloudy: isCloudy,day: daytime,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/livewind', function (req, res) {
     res.locals.err = false;
@@ -145,7 +149,7 @@ app.get('/livewind', function (req, res) {
 	directionObj[2] = makeCompassVector(lastDirection1);
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
-    res.render('livewind',{cloudy: isCloudy,day: daytime,directionObj: directionObj,speed:speed})
+    res.render('livewind',{sunrise: sunrise,sunset: sunset,cloudy: isCloudy,day: daytime,directionObj: directionObj,speed:speed})
 })
 app.get('/testpattern', function (req, res) {
     res.locals.err = false;
@@ -155,7 +159,7 @@ app.get('/testpattern', function (req, res) {
 	    directionObj[y++] = makeCompassVector(x)
 	}
 	console.log(directionObj.length)
-    res.render('testpattern',{directionObj: directionObj})
+    res.render('testpattern',{sunrise: sunrise,sunset: sunset,directionObj: directionObj})
 })
 
 
@@ -305,6 +309,8 @@ setInterval(function(){
 		daytime = 0;
 	else
 		daytime = 1;
+	sunrise = obj.sunrise;
+	sunset = obj.sunset;
 	//console.log(obj.dusk+' '+now+obj.dawn)
 }, 600000); 
 

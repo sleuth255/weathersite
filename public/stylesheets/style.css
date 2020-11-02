@@ -1,20 +1,23 @@
-
+.floatingsuntile{
+	height: 150px;
+	width: 150px;
+	border-radius: 20%;
+	background: white url("/images/suntimelogo.png") no-repeat center 44px;
+	background-size: 65%;
+	position: absolute;
+	display: inline-block;
+	border: 3px solid black;
+	right: 20px;
+	top: 20px;
+	z-index: 2;
+	
+}
 .fontcolor{
 	color: #000000;
-}
-.compass{
-  display: block;
-  margin-right: auto;
-  width: 500px;
 }
 .compasspointer{
   position: absolute;
   display: inline-block;
-}
-.highlight{
-    font-weight: bold;
-    font-size: 45px;
-    color: #0087CC;
 }
 .vertical { 
     border-left: 3px solid black; 
@@ -45,9 +48,10 @@
 .small{
 	font: 20px sans-serif; 
 }
-.black{
-	color: #000000;
+.smaller{
+	font: 15px sans-serif; 
 }
-.white{
-	color: #ffffff;
+.smallerbold{
+	font: 15px sans-serif;
+	font-weight: bold; 
 }

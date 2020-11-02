@@ -99,3 +99,24 @@ block append content
                  |Rain Storm
           tr
             td(height=30)
+     div.floatingsuntile
+       table(cellspacing = 0,cellpadding=0, style='width: 150px')
+         tr
+          td(height=6)
+         tr
+          td(style='text-align: center')
+            span.smallerbold.fontcolor
+               |Sunrise/Sunset
+         tr
+          td(height=6)
+         tr
+          td(style='text-align: center')
+            span.smaller.fontcolor
+               |#{moment(sunrise).format('h:mm a')} 
+         tr
+          td(height=70)
+         tr
+          td(style='text-align: center')
+            span.smaller.fontcolor
+               |#{moment(sunset).format('h:mm a')}
+            
