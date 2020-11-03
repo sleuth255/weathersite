@@ -29,6 +29,9 @@
 .fontcolor{
 	color: #000000;
 }
+.fontcolorblack{
+	color: #000000;
+}
 .compasspointer{
   position: absolute;
   display: inline-block;
