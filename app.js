@@ -32,6 +32,24 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.logger('dev'));
 
 
+function makeMoonPhaseVector(phase){
+	if (phase == 0)
+		return 0;
+    if (phase ==.25)
+    	return 2;
+    if (phase == .5)
+    	return 4;
+    if (phase == .75)
+    	return 6;
+    if (phase < .25)
+    	return 1;
+    if (phase < .5)
+    	return 3;
+    if (phase < .75)
+    	return 5;
+    return 7;
+    	
+}
 function makeCompassVector(direction){
 	var left=top=rotation=0;
 	var heading='';
@@ -120,7 +138,7 @@ var sunrise;
 var sunset;
 var now = new Date();
 var moonsize = suncalc.getMoonIllumination(now);
-moonsize = Math.floor((moonsize.phase*100)/8)
+moonsize = makeMoonPhaseVector(moonsize.phase);
 var daytime = suncalc.getTimes(now,myLatitude,myLongitude);
 sunrise = daytime.sunrise;
 sunset = daytime.sunset;
@@ -163,8 +181,8 @@ app.get('/testpattern', function (req, res) {
 	for (var x = 1;x<360;x+=22.5){
 	    directionObj[y++] = makeCompassVector(x)
 	}
-	console.log(directionObj.length)
-    res.render('testpattern',{moonsize: moonsize,sunrise: sunrise,sunset: sunset,directionObj: directionObj})
+	console.log(moonsize)
+    res.render('testpattern',{cloudy: isCloudy,day: daytime,moonsize: moonsize,sunrise: sunrise,sunset: sunset,directionObj: directionObj})
 })
 
 
@@ -305,7 +323,7 @@ setInterval(function(){
 	catch(err){}
 }, 300000); 
 
-// periodically determine day/night
+// periodically determine day/night and moon phase
 
 setInterval(function(){
 	var now = new Date();
@@ -317,7 +335,7 @@ setInterval(function(){
 	sunrise = obj.sunrise;
 	sunset = obj.sunset;
 	obj = suncalc.getMoonIllumination(now);
-	moonsize = Math.floor((obj.phase*100)/8)
+	moonsize = makeMoonPhaseVector(obj.phase);
 }, 600000); 
 
 
