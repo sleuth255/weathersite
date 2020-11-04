@@ -278,6 +278,7 @@ setInterval(function(){
 			   data+=chunk
 		   })
 		   resp.on('end',function(){
+			   console.log('current conditions reply received')
 			   var obj = JSON.parse(data);
 			   avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
 			   avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
@@ -306,21 +307,22 @@ setInterval(function(){
 				   outTempTrend = 0;
 			   outTempLastReading = obj.data.conditions[0].temp;
 			   try{
+				  console.log('starting WLL UDP refresh request')
 			      http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
 				      data = '';
 				      resp.on('data',function(chunk){
 					      data+=chunk
 				      })
 				      resp.on('end',function(){
-					      //console.log(data.toString())
+					      console.log('UDP request processed')
 				      })
 			      })
 			   }
-			   catch(err){}
+			   catch(err){next(err)}
 		   })
 	   })
 	}
-	catch(err){}
+	catch(err){next(err)}
 }, 300000); 
 
 // periodically determine day/night and moon phase
