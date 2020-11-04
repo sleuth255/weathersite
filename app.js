@@ -266,11 +266,11 @@ http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 			})
 		})
 	})
+}).on('error',(err) =>{
+	   console.log("Current conditions initial request failure")
 })
 
-
 setInterval(function(){
-	try{
 	   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
 	   http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 		   data = '';
@@ -306,29 +306,22 @@ setInterval(function(){
 			   else
 				   outTempTrend = 0;
 			   outTempLastReading = obj.data.conditions[0].temp;
-			   try{
-				  console.log('starting WLL UDP refresh request')
-			      http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
-				      data = '';
-				      resp.on('data',function(chunk){
-					      data+=chunk
-				      })
-				      resp.on('end',function(){
-					      console.log('UDP request processed')
-				      })
-			      })
-			   }
-			   catch(err){
-				   console.log("caught error on UDP request")
-				   next(err)
-			   }
+			   console.log('starting WLL UDP refresh request')
+			   http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
+				   data = '';
+				   resp.on('data',function(chunk){
+				    data+=chunk
+				   })
+				   resp.on('end',function(){
+				    console.log('UDP request processed')
+				   })
+			   }).on('error',(err) =>{
+				   console.log("UDP request failure")
+			   })
 		   })
+	   }).on('error',(err) =>{
+		   console.log("Current conditions request failure")
 	   })
-	}
-	catch(err){
-		console.log("caught error on current conditions request");
-		next(err)
-	}
 }, 300000); 
 
 // periodically determine day/night and moon phase
