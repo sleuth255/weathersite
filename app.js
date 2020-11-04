@@ -318,11 +318,17 @@ setInterval(function(){
 				      })
 			      })
 			   }
-			   catch(err){next(err)}
+			   catch(err){
+				   console.log("caught error on UDP request")
+				   next(err)
+			   }
 		   })
 	   })
 	}
-	catch(err){next(err)}
+	catch(err){
+		console.log("caught error on current conditions request");
+		next(err)
+	}
 }, 300000); 
 
 // periodically determine day/night and moon phase
