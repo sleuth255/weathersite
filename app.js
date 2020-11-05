@@ -2,6 +2,7 @@
 var myLatitude = 42.9764;
 var myLongitude = -88.1084;
 var myWLLIp = '10.0.0.42';
+var myMetarStation = 'KMKE'
 
 var express = require('express')
 , request = require('request')
@@ -254,7 +255,7 @@ server.on('message',function(msg,info){
 // Get initial METAR observation
 
 metarObservation = ""; // Will store the contents of the file
-ftp.get("/data/observations/metar/stations/KMKE.TXT", (err, socket) => {
+ftp.get("/data/observations/metar/stations/"+myMetarStation+".TXT", (err, socket) => {
   if (err) {
     return;
   }
@@ -265,7 +266,7 @@ ftp.get("/data/observations/metar/stations/KMKE.TXT", (err, socket) => {
 
   socket.on("close", err => {
     if (err) {
-      console.error("There was an error retrieving the file.");
+      console.error("Metar Observation retrieval error.");
     }
     //console.log(metarObservation)
   });
@@ -322,7 +323,7 @@ http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 setInterval(function(){
 	   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
        metarObservation = ""; // Will store the contents of the file
-       ftp.get("/data/observations/metar/stations/KMKE.TXT", (err, socket) => {
+       ftp.get("/data/observations/metar/stations/"+myMetarStation+".TXT", (err, socket) => {
          if (err) {
            return;
          }
