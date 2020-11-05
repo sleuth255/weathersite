@@ -264,6 +264,8 @@ http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 			resp.on('end',function(){
 				//console.log(data.toString())
 			})
+		}).on('error',(err) =>{
+			   console.log("UDP broadcast initial request failure")
 		})
 	})
 }).on('error',(err) =>{
