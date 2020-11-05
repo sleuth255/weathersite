@@ -122,7 +122,7 @@ var avgDirection = 0
 var inTemp = 0;
 var inHum = 0;
 var outTemp = 0;
-var outTempLastReading = 0;
+var outTempLastReading = null;
 var outHum = 0;
 var outDewPt = 0;
 var outWindChill = 0;
@@ -241,7 +241,7 @@ http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 		avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
 		inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
 		inHum = Math.round(obj.data.conditions[obj.data.conditions.length-2].hum_in);
-		outTemp = Math.round(obj.data.conditions[0].temp);
+		outTempLastReading = outTemp = Math.round(obj.data.conditions[0].temp);
 		outTempLastReading = obj.data.conditions[0].temp;
 		outHum = Math.round(obj.data.conditions[0].hum);
 		outDewPt = Math.round(obj.data.conditions[0].dew_point);
@@ -298,14 +298,18 @@ setInterval(function(){
 					inBarometerTrend = 'Rising'
 				else
 					inBarometerTrend = 'Steady'
+
+			   if (outTempLastReading == null)
+				   outTempLastReading == obj.data.conditions[0].temp;
 			   if (obj.data.conditions[0].temp > outTempLastReading)
-					   outTempTrend = 1;
+				   outTempTrend = 1;
 			   else
 			   if (obj.data.conditions[0].temp < outTempLastReading)
 				   outTempTrend = -1;
 			   else
 				   outTempTrend = 0;
 			   outTempLastReading = obj.data.conditions[0].temp;
+
 			   console.log('starting WLL UDP refresh request')
 			   http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
 				   data = '';
