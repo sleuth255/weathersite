@@ -1,10 +1,10 @@
 extends layout
 block append content
    body()
-     - day = 0
+     - day = 1
      - cloudy = 0
      -skyconditions = 8
-     -moonsize = 8
+     -moonsize = 4
      script(type='text/javascript')
        |  window.onload = setupRefresh;
        |  function setupRefresh()
@@ -84,7 +84,7 @@ block append content
                 else
                    |New Moon
        if (skyconditions < 5)
-          div.floatingweathertile(style='background: url("/images/DayIcons/skyconditions#{skyconditions}.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #aecae7;')
+          div.floatingweathertile(style='background: url("/images/DayIcons/skyconditions#{skyconditions}.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #ffffff;')
            table(cellspacing = 0,cellpadding=0, style='width: 150px')
              tr
               td(height=6)
