@@ -4,6 +4,7 @@ block append content
      - day = 0
      - cloudy = 0
      -skyconditions = 8
+     -moonsize = 8
      script(type='text/javascript')
        |  window.onload = setupRefresh;
        |  function setupRefresh()
@@ -78,8 +79,10 @@ block append content
                    |Waning Gibbous
                 else if (moonsize == 6)
                    |Third Quarter
-                else
+                else if (moonsize == 7)
                    |Waning Crescent
+                else
+                   |New Moon
        if (skyconditions < 5)
           div.floatingweathertile(style='background: url("/images/DayIcons/skyconditions#{skyconditions}.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #aecae7;')
            table(cellspacing = 0,cellpadding=0, style='width: 150px')
