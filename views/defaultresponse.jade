@@ -203,4 +203,47 @@ block append content
                    |Third Quarter
                 else
                    |Waning Crescent
-                
+       if (skyconditions < 5)
+          div.floatingweathertile(style='background: url("/images/DayIcons/skyconditions#{skyconditions}.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #aecae7;')
+           table(cellspacing = 0,cellpadding=0, style='width: 150px')
+             tr
+              td(height=6)
+             tr
+              td(style='text-align: center')
+                span.smallerbold.fontcolorblack
+                   |Current Weather
+             tr
+              td(height=100)
+             tr
+              td(style='text-align: center')
+                span.smaller.fontcolorblack
+                   if (skyconditions == 1)
+                      |Clear
+                   else if (skyconditions == 2)
+                      |Mostly Clear
+                   else if (skyconditions == 3)
+                      |Partly Cloudy
+                   else if (skyconditions == 4)
+                      |Mostly Cloudy
+       else
+          div.floatingweathertile(style='background: url("/images/DayIcons/skyconditions#{skyconditions}.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #b3b3b3;')
+           table(cellspacing = 0,cellpadding=0, style='width: 150px')
+             tr
+              td(height=6)
+             tr
+              td(style='text-align: center')
+                span.smallerbold.fontcolorblack
+                   |Current Weather
+             tr
+              td(height=100)
+             tr
+              td(style='text-align: center')
+                span.smaller.fontcolorblack
+                   if (skyconditions == 5)
+                      |Overcast
+                   else if (skyconditions == 6)
+                      |Raining
+                   else if (skyconditions == 7)
+                      |Snowing
+                   else if (skyconditions == 8)
+                      |Thunder Storms

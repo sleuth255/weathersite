@@ -12,9 +12,13 @@ var express = require('express')
 , udp = require('dgram')
 , buffer = require('buffer')
 , suncalc = require('suncalc')
+, jsftp = require("jsftp")
 , path = require('path');
 
 var app = express();
+const ftp = new jsftp({
+	host: "tgftp.nws.noaa.gov"
+});
 var server = udp.createSocket('udp4'); 
 server.bind(22222);
 app.locals.moment = require('moment');
@@ -32,6 +36,26 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.logger('dev'));
 
 
+function makeSkyConditionsVector(){
+	var skyconditions = 1;;
+	if (metarObservation.indexOf("CLR") != -1)
+		skyconditions = 1;
+	if (metarObservation.indexOf("FEW") != -1)
+		skyconditions = 2;
+	if (metarObservation.indexOf("SCT") != -1)
+		skyconditions = 3;
+	if (metarObservation.indexOf("BKN") != -1)
+		skyconditions = 4;
+	if (metarObservation.indexOf("OVC") != -1)
+		skyconditions = 5;
+    if (rainStormStart.length > 0)
+		skyconditions = 6;
+	if (metarObservation.indexOf("SN") != -1)
+		skyconditions = 7;
+	if (metarObservation.indexOf("LTG") != -1)
+		skyconditions = 8;
+	return skyconditions
+}
 function makeMoonPhaseVector(phase){
 	if (phase == 0)
 		return 0;
@@ -112,6 +136,7 @@ function makeCompassVector(direction){
 /***************************************************************/
 // globals
 let cookie = {};
+var metarObservation = ""
 var direction = 0;
 var lastDirection3 = lastDirection2 = lastDirection1 = lastDirection = 0;
 var speed = 0;
@@ -156,13 +181,13 @@ app.get('/', function (req, res) {
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
 	
-    res.render('defaultresponse',{moonsize: moonsize,sunrise: sunrise,sunset: sunset,cloudy: isCloudy,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('defaultresponse',{skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,cloudy: isCloudy,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/liveconditions', function (req, res) {
     res.render('liveconditions',{cloudy: isCloudy,day: daytime,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/tileconditions', function (req, res) {
-    res.render('tileconditions',{moonsize: moonsize,sunrise: sunrise,sunset: sunset,cloudy: isCloudy,day: daytime})
+    res.render('tileconditions',{skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,cloudy: isCloudy,day: daytime})
 })
 app.get('/livewind', function (req, res) {
     res.locals.err = false;
@@ -226,6 +251,28 @@ server.on('message',function(msg,info){
 });
 
 
+// Get initial METAR observation
+
+metarObservation = ""; // Will store the contents of the file
+ftp.get("/data/observations/metar/stations/KMKE.TXT", (err, socket) => {
+  if (err) {
+    return;
+  }
+
+  socket.on("data", d => {
+    metarObservation += d.toString();
+  });
+
+  socket.on("close", err => {
+    if (err) {
+      console.error("There was an error retrieving the file.");
+    }
+    //console.log(metarObservation)
+  });
+
+  socket.resume();
+});
+
 //Tell WLL to start send live data every 5 minutes and repeat request every 5 minutes
 
 console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
@@ -274,6 +321,24 @@ http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 
 setInterval(function(){
 	   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
+       metarObservation = ""; // Will store the contents of the file
+       ftp.get("/data/observations/metar/stations/KMKE.TXT", (err, socket) => {
+         if (err) {
+           return;
+         }
+
+         socket.on("data", d => {
+           metarObservation += d.toString();
+         });
+
+         socket.on("close", err => {
+           if (err) {
+             console.error("METAR data retrieval error");
+           }
+           //console.log(metarObservation)
+         });
+         socket.resume();
+       });
 	   http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 		   data = '';
 		   resp.on('data',function(chunk){

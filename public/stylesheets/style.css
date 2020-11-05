@@ -12,6 +12,21 @@
 	z-index: 2;
 	
 }
+.floatingweathertile{
+	height: 150px;
+	width: 150px;
+	border-radius: 20%;
+	background: url("/images/DayIcons/skyconditions1.png") no-repeat center 44px;
+	background-size: 65%;
+	background-color: #7292c5;
+	position: absolute;
+	display: inline-block;
+	border: 3px solid black;
+	right: 20px;
+	top: 190px;
+	z-index: 2;
+	
+}
 .floatingmoontile{
 	height: 150px;
 	width: 150px;
@@ -22,7 +37,7 @@
 	display: inline-block;
 	border: 3px solid white;
 	right: 20px;
-	top: 190px;
+	top: 360px;
 	z-index: 2;
 	
 }
