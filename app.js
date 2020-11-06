@@ -255,6 +255,7 @@ server.on('message',function(msg,info){
 // Get initial METAR observation
 
 metarObservation = ""; // Will store the contents of the file
+try{
 ftp.get("/data/observations/metar/stations/"+myMetarStation+".TXT", (err, socket) => {
   if (err) {
     return;
@@ -273,6 +274,11 @@ ftp.get("/data/observations/metar/stations/"+myMetarStation+".TXT", (err, socket
 
   socket.resume();
 });
+}
+catch(err){
+    console.log('Caught Metar Observation error')
+	next(err);
+}
 
 //Tell WLL to start send live data every 5 minutes and repeat request every 5 minutes
 
@@ -323,6 +329,7 @@ http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 setInterval(function(){
 	   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
        metarObservation = ""; // Will store the contents of the file
+	   try{
        ftp.get("/data/observations/metar/stations/"+myMetarStation+".TXT", (err, socket) => {
          if (err) {
            return;
@@ -340,6 +347,12 @@ setInterval(function(){
          });
          socket.resume();
        });
+	   }
+	   catch(err){
+		   console.log('Caught Metar Observation error')
+		   next(err)
+	   }
+
 	   http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 		   data = '';
 		   resp.on('data',function(chunk){
