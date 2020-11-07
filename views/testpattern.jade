@@ -2,8 +2,9 @@ extends layout
 block append content
    body()
      - day = 1
-     - cloudy = 0
-     -skyconditions = 8
+     -rainStormRate = .1
+     -rainStormStart = ''
+     -skyconditions = 3
      -moonsize = 4
      script(type='text/javascript')
        |  window.onload = setupRefresh;
@@ -12,7 +13,7 @@ block append content
        |    setInterval("refreshWindBlock();",2500);
        |    setInterval("refreshConditionsBlock();",30000);
        |    setInterval("refreshTiles();",30000);
-       if(cloudy)
+       if(skyconditions > 4 && day)
           |$('body').css('background', 'url("/images/cloudybackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#ffffff');
@@ -31,6 +32,103 @@ block append content
        while x < directionObj.length
           img.compasspointer(src='./images/compasspointer.png' style='left:#{directionObj[x].left}px;top:#{directionObj[x].top}px;transform: rotate(#{directionObj[x].rotation}deg); z-index: 1;')
           - x++   
+     div#conditions(style='position: absolute;left: 530px;top: 0px;width: 400px')
+        table(cellpadding=0,cellspacing=0,style='position: absolute;left: 0px;top: #{offset}px;')
+          tr
+            td.big.fontcolor(height=26)
+               |WIND GUST:
+            td.big.fontcolor(height=26)
+               | #{gustSpeed} MPH #{gustDirection}
+          tr
+            td.big.fontcolor(height=26)
+               |WIND SPEED:<span style='display: inline-block; width: 23px'></span>
+            td.big.fontcolor(height=26)
+               | #{avgSpeed} MPH #{avgDirection}
+          tr
+            td.small.fontcolor(colspan=2,style='text-align: center;')
+               |10 minute average
+          tr
+            td(height=30)
+          tr
+            td.big.fontcolor(height=26)
+              |INSIDE:
+            td
+              table(cellspacing=0,cellpadding=0)
+                tr
+                  td.big.fontcolor
+                    | #{inTemp}&deg<span style='font-size: 18px'>F</span>
+                  td
+                    |<span style='display: inline-block; width: 20px'></span>
+                  td.big.fontcolor
+                    | #{inHum}<span style='font-size: 18px'>%</span>   
+          tr
+            td.big.fontcolor(height=26)
+              |OUTSIDE:
+            td
+              table(cellspacing=0,cellpadding=0)
+                tr
+                  td.big.fontcolor
+                    if (outTempTrend == 0)
+                      | #{outTemp}&deg<span style='font-size: 18px'>F</span>
+                    else if (outTempTrend) > 0
+                      | #{outTemp}&deg<img src='images/warming-sm.png'>
+                    else
+                      | #{outTemp}&deg<img src='images/cooling-sm.png'>
+                  td
+                    |<span style='display: inline-block; width: 20px'></span>
+                  td.big.fontcolor
+                    | #{outHum}<span style='font-size: 18px'>%</span>   
+          tr
+            td.small.fontcolor(colspan=2,style='text-align: center;')
+               |Temperature, Humidity
+          tr
+            td(height=30)
+          tr
+            td.big.fontcolor(height=26)
+              |DEWPOINT:
+            td.big.fontcolor
+              | #{outDewPt}&deg  
+          tr
+            td.big.fontcolor(height=26)
+              |WIND CHILL:
+            td.big.fontcolor
+              | #{outWindChill}&deg   
+          tr
+            td.big.fontcolor(height=26)
+              |HEAT INDEX:
+            td.big.fontcolor
+              | #{outHeatIdx}&deg   
+          tr
+            td.big.fontcolor(height=26)
+              |BAROMETER:
+            td.big.fontcolor
+              | #{inBarometer}" <span style='font-size: 18px'> (#{inBarometerTrend})</span> 
+          tr
+            td.small.fontcolor(colspan=2,style='text-align: center;')
+               |Current Conditions
+          tr
+            td(height=30)
+          if (rainStormStart.length > 0)
+             tr
+               td.big.fontcolor(height=26)
+                 |START:
+               td.big.fontcolor
+                 | #{rainStormStart}  
+             tr
+               td.big.fontcolor(height=26)
+                 |RATE:
+               td.big.fontcolor
+                 | #{rainStormRate}"<span style='font-size: 18px'>/hr</span>  
+             tr
+               td.big.fontcolor(height=26)
+                 |TOTAL:
+               td.big.fontcolor
+                 | #{rainStormAmt}"   
+             tr
+               td.small.fontcolor(colspan=2,style='text-align: center;')
+                 |Rain Storm
+          tr
+            td(height=30)
      div#floatingtiles
        div.floatingsuntile
         table(cellspacing = 0,cellpadding=0, style='width: 150px')

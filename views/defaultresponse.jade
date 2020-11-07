@@ -11,7 +11,7 @@ block append content
        |    setInterval("refreshWindBlock();",2500);
        |    setInterval("refreshConditionsBlock();",30000);
        |    setInterval("refreshTiles();",30000);
-       if(cloudy)
+       if(skyconditions > 4 && day)
           |$('body').css('background', 'url("/images/cloudybackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#ffffff');
