@@ -60,11 +60,11 @@ function makeSkyConditionsVector(){
 function makeMoonPhaseVector(phase){
 	if (phase == 0)
 		return 0;
-    if (phase > .24 && phase < .26)
+    if (phase > .23 && phase < .27)
     	return 2;
-    if (phase > .49 && phase < .51)
+    if (phase > .48 && phase < .52)
     	return 4;
-    if (phase > .74 && phase < .76)
+    if (phase > .73 && phase < .77)
     	return 6;
     if (phase < .25)
     	return 1;
