@@ -60,11 +60,11 @@ function makeSkyConditionsVector(){
 function makeMoonPhaseVector(phase){
 	if (phase == 0)
 		return 0;
-    if (phase ==.25)
+    if (phase > .24 && phase < .26)
     	return 2;
-    if (phase == .5)
+    if (phase > .49 && phase < .51)
     	return 4;
-    if (phase == .75)
+    if (phase > .74 && phase < .76)
     	return 6;
     if (phase < .25)
     	return 1;
@@ -422,6 +422,7 @@ setInterval(function(){
 }, 600000); 
 
 
+console.log("Current Moon phase fraction is "+suncalc.getMoonIllumination(now).phase)
 //Start up server
 
 http.createServer(app).listen(app.get('port'), function(){
