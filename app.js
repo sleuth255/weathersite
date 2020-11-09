@@ -279,7 +279,7 @@ catch(err){
 //Tell WLL to start send live data every 5 minutes and repeat request every 5 minutes
 
 console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
-http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
+var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 	data = '';
 	resp.on('data',function(chunk){
 		data+=chunk
@@ -306,12 +306,14 @@ http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 			inBarometerTrend = 'Rising'
 		else
 			inBarometerTrend = 'Steady'
-		http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
+		req1.end();
+		var req2 = http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
 			data = '';
 			resp.on('data',function(chunk){
 				data+=chunk
 			})
 			resp.on('end',function(){
+				req2.end();
 				//console.log(data.toString())
 			})
 		}).on('error',(err) =>{
@@ -348,7 +350,7 @@ setInterval(function(){
 		   console.log('Caught Metar Observation error')
 	   }
 
-	   http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
+	   var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 		   data = '';
 		   resp.on('data',function(chunk){
 			   data+=chunk
@@ -387,13 +389,15 @@ setInterval(function(){
 			   outTempLastReading = obj.data.conditions[0].temp;
 
 			   console.log('starting WLL UDP refresh request')
-			   http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
+			   req1.end();
+			   var req2 = http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
 				   data = '';
 				   resp.on('data',function(chunk){
 				    data+=chunk
 				   })
 				   resp.on('end',function(){
 				    console.log('UDP request processed')
+				    req2.end();
 				   })
 			   }).on('error',(err) =>{
 				   console.log("UDP request failure")
@@ -402,7 +406,6 @@ setInterval(function(){
 	   }).on('error',(err) =>{
 		   console.log("Current conditions request failure")
 	   })
-	   console.log("Observation session ended")
 }, 300000); 
 
 // periodically determine day/night and moon phase
