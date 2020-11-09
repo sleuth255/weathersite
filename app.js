@@ -318,10 +318,12 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 			})
 		}).on('error',(err) =>{
 			   console.log("UDP broadcast initial request failure")
+			   req2.end();
 		})
 	})
 }).on('error',(err) =>{
 	   console.log("Current conditions initial request failure")
+	   req1.end();
 })
 
 setInterval(function(){
@@ -401,10 +403,12 @@ setInterval(function(){
 				   })
 			   }).on('error',(err) =>{
 				   console.log("UDP request failure")
+				   req2.end();
 			   })
 		   })
 	   }).on('error',(err) =>{
 		   console.log("Current conditions request failure")
+		   req1.end();
 	   })
 }, 300000); 
 
