@@ -307,12 +307,14 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 		else
 			inBarometerTrend = 'Steady'
 		req1.end();
+		console.log('UDP broadcast request begins')
 		var req2 = http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
 			data = '';
 			resp.on('data',function(chunk){
 				data+=chunk
 			})
 			resp.on('end',function(){
+				console.log('UDP Broadcast request accepted')
 				req2.end();
 				//console.log(data.toString())
 			})
