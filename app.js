@@ -38,7 +38,7 @@ app.use(express.logger('dev'));
 
 
 function makeSkyConditionsVector(){
-	var skyconditions = 1;;
+	var skyconditions = 1;
 	if (metarObservation.indexOf("CLR") != -1)
 		skyconditions = 1;
 	if (metarObservation.indexOf("FEW") != -1)
@@ -137,7 +137,7 @@ function makeCompassVector(direction){
 /***************************************************************/
 // globals
 let cookie = {};
-var metarObservation = ""
+var metarObservation = "";
 var direction = 0;
 var lastDirection3 = lastDirection2 = lastDirection1 = lastDirection = 0;
 var speed = 0;
@@ -251,22 +251,25 @@ server.on('message',function(msg,info){
 
 // Get initial METAR observation
 
-metarObservation = ""; // Will store the contents of the file
+var Observation = ""; // Will store the contents of the file
 try{
+console.log('Retrieving METAR observation');
 ftp.get("/data/observations/metar/stations/"+myMetarStation+".TXT", (err, socket) => {
   if (err) {
     return;
   }
 
   socket.on("data", d => {
-    metarObservation += d.toString();
+    Observation += d.toString();
   });
 
   socket.on("close", err => {
     if (err) {
       console.error("Metar Observation retrieval error.");
+      return
     }
-    //console.log(metarObservation)
+    metarObservation = Observation;
+    console.log("METAR observation retrieved");
   });
 
   socket.resume();
@@ -330,22 +333,25 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 
 setInterval(function(){
 	   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
-       metarObservation = ""; // Will store the contents of the file
+       var Observation = ""; // Will store the contents of the file
 	   try{
+	   console.log('Retrieving METAR observation');
        ftp.get("/data/observations/metar/stations/"+myMetarStation+".TXT", (err, socket) => {
          if (err) {
            return;
          }
 
          socket.on("data", d => {
-           metarObservation += d.toString();
+           Observation += d.toString();
          });
 
          socket.on("close", err => {
            if (err) {
              console.error("METAR data retrieval error");
+             return;
            }
-           //console.log(metarObservation)
+           metarObservation = Observation;
+           console.log("METAR observation retrieved");
          });
          socket.resume();
        });
