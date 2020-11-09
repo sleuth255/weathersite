@@ -58,7 +58,7 @@ function makeSkyConditionsVector(){
 	return skyconditions
 }
 function makeMoonPhaseVector(phase){
-	if (phase == 0)
+	if (phase > .97 || phase < .03)
 		return 0;
     if (phase > .22 && phase < .28)
     	return 2;
@@ -346,7 +346,6 @@ setInterval(function(){
 	   }
 	   catch(err){
 		   console.log('Caught Metar Observation error')
-		   next(err)
 	   }
 
 	   http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
@@ -403,6 +402,7 @@ setInterval(function(){
 	   }).on('error',(err) =>{
 		   console.log("Current conditions request failure")
 	   })
+	   console.log("Observation session ended")
 }, 300000); 
 
 // periodically determine day/night and moon phase
