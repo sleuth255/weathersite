@@ -274,7 +274,6 @@ ftp.get("/data/observations/metar/stations/"+myMetarStation+".TXT", (err, socket
 }
 catch(err){
     console.log('Caught Metar Observation error')
-	next(err);
 }
 
 //Tell WLL to start send live data every 5 minutes and repeat request every 5 minutes
