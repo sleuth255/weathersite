@@ -5,11 +5,11 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
     script
       |if (!window.jQuery) document.write('<script src="/modules/jquery.min.js"><\/script>');
-      if(skyconditions > 4 && day)
+      if((skyconditions > 4 && day) || (day && rainStormRate > 0))
          |$('body').css('background', 'url("/images/cloudybackground.jpg") no-repeat bottom fixed');
          |$('body').css('background-size', 'cover');
          |$('.fontcolor').css('color','#ffffff');
-       else if(skyconditions > 4 && !day)
+       else if((skyconditions > 4 && !day) || (!day && rainStormRate > 0))
           |$('body').css('background', 'url("/images/cloudynightbackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#ffffff');

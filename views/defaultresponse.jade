@@ -11,11 +11,11 @@ block append content
        |    setInterval("refreshWindBlock();",2500);
        |    setInterval("refreshConditionsBlock();",30000);
        |    setInterval("refreshTiles();",30000);
-       if(skyconditions > 4 && day)
+       if((skyconditions > 4 && day) || (day && rainStormRate > 0))
           |$('body').css('background', 'url("/images/cloudybackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#ffffff');
-       else if(skyconditions > 4 && !day)
+       else if((skyconditions > 4 && !day) || (!day && rainStormRate > 0))
           |$('body').css('background', 'url("/images/cloudynightbackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#ffffff');
