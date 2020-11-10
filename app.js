@@ -25,8 +25,9 @@ ftp.keepAlive();
 ftp.on('error', function(err){
 	console.log('Ftp error caught')
 })
-process.on('unaughtException', function(err){
-	Console.error('uncaught exception: node NOT exiting...')
+process.on('uncaughtException', function(err){
+	console.error(err.stack);
+	console.log('uncaught exception: node NOT exiting...');
 })
 
 var server = udp.createSocket('udp4'); 
