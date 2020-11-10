@@ -2,7 +2,8 @@
 var myLatitude = 42.9764;
 var myLongitude = -88.1084;
 var myWLLIp = '10.0.0.42';
-var myMetarStation = 'KMKE'
+var myMetarFtpSite = "tgftp.nws.noaa.gov";
+var myMetarFilePath = "/data/observations/metar/stations/KMKE.TXT";
 
 var express = require('express')
 , request = require('request')
@@ -18,8 +19,10 @@ var express = require('express')
 
 var app = express();
 const ftp = new jsftp({
-	host: "tgftp.nws.noaa.gov"
+	host: myMetarFtpSite
 });
+ftp.keepAlive();
+
 var server = udp.createSocket('udp4'); 
 server.bind(22222);
 app.locals.moment = require('moment');
@@ -258,7 +261,7 @@ server.on('message',function(msg,info){
 var Observation = ""; // Will store the contents of the file
 try{
 console.log('Retrieving METAR observation');
-ftp.get("/data/observations/metar/stations/"+myMetarStation+".TXT", (err, socket) => {
+ftp.get(myMetarFilePath, (err, socket) => {
   if (err) {
     return;
   }
@@ -345,7 +348,7 @@ setInterval(function(){
        var Observation = ""; // Will store the contents of the file
 	   try{
 	   console.log('Retrieving METAR observation');
-       ftp.get("/data/observations/metar/stations/"+myMetarStation+".TXT", (err, socket) => {
+       ftp.get(myMetarFilePath, (err, socket) => {
          if (err) {
            return;
          }
