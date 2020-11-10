@@ -57,20 +57,25 @@ function makeSkyConditionsVector(){
 		skyconditions = 8;
 	return skyconditions
 }
-function makeMoonPhaseVector(phase){
-	if (phase > .97 || phase < .03)
+function makeMoonPhaseVector(){
+	var daystart = new Date(app.locals.moment(new Date()).format('MMMM DD,YYYY 00:00:00'));
+	var dayend = new Date(daystart)
+	dayend.setDate(daystart.getDate()+1)
+    var dayStartPhase = suncalc.getMoonTimes(daystart).phase
+    var dayEndPhase = suncalc.getMoonTimes(dayend).phase
+	if (dayEndPhase < dayStartPhase)
 		return 0;
-    if (phase > .22 && phase < .28)
+    if (dayStartPhase < .25 && dayEndPhase > .25)
     	return 2;
-    if (phase > .47 && phase < .53)
+    if (dayStartPhase < .5 && dayEndphase > .5)
     	return 4;
-    if (phase > .72 && phase < .78)
+    if (dayStartPhase < .75 && dayEndPhase > .75)
     	return 6;
-    if (phase < .25)
+    if (dayStartPhase < .25)
     	return 1;
-    if (phase < .5)
+    if (dayStartPhase < .5)
     	return 3;
-    if (phase < .75)
+    if (dayStartPhase < .75)
     	return 5;
     return 7;
     	
@@ -162,8 +167,7 @@ var rainStormRate = 0;
 var sunrise;
 var sunset;
 var now = new Date();
-var moonsize = suncalc.getMoonIllumination(now);
-moonsize = makeMoonPhaseVector(moonsize.phase);
+var moonsize = makeMoonPhaseVector();
 var daytime = suncalc.getTimes(now,myLatitude,myLongitude);
 sunrise = daytime.sunrise;
 sunset = daytime.sunset;
@@ -279,7 +283,8 @@ catch(err){
     console.log('Caught Metar Observation error')
 }
 
-//Tell WLL to start send live data every 5 minutes and repeat request every 5 minutes
+//Get initial conditions from WLL.
+//Also tell WLL to start broadcasting live UDP Wind/Rainfall data every 5 minutes
 
 console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
 var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
@@ -330,6 +335,10 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 	   console.log("Current conditions initial request failure")
 	   req1.end();
 })
+
+// Primary 5 minute weather conditions refresh code block follows
+// get METAR Observation from NOAA FTP site and local conditions from WLL  
+// Tell WLL server to continue to send UDP packets
 
 setInterval(function(){
 	   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
@@ -431,13 +440,11 @@ setInterval(function(){
 		daytime = 1;
 	sunrise = obj.sunrise;
 	sunset = obj.sunset;
-	obj = suncalc.getMoonIllumination(now);
-	moonsize = makeMoonPhaseVector(obj.phase);
+	moonsize = makeMoonPhaseVector();
 }, 600000); 
 
-
 console.log("Current Moon phase fraction is "+suncalc.getMoonIllumination(now).phase)
-//Start up server
+//Start up  Web server
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
