@@ -22,6 +22,9 @@ const ftp = new jsftp({
 	host: myMetarFtpSite
 });
 ftp.keepAlive();
+ftp.on('error', function(err){
+	console.log('Ftp error caught')
+})
 
 var server = udp.createSocket('udp4'); 
 server.bind(22222);
