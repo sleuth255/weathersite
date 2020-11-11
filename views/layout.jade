@@ -3,6 +3,7 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='prefetch',href='#{zoominradarimage}')
     script
       |if (!window.jQuery) document.write('<script src="/modules/jquery.min.js"><\/script>');
       if((skyconditions > 4 && day) || (day && rainStormRate > 0))
