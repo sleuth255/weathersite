@@ -44,11 +44,23 @@ block append content
        |  function conditions(){
        |     window.location = getURL()+"/";
        |  }
+       |  function uparrowclicked(){
+       |     $(".uparrow").attr('src','/images/UpArrowTransparentRed.png');
+       |     $(".downarrow").attr('src','/images/DownArrowTransparentGreen.png');
+       |     $(".radartile").css('background-image', 'url("#{zoominradarimage}")')
+       |  }
+       |  function downarrowclicked(){
+       |     $(".uparrow").attr('src','/images/UpArrowTransparentGreen.png');
+       |     $(".downarrow").attr('src','/images/DownArrowTransparentRed.png');
+       |     $(".radartile").css('background-image', 'url("#{zoomoutradarimage}")')
+       |  }
      div#radarblock(style='display: block; height: 700px;')
         table(cellspacing=0,cellpadding=0,style='width: 90%')
           tr
             td(width="50%",height=550)
              div.radartile(style='display: block; left: 20px; top: 20px; background-image: url("#{zoominradarimage}");')
+             img.uparrow(src='/images/UpArrowTransparentRed.png', onclick='uparrowclicked()')
+             img.downarrow(src='/images/DownArrowTransparentGreen.png', onclick='downarrowclicked()')
             td(width="50%",style='text-align: center')
              img(src='/images/weathersitelogo.png')
      div#floatingtiles
