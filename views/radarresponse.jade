@@ -1,6 +1,9 @@
 extends layout
 block append content
    body()
+     - rainStormRate = 0
+     - skyconditions = 1
+     - day = 1
      script(type='text/javascript')
        |  window.onload = setupRefresh;
        |  function setupRefresh()
@@ -46,3 +49,101 @@ block append content
        |  }
      div#radarblock
         span.radartile(style='display: block; left: 20px; top: 20px; background-image: url("#{zoominradarimage}");')
+     div#floatingtiles
+       div.floatingsuntile
+        table(cellspacing = 0,cellpadding=0, style='width: 150px')
+          tr
+           td(height=6)
+          tr
+           td(style='text-align: center')
+             span.smallerbold.fontcolorblack
+                |Sunrise/Sunset
+          tr
+           td(height=6)
+          tr
+           td(style='text-align: center')
+             span.smaller.fontcolorblack
+                |#{moment(sunrise).format('h:mm a')} 
+          tr
+           td(height=70)
+          tr
+           td(style='text-align: center')
+             span.smaller.fontcolorblack
+                |#{moment(sunset).format('h:mm a')}
+       div.floatingmoontile(style='	background: black url("/images/moon#{moonsize}.gif") no-repeat center 40px;background-size: 50%;')
+        table(cellspacing = 0,cellpadding=0, style='width: 150px')
+          tr
+           td(height=6)
+          tr
+           td(style='text-align: center')
+             span.smallerbold.fontcolorwhite
+                |Moon Phase
+          tr
+           td(height=100)
+          tr
+           td(style='text-align: center')
+             span.smaller.fontcolorwhite
+                if (moonsize == 0)
+                   |New Moon
+                else if (moonsize == 1)
+                   |Waxing Crescent
+                else if (moonsize == 2)
+                   |First Quarter
+                else if (moonsize == 3)
+                   |Waxing Gibbous
+                else if (moonsize == 4)
+                   |Full Moon
+                else if (moonsize == 5)
+                   |Waning Gibbous
+                else if (moonsize == 6)
+                   |Third Quarter
+                else if (moonsize == 7)
+                   |Waning Crescent
+                else
+                   |New Moon
+       if (skyconditions < 5)
+          div.floatingweathertile(style='background: url("/images/DayIcons/skyconditions#{skyconditions}.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #ffffff;')
+           table(cellspacing = 0,cellpadding=0, style='width: 150px')
+             tr
+              td(height=6)
+             tr
+              td(style='text-align: center')
+                span.smallerbold.fontcolorblack
+                   |Current Weather
+             tr
+              td(height=100)
+             tr
+              td(style='text-align: center')
+                span.smaller.fontcolorblack
+                   if (skyconditions == 1)
+                      |Clear
+                   else if (skyconditions == 2)
+                      |Mostly Clear
+                   else if (skyconditions == 3)
+                      |Partly Cloudy
+                   else if (skyconditions == 4)
+                      |Mostly Cloudy
+       else
+          div.floatingweathertile(style='background: url("/images/DayIcons/skyconditions#{skyconditions}.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #b3b3b3;')
+           table(cellspacing = 0,cellpadding=0, style='width: 150px')
+             tr
+              td(height=6)
+             tr
+              td(style='text-align: center')
+                span.smallerbold.fontcolorblack
+                   |Current Weather
+             tr
+              td(height=100)
+             tr
+              td(style='text-align: center')
+                span.smaller.fontcolorblack
+                   if (skyconditions == 5)
+                      |Overcast
+                   else if (skyconditions == 6)
+                      |Raining
+                   else if (skyconditions == 7)
+                      |Snowing
+                   else if (skyconditions == 8)
+                      |Thunder Storms
+     div#buttons
+        button.button(onClick='conditions()') Conditions
