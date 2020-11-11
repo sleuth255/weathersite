@@ -1,9 +1,6 @@
 extends layout
 block append content
    body()
-     - rainStormRate = 0
-     - skyconditions = 1
-     - day = 1
      script(type='text/javascript')
        |  window.onload = setupRefresh;
        |  function setupRefresh()
@@ -48,7 +45,6 @@ block append content
        |     window.location = getURL()+"/";
        |  }
      div#radarblock
-        span.radartile(style='display: block; left: 20px; top: 20px; background-image: url("#{zoominradarimage}");')
      div#floatingtiles
        div.floatingsuntile
         table(cellspacing = 0,cellpadding=0, style='width: 150px')
