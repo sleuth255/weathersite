@@ -2,6 +2,7 @@ extends layout
 block append content
    body()
      script(type='text/javascript')
+       |  zoom = 0;
        |  window.onload = setupRefresh;
        |  function setupRefresh()
        |  {
@@ -48,11 +49,13 @@ block append content
        |     $(".uparrow").attr('src','/images/UpArrowTransparentRed.png');
        |     $(".downarrow").attr('src','/images/DownArrowTransparentGreen.png');
        |     $(".radartile").css('background-image', 'url("#{zoominradarimage}")')
+       |     zoom = 0;
        |  }
        |  function downarrowclicked(){
        |     $(".uparrow").attr('src','/images/UpArrowTransparentGreen.png');
        |     $(".downarrow").attr('src','/images/DownArrowTransparentRed.png');
        |     $(".radartile").css('background-image', 'url("#{zoomoutradarimage}")')
+       |     zoom = 1;
        |  }
      div#radarblock(style='display: block; height: 700px;')
         table(cellspacing=0,cellpadding=0,style='width: 90%')
