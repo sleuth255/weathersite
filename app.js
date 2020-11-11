@@ -4,6 +4,8 @@ var myLongitude = -88.1084;
 var myWLLIp = '10.0.0.42';
 var myMetarFtpSite = "tgftp.nws.noaa.gov";
 var myMetarFilePath = "/data/observations/metar/stations/KMKE.TXT";
+var myRadarZoominPath = "https://radar.weather.gov/lite/N0R/MKX_loop.gif"
+var myRadarZoomoutPath = "https://radar.weather.gov/lite/N0Z/MKX_loop.gif"
 
 var express = require('express')
 , request = require('request')
@@ -211,7 +213,15 @@ app.get('/livewind', function (req, res) {
 	directionObj[2] = makeCompassVector(lastDirection1);
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
-    res.render('livewind',{skyconditions: makeSkyConditionsVector(),day: daytime,directionObj: directionObj,speed:speed})
+    res.render('livewind',{rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,directionObj: directionObj,speed:speed})
+})
+app.get('/radar', function (req, res) {
+    res.locals.err = false;
+	res.render('radarresponse',{skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
+})
+app.get('/radarrefresh', function (req, res) {
+    res.locals.err = false;
+	res.render('radarrefresh',{skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
 })
 app.get('/testpattern', function (req, res) {
     res.locals.err = false;

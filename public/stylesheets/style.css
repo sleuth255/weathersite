@@ -1,3 +1,15 @@
+.radartile{
+	height: 550px;
+	width: 600px;
+	border-radius: 0%;
+	background: white no-repeat center;
+	background-size: cover;
+	position: absolute;
+	display: inline-block;
+	border: 2px solid black;
+	z-index: 2;
+	
+}
 .floatingsuntile{
 	height: 150px;
 	width: 150px;
@@ -91,3 +103,47 @@
 	font: 15px sans-serif;
 	font-weight: bold; 
 }
+.button {
+	position: absolute;
+    top: 600px; 
+    left: 20px;
+    border-radius: 7px 7px 7px 7px;
+	background-color: white;
+	border: 3px solid black;
+    color: black;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-family: "Open Sans", sans-serif;
+    text-transform: uppercase;
+    font-weight: 650;
+	letter-spacing: 1.3px;
+    margin: 4px 2px;
+    font-size: 14px;
+}
+.button:hover{
+	background-color: #0066B3;
+	
+}
+.tinybutton {
+    background-color: #0087CC;
+    border: none;
+    color: white;
+    padding: 5px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-family: "Open Sans", sans-serif;
+    text-transform: uppercase;
+    font-weight: 550;
+	letter-spacing: 1.3px;
+    font-size: 11px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+.tinybutton:hover{
+	background-color: #0066B3;
+	
+}
+
