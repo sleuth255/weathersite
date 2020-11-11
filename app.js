@@ -251,7 +251,7 @@ server.on('message',function(msg,info){
 	  gustSpeed=Math.round(obj.conditions[0].wind_speed_hi_last_10_min);
 	  //rainStormStart='1603243501';
 	  rainStormStart=obj.conditions[0].rain_storm_start_at
-	  rainStormAmt=obj.conditions[0].rain_storm *.01
+	  rainStormAmt=(obj.conditions[0].rain_storm *.01).toFixed(2);
 	  rainStormRate=obj.conditions[0].rain_rate_last *.01
 	  
 	  if (rainStormStart == null){
