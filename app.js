@@ -20,18 +20,15 @@ var express = require('express')
 , path = require('path');
 
 var app = express();
-const ftp = new jsftp({
+var ftp = new jsftp({
 	host: myMetarFtpSite
 });
 ftp.keepAlive();
-ftp.auth('anonymous','anonymous', function(response){
-	console.log('FTP login successful');
-})
 ftp.on('error', function(err){
 	console.log('Ftp error caught');
-	ftp.auth('anonymous','anonymous', function(response){
-		console.log('FTP login complete');
-	})
+	ftp = new jsftp({
+		host: myMetarFtpSite
+	});
 })
 process.on('uncaughtException', function(err){
 	console.error(err.stack);
