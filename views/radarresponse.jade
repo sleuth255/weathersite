@@ -45,7 +45,12 @@ block append content
        |     window.location = getURL()+"/";
        |  }
      div#radarblock(style='display: block; height: 700px;')
-        div.radartile(style='display: block; left: 20px; top: 20px; background-image: url("#{zoominradarimage}");')
+        table(cellspacing=0,cellpadding=0,style='width: 90%')
+          tr
+            td(width="50%",height=550)
+             div.radartile(style='display: block; left: 20px; top: 20px; background-image: url("#{zoominradarimage}");')
+            td(width="50%",style='text-align: center')
+             img(src='/images/weathersitelogo.png')
      div#floatingtiles
        div.floatingsuntile
         table(cellspacing = 0,cellpadding=0, style='width: 150px')
