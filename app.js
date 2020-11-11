@@ -258,7 +258,7 @@ server.on('message',function(msg,info){
 		  rainStormStart = ''
 	  }
 	  else{
-		  rainStormStart = app.locals.moment.unix(rainStormStart).format('MMM Do, h:mm a')
+		  rainStormStart = app.locals.moment.unix(rainStormStart).format('MMM D, h:mm a')
 	  }
 });
 
