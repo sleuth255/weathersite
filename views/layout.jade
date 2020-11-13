@@ -3,8 +3,10 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
-    link(rel='prefetch',href='#{zoominradarimage}')
-    link(rel='prefetch',href='#{zoomoutradarimage}')
+    if (zoominradarimage.length > 0)
+       link(rel='prefetch',href='#{zoominradarimage}')
+    if (zoomoutradarimage.length > 0)
+       link(rel='prefetch',href='#{zoomoutradarimage}')
     script
       |if (!window.jQuery) document.write('<script src="/modules/jquery.min.js"><\/script>');
     script

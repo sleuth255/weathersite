@@ -2,10 +2,12 @@
 var myLatitude = 42.9764;
 var myLongitude = -88.1084;
 var myWLLIp = '10.0.0.42';
+
 var myMetarFtpSite = "tgftp.nws.noaa.gov";
 var myMetarFilePath = "/data/observations/metar/stations/KMKE.TXT";
 var myRadarZoominPath = "https://radar.weather.gov/lite/N0R/MKX_loop.gif"
 var myRadarZoomoutPath = "https://radar.weather.gov/lite/N0Z/MKX_loop.gif"
+
 
 var express = require('express')
 , request = require('request')
@@ -20,16 +22,18 @@ var express = require('express')
 , path = require('path');
 
 var app = express();
-var ftp = new jsftp({
-	host: myMetarFtpSite
-});
-ftp.keepAlive();
-ftp.on('error', function(err){
-	console.log('Ftp error caught');
-	ftp = new jsftp({
-		host: myMetarFtpSite
-	});
-})
+if (myMetarFtpSite.length > 0){
+   var ftp = new jsftp({
+	   host: myMetarFtpSite
+   });
+   ftp.keepAlive();
+   ftp.on('error', function(err){
+	   console.log('Ftp error caught');
+	   ftp = new jsftp({
+		   host: myMetarFtpSite
+	   });
+   })
+}
 process.on('uncaughtException', function(err){
 	console.error(err.stack);
 	console.log('uncaught exception: node NOT exiting...');
@@ -277,35 +281,35 @@ server.on('message',function(msg,info){
 
 
 // Get initial METAR observation
+if (myMetarFtpSite.length > 0){
+   var Observation = ""; // Will store the contents of the file
+   try{
+   console.log('Retrieving METAR observation');
+   ftp.get(myMetarFilePath, (err, socket) => {
+     if (err) {
+       return;
+     }
 
-var Observation = ""; // Will store the contents of the file
-try{
-console.log('Retrieving METAR observation');
-ftp.get(myMetarFilePath, (err, socket) => {
-  if (err) {
-    return;
-  }
+     socket.on("data", d => {
+       Observation += d.toString();
+     });
 
-  socket.on("data", d => {
-    Observation += d.toString();
-  });
+     socket.on("close", err => {
+       if (err) {
+         console.error("Metar Observation retrieval error.");
+         return
+       }
+       metarObservation = Observation;
+       console.log("METAR observation retrieved");
+     });
 
-  socket.on("close", err => {
-    if (err) {
-      console.error("Metar Observation retrieval error.");
-      return
-    }
-    metarObservation = Observation;
-    console.log("METAR observation retrieved");
-  });
-
-  socket.resume();
-});
+     socket.resume();
+   });
+   }
+   catch(err){
+       console.log('Caught Metar Observation error')
+   }
 }
-catch(err){
-    console.log('Caught Metar Observation error')
-}
-
 //Get initial conditions from WLL.
 //Also tell WLL to start broadcasting live UDP Wind/Rainfall data every 5 minutes
 
@@ -365,33 +369,34 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 
 setInterval(function(){
 	   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
-       var Observation = ""; // Will store the contents of the file
+if (myMetarFtpSite.length > 0){
+	   var Observation = ""; // Will store the contents of the file
 	   try{
-	   console.log('Retrieving METAR observation');
-       ftp.get(myMetarFilePath, (err, socket) => {
-         if (err) {
-           return;
-         }
+	      console.log('Retrieving METAR observation');
+          ftp.get(myMetarFilePath, (err, socket) => {
+            if (err) {
+              return;
+            }
 
-         socket.on("data", d => {
-           Observation += d.toString();
-         });
+            socket.on("data", d => {
+              Observation += d.toString();
+            });
 
-         socket.on("close", err => {
-           if (err) {
-             console.error("METAR data retrieval error");
-             return;
-           }
-           metarObservation = Observation;
-           console.log("METAR observation retrieved");
-         });
-         socket.resume();
-       });
-	   }
-	   catch(err){
-		   console.log('Caught Metar Observation error')
-	   }
-
+            socket.on("close", err => {
+              if (err) {
+                console.error("METAR data retrieval error");
+                return;
+              }
+              metarObservation = Observation;
+              console.log("METAR observation retrieved");
+            });
+            socket.resume();
+          });
+   	      }
+	      catch(err){
+		      console.log('Caught Metar Observation error')
+	      }
+       }
 	   var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 		   data = '';
 		   resp.on('data',function(chunk){

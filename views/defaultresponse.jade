@@ -265,5 +265,6 @@ block append content
                       |Snowing
                    else if (skyconditions == 8)
                       |Thunder Storms
-     div#buttons
-        button.button(onClick='radar()') Live Radar
+     if (zoominradarimage.length > 0)                      
+        div#buttons
+           button.button(onClick='radar()') Live Radar

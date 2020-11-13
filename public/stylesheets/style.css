@@ -1,15 +1,3 @@
-.radartile{
-	height: 550px;
-	width: 600px;
-	border-radius: 0%;
-	background: no-repeat center;
-	background-size: cover;
-	position: absolute;
-	display: inline-block;
-	border: 2px solid black;
-	z-index: 2;
-	
-}
 .floatingsuntile{
 	height: 150px;
 	width: 150px;
@@ -38,18 +26,6 @@
 	top: 190px;
 	z-index: 2;
 }
-.uparrow{
-	position: absolute;
-	left: 70px;
-	top: 165px;
-	z-index: 3;
-}
-.downarrow{
-	position: absolute;
-	left: 70px;
-	top: 275px;
-	z-index: 3;
-}
 .floatingmoontile{
 	height: 150px;
 	width: 150px;
@@ -63,6 +39,30 @@
 	top: 360px;
 	z-index: 2;
 	
+}
+.radartile{
+	height: 550px;
+	width: 600px;
+	border-radius: 0%;
+	background: no-repeat center;
+	background-size: cover;
+	position: absolute;
+	display: inline-block;
+	border: 2px solid black;
+	z-index: 2;
+	
+}
+.uparrow{
+	position: absolute;
+	left: 70px;
+	top: 165px;
+	z-index: 3;
+}
+.downarrow{
+	position: absolute;
+	left: 70px;
+	top: 275px;
+	z-index: 3;
 }
 .fontcolor{
 	color: #000000;
