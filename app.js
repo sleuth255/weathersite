@@ -94,7 +94,7 @@ app.use(express.logger('dev'));
 function shiftHist(array){
 	var newArray = []
 	for(var x = 1; x < array.length; x++)
-		newArray += array[x]
+		newArray.push(array[x])
 	return newArray;
 }
 function makeSkyConditionsVector(){
