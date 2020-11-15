@@ -1,0 +1,23 @@
+extends layout
+block append content
+       div#charts(style='display: block; height: 700px;')
+          table(cellspacing=0,cellpadding=0)
+            tr
+              td(width="90%")
+                  #chart.chart(style="width: 900px; height: 180px;")
+                  #chart2.chart(style="width: 900px; height: 180px;")
+                  #chart3.chart(style="width: 900px; height: 180px;")
+               td(width="10%",style='vertical-align: top;')
+                  img(src='/images/weathersitelogo.png')
+          script.
+            var chartoptions = !{data}
+            var chart = echarts.init(document.getElementById('chart'));
+            chart.setOption(chartoptions);
+            chartoptions = !{data2}
+            var chart2 = echarts.init(document.getElementById('chart2'));
+            chart2.setOption(chartoptions);        
+            chartoptions = !{data3}
+            var chart3 = echarts.init(document.getElementById('chart3'));
+            chart3.setOption(chartoptions);    
+           
+                   
