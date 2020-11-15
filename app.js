@@ -121,13 +121,13 @@ function makeMoonPhaseVector(){
 	var daystart = new Date(app.locals.moment(new Date()).format('MMMM DD,YYYY 00:00:00'));
 	var dayend = new Date(daystart)
 	dayend.setDate(daystart.getDate()+1)
-    var dayStartPhase = suncalc.getMoonTimes(daystart).phase
-    var dayEndPhase = suncalc.getMoonTimes(dayend).phase
-	if (dayEndPhase < dayStartPhase)
+	var dayStartPhase = suncalc.getMoonIllumination(daystart).phase
+	var dayEndPhase = suncalc.getMoonIllumination(dayend).phase
+	if (dayStartPhase > dayEndPhase)
 		return 0;
     if (dayStartPhase < .25 && dayEndPhase > .25)
     	return 2;
-    if (dayStartPhase < .5 && dayEndphase > .5)
+    if (dayStartPhase < .5 && dayEndPhase > .5)
     	return 4;
     if (dayStartPhase < .75 && dayEndPhase > .75)
     	return 6;
@@ -612,6 +612,7 @@ if (myMetarFtpSite.length > 0){
 
 // periodically determine day/night and moon phase
 
+
 setInterval(function(){
 	var now = new Date();
 	var obj = suncalc.getTimes(now,myLatitude,myLongitude)
@@ -625,6 +626,24 @@ setInterval(function(){
 }, 600000); 
 
 console.log("Current Moon phase fraction is "+suncalc.getMoonIllumination(now).phase)
+
+	var daystart = new Date(app.locals.moment(new Date()).format('MMMM DD,YYYY 00:00:00'));
+	var daystarttrend = new Date(app.locals.moment(new Date()).format('MMMM DD,YYYY 00:01:00'));
+	var dayend = new Date(daystart)
+	dayend.setDate(daystart.getDate()+1)
+	var dayendtrend = new Date(daystarttrend)
+	dayendtrend.setDate(dayendtrend.getDate()+1)
+	var dayStartPhase = suncalc.getMoonIllumination(daystart).phase
+	var dayEndPhase = suncalc.getMoonIllumination(dayend).phase
+	var dayStartTrendPhase = suncalc.getMoonIllumination(daystarttrend).phase
+	var dayEndTrendPhase = suncalc.getMoonIllumination(dayendtrend).phase
+
+    console.log('daystart dates: '+daystart+' '+daystarttrend)
+    console.log('dayend dates: '+dayend+' '+dayendtrend)
+	console.log('daystart Phases'+ dayStartPhase+' '+dayStartTrendPhase)
+	console.log('dayend Phases'+ dayEndPhase+' '+dayEndTrendPhase)
+
+
 //Start up  Web server
 
 http.createServer(app).listen(app.get('port'), function(){
