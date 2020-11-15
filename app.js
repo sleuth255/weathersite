@@ -663,7 +663,7 @@ if (myMetarFtpSite.length > 0){
 		   console.log("Current conditions request failure")
 		   req1.end();
 	   })
-}, 300000); 
+}, 5*60*1000); 
 
 // periodically determine day/night and moon phase
 
@@ -677,7 +677,7 @@ setInterval(function(){
 	sunrise = obj.sunrise;
 	sunset = obj.sunset;
 	moonsize = makeMoonPhaseVector();
-}, 600000); 
+}, 10*60*1000); 
 
 console.log("Current Moon phase fraction is "+suncalc.getMoonIllumination(now).phase)
 
