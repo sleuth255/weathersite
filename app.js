@@ -273,7 +273,7 @@ app.get('/radarrefresh', function (req, res) {
 })
 app.get('/charts', function (req, res) {
     res.locals.err = false;
-    var xData = ["|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|"];
+    var xData = ["|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"];
     for (var x=0;x<xData.length;x++){
     	if (xData[x] == "|")
     		if (x < oDate.length)
@@ -296,7 +296,7 @@ app.get('/charts', function (req, res) {
     lineOptions.series[1].data = oDewpt
 
     var lineOptions2 = clone(linechart);
-    lineOptions2.yAxis.axisLabel.formatter = "{value}mph"
+    lineOptions2.yAxis.axisLabel.formatter = "{value} mph"
     lineOptions2.legend.data = ["Wind Speed"]
     lineOptions2.legend.textStyle.color = fontColor
     lineOptions2.xAxis.data = xData;
@@ -325,6 +325,61 @@ app.get('/charts', function (req, res) {
     chartOptions.series[0].data = [10,20,30,40,50];
 */   
 	res.render('charts',{data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
+})
+app.get('/chartrefresh', function (req, res) {
+    res.locals.err = false;
+    var xData = ["|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"];
+    for (var x=0;x<xData.length;x++){
+    	if (xData[x] == "|")
+    		if (x < oDate.length)
+    			xData[x] = app.locals.moment(oDate[x]).format('ha')
+    }
+    xData = xData.slice(0,oTemp.length)
+    var fontColor = "#fff"
+    if (daytime  && makeSkyConditionsVector() < 5)
+    	fontColor = "#000"
+
+    var lineOptions = clone(linechart);
+    lineOptions.legend.data = ["Outside Temp","Dew Point"]
+    lineOptions.legend.textStyle.color = fontColor
+    lineOptions.xAxis.data = xData;
+    lineOptions.xAxis.axisLine.lineStyle.color = fontColor;
+    lineOptions.yAxis.axisLine.lineStyle.color = fontColor;
+    lineOptions.series[0].name = "Outside Temp"
+    lineOptions.series[0].data = oTemp
+    lineOptions.series[1].name = "Dew Point"
+    lineOptions.series[1].data = oDewpt
+
+    var lineOptions2 = clone(linechart);
+    lineOptions2.yAxis.axisLabel.formatter = "{value} mph"
+    lineOptions2.legend.data = ["Wind Speed"]
+    lineOptions2.legend.textStyle.color = fontColor
+    lineOptions2.xAxis.data = xData;
+    lineOptions2.xAxis.axisLine.lineStyle.color = fontColor;
+    lineOptions2.yAxis.axisLine.lineStyle.color = fontColor;
+    lineOptions2.series[0].name = "Wind Speed"
+    lineOptions2.series[0].data = oWindspd
+    lineOptions2.series[1].name = ""
+    lineOptions2.series[1].data = []
+
+    var lineOptions3 = clone(linechart);
+    lineOptions3.yAxis.axisLabel.formatter = "{value}\u201d"
+    lineOptions3.legend.data = ["Barometer"]
+    lineOptions3.legend.textStyle.color = fontColor
+    lineOptions3.xAxis.data = xData;
+    lineOptions3.xAxis.axisLine.lineStyle.color = fontColor;
+    lineOptions3.yAxis.axisLine.lineStyle.color = fontColor;
+    lineOptions3.series[0].name = "Barometer"
+    lineOptions3.series[0].data = oBarometer
+    lineOptions3.series[1].name = ""
+    lineOptions3.series[1].data = []
+/*
+    var chartOptions = clone(barchart);
+    var categories = ["newCat1","newCat2","newCat3","newCat4","newCat5"];
+    chartOptions.xAxis[0].data = categories;
+    chartOptions.series[0].data = [10,20,30,40,50];
+*/   
+	res.render('chartrefresh',{data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/testpattern', function (req, res) {
     res.locals.err = false;

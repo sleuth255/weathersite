@@ -1,4 +1,14 @@
 {
+	"grid":{
+		"left": "7%",
+		"right": "10px",
+		"bottom": "14%",
+		"top": "17%",
+		"containlabel": true
+	},
+	"tooltip":{
+		"trigger": "axis"
+	},
 	"legend": {
         "data": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         "textStyle":{

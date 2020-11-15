@@ -5,6 +5,7 @@ block append content
        |  window.onload = setupRefresh;
        |  function setupRefresh()
        |  {
+       |    setInterval("refreshCharts();",5*60*1000);
        if((skyconditions > 4 && day) || (day && rainStormRate > 0))
           |$('body').css('background', 'url("/images/cloudybackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
@@ -22,6 +23,10 @@ block append content
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#ffffff');
        |  }
+       |  function refreshCharts()
+       |  {
+       |     $('#charts').load("./chartrefresh");
+       |  }
        |  function getURL(){
        |     var url = location.href;
        |     var idx = url.indexOf('?')
@@ -35,18 +40,16 @@ block append content
        |     window.location = getURL()+"/";
        |  }
    body()
-       table(cellspacing=0,cellpadding=0)
-         tr
-           td(width="90%")
-             #chart.chart(style="width: 900px; height: 180px;")
-             #chart2.chart(style="width: 900px; height: 180px;")
-             #chart3.chart(style="width: 900px; height: 180px;")
-            td(width="10%",style='vertical-align: top;')
-             img(src='/images/weathersitelogo.png')
-           
-       div#buttons
-          button.button(onClick='conditions()') Conditions      
+   
        div#charts(style='display: block; height: 700px;')
+          table(cellspacing=0,cellpadding=0)
+            tr
+              td(width="90%")
+                  #chart.chart(style="width: 900px; height: 180px;")
+                  #chart2.chart(style="width: 900px; height: 180px;")
+                  #chart3.chart(style="width: 900px; height: 180px;")
+               td(width="10%",style='vertical-align: top;')
+                  img(src='/images/weathersitelogo.png')
           script.
             var chartoptions = !{data}
             var chart = echarts.init(document.getElementById('chart'));
@@ -57,4 +60,5 @@ block append content
             chartoptions = !{data3}
             var chart3 = echarts.init(document.getElementById('chart3'));
             chart3.setOption(chartoptions);    
-                   
+       div#buttons
+          button.button(onClick='conditions()') Conditions      
