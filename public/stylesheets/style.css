@@ -115,6 +115,7 @@
 	font-weight: bold; 
 }
 .button {
+	width: 120px;
 	position: absolute;
     top: 600px; 
     left: 20px;
@@ -138,9 +139,10 @@
 	
 }
 .button2 {
+	width: 120px;
 	position: absolute;
     top: 600px; 
-    left: 110px;
+    left: 150px;
     border-radius: 7px 7px 7px 7px;
 	background-color: white;
 	border: 3px solid black;

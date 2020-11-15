@@ -36,6 +36,9 @@ block append content
        |     url = url.substring(0,idx);
        |     return url;
        |  }
+       |  function radar(){
+       |     window.location = getURL()+"/radar";
+       |  }
        |  function conditions(){
        |     window.location = getURL()+"/";
        |  }
@@ -61,4 +64,5 @@ block append content
             var chart3 = echarts.init(document.getElementById('chart3'));
             chart3.setOption(chartoptions);    
        div#buttons
-          button.button(onClick='conditions()') Conditions      
+          button.button(onClick='conditions()') Conditions 
+          button.button2(onClick='radar()') Radar 

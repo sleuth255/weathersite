@@ -45,6 +45,9 @@ block append content
        |  function conditions(){
        |     window.location = getURL()+"/";
        |  }
+       |  function charts(){
+       |     window.location = getURL()+"/charts";
+       |  }
        |  function uparrowclicked(){
        |     $(".uparrow").attr('src','/images/UpArrowTransparentRed.png');
        |     $(".downarrow").attr('src','/images/DownArrowTransparentGreen.png');
@@ -165,3 +168,4 @@ block append content
      if (zoominradarimage.length > 0)
         div#buttons
            button.button(onClick='conditions()') Conditions
+           button.button2(onClick='charts()') history           
