@@ -11,14 +11,14 @@
 	},
 	"color": ["#f00", "#0f0"],
 	"legend": {
-        "data": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        "data": [],
         "textStyle":{
         	"color": "#000"
         }
     },
 	"xAxis": {
         "type": "category",
-        "data": [".","."],
+        "data": [],
         "axisLine":{
             "lineStyle":{
         	      "color": "#000"
@@ -41,12 +41,12 @@
     "series": [
     	{
     		"name": "name1",
-    		"data": [820, 932, 901, 934, 1290, 1330, 1320],
+    		"data": [],
             "type": "line",
             "smooth": true
         },{
             "name": "name2",
-            "data": [820, 932, 901, 934, 1290, 1330, 1320],
+            "data": [],
             "type": "line",
             "smooth": true
         }

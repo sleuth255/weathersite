@@ -37,12 +37,12 @@ if (myMetarFtpSite.length > 0){
 	   });
    })
 }
-/*
+
 process.on('uncaughtException', function(err){
 	console.error(err.stack);
 	console.log('uncaught exception: node NOT exiting...');
 })
-*/
+
 var server = udp.createSocket('udp4'); 
 server.bind(22222);
 app.locals.moment = require('moment');
