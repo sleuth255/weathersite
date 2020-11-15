@@ -19,6 +19,9 @@ var express = require('express')
 , buffer = require('buffer')
 , suncalc = require('suncalc')
 , jsftp = require("jsftp")
+, clone = require("clone")
+, barchart = require('./barChart.json')
+, linechart = require('./lineChart.json')
 , path = require('path');
 
 var app = express();
@@ -34,14 +37,47 @@ if (myMetarFtpSite.length > 0){
 	   });
    })
 }
+/*
 process.on('uncaughtException', function(err){
 	console.error(err.stack);
 	console.log('uncaught exception: node NOT exiting...');
 })
-
+*/
 var server = udp.createSocket('udp4'); 
 server.bind(22222);
 app.locals.moment = require('moment');
+
+//initialize local storage
+var oDate,oTemp,oHum,oDewpt,oWindspd,oWinddir,oBarometer
+var localStorage = new LocalStorage('/Weathersite Stats'); 
+if ((localStorage.getItem("oDate"))==null)
+	oDate = [];
+else
+	oDate = JSON.parse(localStorage.getItem("oDate"));
+if ((localStorage.getItem("oTemp"))==null)
+	oTemp = [];
+else
+	oTemp = JSON.parse(localStorage.getItem("oTemp"));
+if ((localStorage.getItem("oHum"))==null)
+	oHum = [];
+else
+	oHum = JSON.parse(localStorage.getItem("oHum"));
+if ((localStorage.getItem("oDewpt"))==null)
+	oDewpt = [];
+else
+	oDewpt = JSON.parse(localStorage.getItem("oDewpt"));
+if ((localStorage.getItem("oWindspd"))==null)
+	oWindspd = [];
+else
+	oWindspd = JSON.parse(localStorage.getItem("oWindspd"));
+if ((localStorage.getItem("oWinddir"))==null)
+	oWinddir = [];
+else
+	oWinddir = JSON.parse(localStorage.getItem("oWinddir"));
+if ((localStorage.getItem("oBarometer"))==null)
+	oBarometer = [];
+else
+	oBarometer = JSON.parse(localStorage.getItem("oBarometer"));
 
 //all environments
 
@@ -55,7 +91,12 @@ app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.logger('dev'));
 
-
+function shiftHist(array){
+	var newArray = []
+	for(var x = 1; x < array.length; x++)
+		newArray += array[x]
+	return newArray;
+}
 function makeSkyConditionsVector(){
 	var skyconditions = 1;
 	if (metarObservation.indexOf("CLR") != -1)
@@ -230,6 +271,61 @@ app.get('/radarrefresh', function (req, res) {
     res.locals.err = false;
 	res.render('radarrefresh',{skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
 })
+app.get('/charts', function (req, res) {
+    res.locals.err = false;
+    var xData = ["|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|",".",".",".",".",".",".",".",".",".",".",".","|"];
+    for (var x=0;x<xData.length;x++){
+    	if (xData[x] == "|")
+    		if (x < oDate.length)
+    			xData[x] = app.locals.moment(oDate[x]).format('ha')
+    }
+    xData = xData.slice(0,oTemp.length)
+    var fontColor = "#fff"
+    if (daytime  && makeSkyConditionsVector() < 5)
+    	fontColor = "#000"
+
+    var lineOptions = clone(linechart);
+    lineOptions.legend.data = ["Outside Temp","Dew Point"]
+    lineOptions.legend.textStyle.color = fontColor
+    lineOptions.xAxis.data = xData;
+    lineOptions.xAxis.axisLine.lineStyle.color = fontColor;
+    lineOptions.yAxis.axisLine.lineStyle.color = fontColor;
+    lineOptions.series[0].name = "Outside Temp"
+    lineOptions.series[0].data = oTemp
+    lineOptions.series[1].name = "Dew Point"
+    lineOptions.series[1].data = oDewpt
+
+    var lineOptions2 = clone(linechart);
+    lineOptions2.yAxis.axisLabel.formatter = "{value}mph"
+    lineOptions2.legend.data = ["Wind Speed"]
+    lineOptions2.legend.textStyle.color = fontColor
+    lineOptions2.xAxis.data = xData;
+    lineOptions2.xAxis.axisLine.lineStyle.color = fontColor;
+    lineOptions2.yAxis.axisLine.lineStyle.color = fontColor;
+    lineOptions2.series[0].name = "Wind Speed"
+    lineOptions2.series[0].data = oWindspd
+    lineOptions2.series[1].name = ""
+    lineOptions2.series[1].data = []
+
+    var lineOptions3 = clone(linechart);
+    lineOptions3.yAxis.axisLabel.formatter = "{value}\u201d"
+    lineOptions3.legend.data = ["Barometer"]
+    lineOptions3.legend.textStyle.color = fontColor
+    lineOptions3.xAxis.data = xData;
+    lineOptions3.xAxis.axisLine.lineStyle.color = fontColor;
+    lineOptions3.yAxis.axisLine.lineStyle.color = fontColor;
+    lineOptions3.series[0].name = "Barometer"
+    lineOptions3.series[0].data = oBarometer
+    lineOptions3.series[1].name = ""
+    lineOptions3.series[1].data = []
+/*
+    var chartOptions = clone(barchart);
+    var categories = ["newCat1","newCat2","newCat3","newCat4","newCat5"];
+    chartOptions.xAxis[0].data = categories;
+    chartOptions.series[0].data = [10,20,30,40,50];
+*/   
+	res.render('charts',{data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
+})
 app.get('/testpattern', function (req, res) {
     res.locals.err = false;
 	var directionObj = []
@@ -237,8 +333,10 @@ app.get('/testpattern', function (req, res) {
 	for (var x = 1;x<360;x+=22.5){
 	    directionObj[y++] = makeCompassVector(x)
 	}
-	console.log(moonsize)
-    res.render('testpattern',{day: daytime,moonsize: moonsize,sunrise: sunrise,sunset: sunset,directionObj: directionObj})
+	console.log(oTemp.length)
+	for (var x=0;x<oTemp.length;x++)
+		console.log(oTemp[x]);
+    res.render('testpattern',{zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,moonsize: moonsize,sunrise: sunrise,sunset: sunset,directionObj: directionObj})
 })
 
 
@@ -334,6 +432,34 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 		outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
 		inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
 		inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
+		if (oDate.length > 143)
+			oDate = shiftHist(oDate)
+		oDate.push(new Date());
+	    localStorage.setItem("oDate",JSON.stringify(oDate));
+		if (oTemp.length > 143)
+			oTemp = shiftHist(oTemp)
+		oTemp.push(outTemp);
+	    localStorage.setItem("oTemp",JSON.stringify(oTemp));
+		if (oHum.length > 143)
+			oHum = shiftHist(oHum)
+		oHum.push(outHum);
+	    localStorage.setItem("oHum",JSON.stringify(oHum));
+		if (oDewpt.length > 143)
+			oDewpt = shiftHist(oDewpt)
+		oDewpt.push(outDewPt);
+	    localStorage.setItem("oDewpt",JSON.stringify(oDewpt));
+		if (oWindspd.length > 143)
+			oWindspd = shiftHist(oWindspd)
+		oWindspd.push(avgSpeed);
+	    localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
+		if (oWinddir.length > 143)
+			oWinddir = shiftHist(oWinddir)
+		oWinddir.push(avgDirection);
+	    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
+		if (oBarometer.length > 143)
+			oBarometer = shiftHist(oBarometer)
+		oBarometer.push(inBarometer);
+	    localStorage.setItem("oBarometer",JSON.stringify(oBarometer));
 		if (inBarometerTrend < 0)
 			inBarometerTrend = 'Falling'
 		else
@@ -416,14 +542,41 @@ if (myMetarFtpSite.length > 0){
 			   outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
 			   inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
 			   inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
-				if (inBarometerTrend < 0)
-					inBarometerTrend = 'Falling'
-				else
-				if (inBarometerTrend > 0)
-					inBarometerTrend = 'Rising'
-				else
-					inBarometerTrend = 'Steady'
-
+			   if (oDate.length > 143)
+				   oDate = shiftHist(oDate)
+			   oDate.push(new Date());
+		       localStorage.setItem("oDate",JSON.stringify(oDate));
+			   if (oTemp.length > 143)
+				   oTemp = shiftHist(oTemp)
+			   oTemp.push(outTemp);
+			   localStorage.setItem("oTemp",JSON.stringify(oTemp));
+			   if (oHum.length > 143)
+				   oHum = shiftHist(oHum)
+			   oHum.push(outHum);
+			   localStorage.setItem("oHum",JSON.stringify(oHum));
+			   if (oDewpt.length > 143)
+				   oDewpt = shiftHist(oDewpt)
+			   oDewpt.push(outDewPt);
+			   localStorage.setItem("oDewpt",JSON.stringify(oDewpt));
+			   if (oWindspd.length > 143)
+				   oWindspd = shiftHist(oWindspd)
+			   oWindspd.push(avgSpeed);
+			   localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
+			   if (oWinddir.length > 143)
+				   oWinddir = shiftHist(oWinddir)
+			   oWinddir.push(avgDirection);
+			   localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
+			   if (oBarometer.length > 143)
+			   	   oBarometer = shiftHist(oBarometer)
+			   oBarometer.push(inBarometer);
+  		       localStorage.setItem("oBarometer",JSON.stringify(oBarometer));
+			   if (inBarometerTrend < 0)
+				   inBarometerTrend = 'Falling'
+			   else
+			   if (inBarometerTrend > 0)
+				   inBarometerTrend = 'Rising'
+			   else
+				   inBarometerTrend = 'Steady'
 			   if (outTempLastReading == null)
 				   outTempLastReading == obj.data.conditions[0].temp;
 			   if (obj.data.conditions[0].temp > outTempLastReading)

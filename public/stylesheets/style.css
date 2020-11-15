@@ -137,24 +137,26 @@
 	background-color: #0066B3;
 	
 }
-.tinybutton {
-    background-color: #0087CC;
-    border: none;
-    color: white;
-    padding: 5px 15px;
+.button2 {
+	position: absolute;
+    top: 600px; 
+    left: 110px;
+    border-radius: 7px 7px 7px 7px;
+	background-color: white;
+	border: 3px solid black;
+    color: black;
+    padding: 5px 5px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-family: "Open Sans", sans-serif;
     text-transform: uppercase;
-    font-weight: 550;
+    font-weight: 650;
 	letter-spacing: 1.3px;
-    font-size: 11px;
     margin: 4px 2px;
-    cursor: pointer;
+    font-size: 14px;
 }
-.tinybutton:hover{
+.button2:hover{
 	background-color: #0066B3;
 	
 }
-
