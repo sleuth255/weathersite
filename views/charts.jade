@@ -40,16 +40,17 @@ block append content
        #chart3(style="width: 1000px; height: 200px;")
        div#buttons
           button.button(onClick='conditions()') Conditions      
-       script.
-         var chartoptions = !{data}
-         var chart = echarts.init(document.getElementById('chart'));
-         chart.setOption(chartoptions);
-         chartoptions = !{data2}
-         var chart2 = echarts.init(document.getElementById('chart2'));
-         chart2.setOption(chartoptions);        
-         chartoptions = !{data3}
-         var chart3 = echarts.init(document.getElementById('chart3'));
-         chart3.setOption(chartoptions);    
+       div#charts(style='display: block; height: 700px;')
+          script.
+            var chartoptions = !{data}
+            var chart = echarts.init(document.getElementById('chart'));
+            chart.setOption(chartoptions);
+            chartoptions = !{data2}
+            var chart2 = echarts.init(document.getElementById('chart2'));
+            chart2.setOption(chartoptions);        
+            chartoptions = !{data3}
+            var chart3 = echarts.init(document.getElementById('chart3'));
+            chart3.setOption(chartoptions);    
        div.floatingsuntile
         table(cellspacing = 0,cellpadding=0, style='width: 150px')
           tr
