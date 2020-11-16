@@ -49,14 +49,14 @@ block append content
        |     window.location = getURL()+"/charts";
        |  }
        |  function uparrowclicked(){
-       |     $(".uparrow").attr('src','/images/UpArrowTransparentRed.png');
-       |     $(".downarrow").attr('src','/images/DownArrowTransparentGreen.png');
+       |     //$(".uparrow").attr('src','/images/UpArrowTransparentRed.png');
+       |     //$(".downarrow").attr('src','/images/DownArrowTransparentGreen.png');
        |     $(".radartile").css('background-image', 'url("#{zoominradarimage}")')
        |     zoom = 0;
        |  }
        |  function downarrowclicked(){
-       |     $(".uparrow").attr('src','/images/UpArrowTransparentGreen.png');
-       |     $(".downarrow").attr('src','/images/DownArrowTransparentRed.png');
+       |     //$(".uparrow").attr('src','/images/UpArrowTransparentGreen.png');
+       |     //$(".downarrow").attr('src','/images/DownArrowTransparentRed.png');
        |     $(".radartile").css('background-image', 'url("#{zoomoutradarimage}")')
        |     zoom = 1;
        |  }
@@ -65,8 +65,8 @@ block append content
           tr
             td(width="650px",height=550)
              div.radartile(style='display: block; left: 20px; top: 20px; background-image: url("#{zoominradarimage}");')
-             img.uparrow(src='/images/UpArrowTransparentRed.png', onclick='uparrowclicked()')
-             img.downarrow(src='/images/DownArrowTransparentGreen.png', onclick='downarrowclicked()')
+             img.uparrow(src='/images/UpArrowTransparent.png', onclick='uparrowclicked()')
+             img.downarrow(src='/images/DownArrowTransparent.png', onclick='downarrowclicked()')
             td(style='text-align: center')
              img(src='/images/weathersitelogo.png')
      div#floatingtiles

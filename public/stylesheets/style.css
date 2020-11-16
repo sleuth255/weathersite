@@ -57,11 +57,18 @@
 	top: 165px;
 	z-index: 3;
 }
+.uparrow:hover{
+	background-image: url("/images/UpArrowTransparentGreen.png")
+}
 .downarrow{
 	position: absolute;
 	left: 70px;
 	top: 275px;
 	z-index: 3;
+}
+.downarrow:hover{
+	background-image: url("/images/DownArrowTransparentGreen.png")
+	
 }
 .fontcolor{
 	color: #000000;
