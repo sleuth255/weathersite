@@ -49,12 +49,22 @@ block append content
        |     window.location = getURL()+"/charts";
        |  }
        |  function uparrowclicked(){
+       |     if (zoom == 0){
+       |        $(".uparrow").attr('src','/images/UpArrowTransparentRed.png')
+       |        setTimeout(function(){$(".uparrow").attr('src','/images/UpArrowTransparent.png');},1000)
+       |        return
+       |     }
        |     $(".radartile").css('background-image', 'url("#{zoominradarimage}")')
        |     $(".uparrow").attr('src','/images/UpArrowTransparentGreen.png')
        |     setTimeout(function(){$(".uparrow").attr('src','/images/UpArrowTransparent.png');},1000)
        |     zoom = 0;
        |  }
        |  function downarrowclicked(){
+       |     if (zoom == 1){
+       |        $(".downarrow").attr('src','/images/DownArrowTransparentRed.png')
+       |        setTimeout(function(){$(".downarrow").attr('src','/images/DownArrowTransparent.png');},1000)
+       |        return
+       |     }
        |     $(".radartile").css('background-image', 'url("#{zoomoutradarimage}")')
        |     $(".downarrow").attr('src','/images/DownArrowTransparentGreen.png')
        |     setTimeout(function(){$(".downarrow").attr('src','/images/DownArrowTransparent.png');},1000)
