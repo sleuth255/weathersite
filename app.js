@@ -49,7 +49,7 @@ app.locals.moment = require('moment');
 
 //initialize local storage
 var oDate,oTemp,oHum,oDewpt,oWindspd,oWinddir,oWindgust,oBarometer
-var localStorage = new LocalStorage('/Weathersite Stats'); 
+var localStorage = new LocalStorage('/WeathersiteStats'); 
 if ((localStorage.getItem("oDate"))==null)
 	oDate = [];
 else
