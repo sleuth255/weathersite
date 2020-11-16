@@ -2,13 +2,13 @@ extends layout
 block append content
      script
         | if (zoom == 0){
-        |    //$(".uparrow").attr('src','/images/UpArrowTransparentRed.png');
-        |    //$(".downarrow").attr('src','/images/DownArrowTransparentGreen.png');
+        |    $(".uparrow").attr('src','/images/UpArrowTransparent.png');
+        |    $(".downarrow").attr('src','/images/DownArrowTransparent.png');
         |    $(".radartile").css('background-image', 'url("#{zoominradarimage}")')
         | }
         | else{
-        |    //$(".uparrow").attr('src','/images/UpArrowTransparent.png');
-        |    //$(".downarrow").attr('src','/images/DownArrowTransparentRed.png');
+        |    $(".uparrow").attr('src','/images/UpArrowTransparent.png');
+        |    $(".downarrow").attr('src','/images/DownArrowTransparent.png');
         |    $(".radartile").css('background-image', 'url("#{zoomoutradarimage}")')
         |}
      div#radarblock(style='display: block; height: 700px;')

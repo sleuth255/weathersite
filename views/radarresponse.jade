@@ -49,14 +49,14 @@ block append content
        |     window.location = getURL()+"/charts";
        |  }
        |  function uparrowclicked(){
-       |     //$(".uparrow").attr('src','/images/UpArrowTransparentRed.png');
-       |     //$(".downarrow").attr('src','/images/DownArrowTransparentGreen.png');
+       |     $(".uparrow").attr('src','/images/UpArrowTransparent.png');
+       |     $(".downarrow").attr('src','/images/DownArrowTransparent.png');
        |     $(".radartile").css('background-image', 'url("#{zoominradarimage}")')
        |     zoom = 0;
        |  }
        |  function downarrowclicked(){
-       |     //$(".uparrow").attr('src','/images/UpArrowTransparentGreen.png');
-       |     //$(".downarrow").attr('src','/images/DownArrowTransparentRed.png');
+       |     $(".uparrow").attr('src','/images/UpArrowTransparent.png');
+       |     $(".downarrow").attr('src','/images/DownArrowTransparent.png');
        |     $(".radartile").css('background-image', 'url("#{zoomoutradarimage}")')
        |     zoom = 1;
        |  }
