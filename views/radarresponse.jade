@@ -50,11 +50,13 @@ block append content
        |  }
        |  function uparrowclicked(){
        |     $(".radartile").css('background-image', 'url("#{zoominradarimage}")')
+       |     $(".uparrow").attr('src','/images/UpArrowTransparentGreen.png')
        |     setTimeout(function(){$(".uparrow").attr('src','/images/UpArrowTransparent.png');},1000)
        |     zoom = 0;
        |  }
        |  function downarrowclicked(){
        |     $(".radartile").css('background-image', 'url("#{zoomoutradarimage}")')
+       |     $(".downarrow").attr('src','/images/DownArrowTransparentGreen.png')
        |     setTimeout(function(){$(".downarrow").attr('src','/images/DownArrowTransparent.png');},1000)
        |     zoom = 1;
        |  }
