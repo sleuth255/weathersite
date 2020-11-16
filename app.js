@@ -48,7 +48,7 @@ server.bind(22222);
 app.locals.moment = require('moment');
 
 //initialize local storage
-var oDate,oTemp,oHum,oDewpt,oWindspd,oWinddir,oBarometer
+var oDate,oTemp,oHum,oDewpt,oWindspd,oWinddir,oWindgust,oBarometer
 var localStorage = new LocalStorage('/Weathersite Stats'); 
 if ((localStorage.getItem("oDate"))==null)
 	oDate = [];
@@ -74,6 +74,10 @@ if ((localStorage.getItem("oWinddir"))==null)
 	oWinddir = [];
 else
 	oWinddir = JSON.parse(localStorage.getItem("oWinddir"));
+if ((localStorage.getItem("oWindgust"))==null)
+	oWindgust = [];
+else
+	oWindgust = JSON.parse(localStorage.getItem("oWindgust"));
 if ((localStorage.getItem("oBarometer"))==null)
 	oBarometer = [];
 else
@@ -297,15 +301,15 @@ app.get('/charts', function (req, res) {
 
     var lineOptions2 = clone(linechart);
     lineOptions2.yAxis.axisLabel.formatter = "{value} mph"
-    lineOptions2.legend.data = ["Wind Speed"]
+    lineOptions2.legend.data = ["Wind Speed", "Wind Gust"]
     lineOptions2.legend.textStyle.color = fontColor
     lineOptions2.xAxis.data = xData;
     lineOptions2.xAxis.axisLine.lineStyle.color = fontColor;
     lineOptions2.yAxis.axisLine.lineStyle.color = fontColor;
     lineOptions2.series[0].name = "Wind Speed"
     lineOptions2.series[0].data = oWindspd
-    lineOptions2.series[1].name = ""
-    lineOptions2.series[1].data = []
+    lineOptions2.series[1].name = "Wind Gust"
+    lineOptions2.series[1].data = oWindgust
 
     var lineOptions3 = clone(linechart);
     lineOptions3.yAxis.axisLabel.formatter = "{value}\u201d"
@@ -318,13 +322,8 @@ app.get('/charts', function (req, res) {
     lineOptions3.series[0].data = oBarometer
     lineOptions3.series[1].name = ""
     lineOptions3.series[1].data = []
-/*
-    var chartOptions = clone(barchart);
-    var categories = ["newCat1","newCat2","newCat3","newCat4","newCat5"];
-    chartOptions.xAxis[0].data = categories;
-    chartOptions.series[0].data = [10,20,30,40,50];
-*/   
-	res.render('charts',{data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
+
+    res.render('charts',{data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/chartrefresh', function (req, res) {
     res.locals.err = false;
@@ -352,15 +351,15 @@ app.get('/chartrefresh', function (req, res) {
 
     var lineOptions2 = clone(linechart);
     lineOptions2.yAxis.axisLabel.formatter = "{value} mph"
-    lineOptions2.legend.data = ["Wind Speed"]
+    lineOptions2.legend.data = ["Wind Speed","Wind Gust"]
     lineOptions2.legend.textStyle.color = fontColor
     lineOptions2.xAxis.data = xData;
     lineOptions2.xAxis.axisLine.lineStyle.color = fontColor;
     lineOptions2.yAxis.axisLine.lineStyle.color = fontColor;
     lineOptions2.series[0].name = "Wind Speed"
     lineOptions2.series[0].data = oWindspd
-    lineOptions2.series[1].name = ""
-    lineOptions2.series[1].data = []
+    lineOptions2.series[1].name = "Wind Gust"
+    lineOptions2.series[1].data = oWindgust
 
     var lineOptions3 = clone(linechart);
     lineOptions3.yAxis.axisLabel.formatter = "{value}\u201d"
@@ -373,13 +372,8 @@ app.get('/chartrefresh', function (req, res) {
     lineOptions3.series[0].data = oBarometer
     lineOptions3.series[1].name = ""
     lineOptions3.series[1].data = []
-/*
-    var chartOptions = clone(barchart);
-    var categories = ["newCat1","newCat2","newCat3","newCat4","newCat5"];
-    chartOptions.xAxis[0].data = categories;
-    chartOptions.series[0].data = [10,20,30,40,50];
-*/   
-	res.render('chartrefresh',{data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
+
+    res.render('chartrefresh',{data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/testpattern', function (req, res) {
     res.locals.err = false;
@@ -511,6 +505,10 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 			oWinddir = shiftHist(oWinddir)
 		oWinddir.push(avgDirection);
 	    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
+		if (oWindgust.length > 143)
+			oWindgust = shiftHist(oWindgust)
+		oWindgust.push(gustSpeed);
+	    localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
 		if (oBarometer.length > 143)
 			oBarometer = shiftHist(oBarometer)
 		oBarometer.push(inBarometer);
@@ -621,6 +619,10 @@ if (myMetarFtpSite.length > 0){
 				   oWinddir = shiftHist(oWinddir)
 			   oWinddir.push(avgDirection);
 			   localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
+			   if (oWindgust.length > 143)
+				   oWindgust = shiftHist(oWindgust)
+			   oWindgust.push(gustSpeed);
+			   localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
 			   if (oBarometer.length > 143)
 			   	   oBarometer = shiftHist(oBarometer)
 			   oBarometer.push(inBarometer);
