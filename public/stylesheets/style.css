@@ -42,13 +42,12 @@
 }
 .radartile{
 	height: 550px;
-	width: 600px;
+	width: 650px;
 	border-radius: 0%;
 	background: no-repeat center;
-	background-size: cover;
+	background-size: contain;
 	position: absolute;
 	display: inline-block;
-	border: 2px solid black;
 	z-index: 2;
 	
 }

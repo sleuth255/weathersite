@@ -6,7 +6,8 @@ var myWLLIp = '10.0.0.42';
 var myMetarFtpSite = "tgftp.nws.noaa.gov";
 var myMetarFilePath = "/data/observations/metar/stations/KMKE.TXT";
 var myRadarZoominPath = "https://radar.weather.gov/lite/N0R/MKX_loop.gif"
-var myRadarZoomoutPath = "https://radar.weather.gov/lite/N0Z/MKX_loop.gif"
+//var myRadarZoomoutPath = "https://radar.weather.gov/lite/N0Z/MKX_loop.gif"
+var myRadarZoomoutPath = "https://s.w-x.co/staticmaps/wu/wu/wxtype1200_cur/uscad/animate.png"
 
 
 var express = require('express')
@@ -469,6 +470,7 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 	resp.on('end',function(){
 		console.log(data.toString())
 		var obj = JSON.parse(data);
+	    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
 		avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
 		avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
 		inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
@@ -507,7 +509,7 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 	    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
 		if (oWindgust.length > 143)
 			oWindgust = shiftHist(oWindgust)
-		oWindgust.push(gustSpeed);
+		oWindgust.push(gust);
 	    localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
 		if (oBarometer.length > 143)
 			oBarometer = shiftHist(oBarometer)
@@ -584,6 +586,7 @@ if (myMetarFtpSite.length > 0){
 		   resp.on('end',function(){
 			   console.log('current conditions reply received')
 			   var obj = JSON.parse(data);
+  			   var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
 			   avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
 			   avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
 			   inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
@@ -621,7 +624,7 @@ if (myMetarFtpSite.length > 0){
 			   localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
 			   if (oWindgust.length > 143)
 				   oWindgust = shiftHist(oWindgust)
-			   oWindgust.push(gustSpeed);
+			   oWindgust.push(gust);
 			   localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
 			   if (oBarometer.length > 143)
 			   	   oBarometer = shiftHist(oBarometer)
