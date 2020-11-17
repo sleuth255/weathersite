@@ -33,6 +33,8 @@ if (myMetarFtpSite.length > 0){
    ftp.keepAlive();
    ftp.on('error', function(err){
 	   console.log('Ftp error caught');
+	   ftp.raw("QUIT");
+	   ftp.destroy();
 	   ftp = new jsftp({
 		   host: myMetarFtpSite
 	   });
