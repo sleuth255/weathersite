@@ -1,5 +1,10 @@
 extends layout
 block append content
+       - speedunit = "MPH"
+       - tempunit = "F"
+       if (metricunits)
+          - speedunit = "km/h"
+          - tempunit = "C"
        if (directionObj[0].left > 0 && directionObj[0].top > 0)
          img.compasspointer(src='./images/compasspointer.png' style='left:#{directionObj[0].left}px;top:#{directionObj[0].top}px;transform: rotate(#{directionObj[0].rotation}deg); z-index: 5;')
        - x = 1
@@ -14,7 +19,7 @@ block append content
                 |WIND SPEED
            tr               
              td.bigger.fontcolor(style='text-align: center;margin-left: 150px;')
-                |#{speed} MPH #{directionObj[0].heading}         
+                |#{speed} #{speedunit} #{directionObj[0].heading}         
            tr               
              td.small.fontcolor(style='text-align: center;margin-left: 150px;')
                 |CURRENT

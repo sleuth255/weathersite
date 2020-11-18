@@ -1,5 +1,14 @@
 extends layout
 block append content
+        - speedunit = "MPH"
+        - tempunit = "F"
+        - pressureunit = '"'
+        - rainunit = '"'
+        if (metricunits)
+           - speedunit = "km/h"
+           - tempunit = "C"
+           - pressureunit = "mb"
+           - rainunit = "mm"
         - offset = 100
         if (rainStormStart.length > 0)
            - offset = 50
@@ -8,12 +17,12 @@ block append content
             td.big.fontcolor(height=26)
                |WIND GUST:
             td.big.fontcolor(height=26)
-               | #{gustSpeed} MPH #{gustDirection}
+               | #{gustSpeed} #{speedunit} #{gustDirection}
           tr
             td.big.fontcolor(height=26)
                |WIND SPEED:<span style='display: inline-block; width: 23px'></span>
             td.big.fontcolor(height=26)
-               | #{avgSpeed} MPH #{avgDirection}
+               | #{avgSpeed} #{speedunit} #{avgDirection}
           tr
             td.small.fontcolor(colspan=2,style='text-align: center;')
                |10 minute average
@@ -26,7 +35,7 @@ block append content
               table(cellspacing=0,cellpadding=0)
                 tr
                   td.big.fontcolor
-                    | #{inTemp}&deg<span style='font-size: 18px'>F</span>
+                    | #{inTemp}&deg<span style='font-size: 18px'>#{tempunit}</span>
                   td
                     |<span style='display: inline-block; width: 20px'></span>
                   td.big.fontcolor
@@ -39,7 +48,7 @@ block append content
                 tr
                   td.big.fontcolor
                     if (outTempTrend == 0)
-                      | #{outTemp}&deg<span style='font-size: 18px'>F</span>
+                      | #{outTemp}&deg<span style='font-size: 18px'>#{tempunit}</span>
                     else if (outTempTrend) > 0
                       | #{outTemp}&deg<img src='images/warming-sm.png'>
                     else
@@ -72,7 +81,7 @@ block append content
             td.big.fontcolor(height=26)
               |BAROMETER:
             td.big.fontcolor
-              | #{inBarometer}" <span style='font-size: 18px'> (#{inBarometerTrend})</span> 
+              | #{inBarometer}#{pressureunit}<span style='font-size: 18px'> (#{inBarometerTrend})</span> 
           tr
             td.small.fontcolor(colspan=2,style='text-align: center;')
                |Current Conditions
@@ -88,12 +97,12 @@ block append content
                td.big.fontcolor(height=26)
                  |RATE:
                td.big.fontcolor
-                 | #{rainStormRate}"<span style='font-size: 18px'>/hr</span>  
+                 | #{rainStormRate}#{rainunit}<span style='font-size: 18px'>/hr</span>  
              tr
                td.big.fontcolor(height=26)
                  |TOTAL:
                td.big.fontcolor
-                 | #{rainStormAmt}"   
+                 | #{rainStormAmt}#{rainunit}   
              tr
                td.small.fontcolor(colspan=2,style='text-align: center;')
                  |Rain Storm

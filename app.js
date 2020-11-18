@@ -1,15 +1,24 @@
-// settings you need to change
+//
+// Settings that you need to change.  
+//
+// To refresh weathersite code, first copy these to the clipboard
+// then open up a command prompt/terminal window and switch to the /weathersite directory
+// now do: git pull origin master
+// The codebase will be updated.  Then open app.js in an editor and paste your settings back in.
+//
 var myLatitude = 42.9764;
 var myLongitude = -88.1084;
 var myWLLIp = '10.0.0.42';
-
 var myMetarFtpSite = "tgftp.nws.noaa.gov";
 var myMetarFilePath = "/data/observations/metar/stations/KMKE.TXT";
 var myRadarZoominPath = "https://radar.weather.gov/lite/N0R/MKX_loop.gif"
 //var myRadarZoomoutPath = "https://radar.weather.gov/lite/N0Z/MKX_loop.gif"
 var myRadarZoomoutPath = "https://s.w-x.co/staticmaps/wu/wu/wxtype1200_cur/uscad/animate.png"
-
-
+var metricUnits = false;
+// if set to true, choose C, mm, mb, km/h for temp,rain,pressure,windspeed in WLL Units settings
+//	
+//end of settings that you need to change
+//
 var express = require('express')
 , request = require('request')
 , routes = require('routes')
@@ -43,7 +52,6 @@ if (myMetarFtpSite.length > 0){
 
 process.on('uncaughtException', function(err){
 	console.error(err.stack);
-	console.log('uncaught exception: node NOT exiting...');
 })
 
 var server = udp.createSocket('udp4'); 
@@ -252,10 +260,10 @@ app.get('/', function (req, res) {
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
 	
-    res.render('defaultresponse',{zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('defaultresponse',{metricunits: metricUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/liveconditions', function (req, res) {
-    res.render('liveconditions',{zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),day: daytime,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('liveconditions',{metricunits: metricUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),day: daytime,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/tileconditions', function (req, res) {
     res.render('tileconditions',{zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
@@ -268,7 +276,7 @@ app.get('/livewind', function (req, res) {
 	directionObj[2] = makeCompassVector(lastDirection1);
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
-    res.render('livewind',{zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,directionObj: directionObj,speed:speed})
+    res.render('livewind',{metricunits: metricUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,directionObj: directionObj,speed:speed})
 })
 app.get('/radar', function (req, res) {
     res.locals.err = false;
@@ -303,6 +311,7 @@ app.get('/charts', function (req, res) {
     lineOptions.series[1].data = oDewpt
 
     var lineOptions2 = clone(linechart);
+    lineOptions.yAxis.axisLabel.formatter = "{value} \u00b0F"
     lineOptions2.yAxis.axisLabel.formatter = "{value} mph"
     lineOptions2.legend.data = ["Wind Speed", "Wind Gust"]
     lineOptions2.legend.textStyle.color = fontColor
@@ -326,6 +335,12 @@ app.get('/charts', function (req, res) {
     lineOptions3.series[1].name = ""
     lineOptions3.series[1].data = []
 
+    if (metricUnits){
+        lineOptions.yAxis.axisLabel.formatter = "{value} \u00b0C"
+        lineOptions2.yAxis.axisLabel.formatter = "{value} km/h"
+        lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
+    }
+
     res.render('charts',{data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/chartrefresh', function (req, res) {
@@ -342,6 +357,7 @@ app.get('/chartrefresh', function (req, res) {
     	fontColor = "#000"
 
     var lineOptions = clone(linechart);
+    lineOptions.yAxis.axisLabel.formatter = "{value} \u00b0F"
     lineOptions.legend.data = ["Outside Temp","Dew Point"]
     lineOptions.legend.textStyle.color = fontColor
     lineOptions.xAxis.data = xData;
@@ -376,6 +392,11 @@ app.get('/chartrefresh', function (req, res) {
     lineOptions3.series[1].name = ""
     lineOptions3.series[1].data = []
 
+    if (metricUnits){
+        lineOptions.yAxis.axisLabel.formatter = "{value} \u00b0C"
+        lineOptions2.yAxis.axisLabel.formatter = "{value} km/h"
+        lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
+    }
     res.render('chartrefresh',{data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/testpattern', function (req, res) {
@@ -388,7 +409,7 @@ app.get('/testpattern', function (req, res) {
 	console.log(oTemp.length)
 	for (var x=0;x<oTemp.length;x++)
 		console.log(oTemp[x]);
-    res.render('testpattern',{zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,moonsize: moonsize,sunrise: sunrise,sunset: sunset,directionObj: directionObj})
+    res.render('testpattern',{metricunits: metricUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,moonsize: moonsize,sunrise: sunrise,sunset: sunset,directionObj: directionObj})
 })
 
 
