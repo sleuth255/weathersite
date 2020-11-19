@@ -15,10 +15,10 @@ var myRadarZoominPath = "https://radar.weather.gov/lite/N0R/MKX_loop.gif"
 //var myRadarZoomoutPath = "https://radar.weather.gov/lite/N0Z/MKX_loop.gif"
 var myRadarZoomoutPath = "https://s.w-x.co/staticmaps/wu/wu/wxtype1200_cur/uscad/animate.png"
 var observationUnits = {
-   metricTemp: true,
-   metricRain: true,
-   metricPressure:  true,
-   metricSpeed: true
+   metricTemp: false,
+   metricRain: false,
+   metricPressure:  false,
+   metricSpeed: false
 }
 	
 //end of settings that you need to change
