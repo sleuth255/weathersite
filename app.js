@@ -14,9 +14,13 @@ var myMetarFilePath = "/data/observations/metar/stations/KMKE.TXT";
 var myRadarZoominPath = "https://radar.weather.gov/lite/N0R/MKX_loop.gif"
 //var myRadarZoomoutPath = "https://radar.weather.gov/lite/N0Z/MKX_loop.gif"
 var myRadarZoomoutPath = "https://s.w-x.co/staticmaps/wu/wu/wxtype1200_cur/uscad/animate.png"
-var metricUnits = false;
-// if set to true, choose C, mm, mb, km/h for temp,rain,pressure,windspeed in WLL Units settings
-//	
+var observationUnits = {
+   metricTemp: true,
+   metricRain: true,
+   metricPressure:  true,
+   metricSpeed: true
+}
+	
 //end of settings that you need to change
 //
 var express = require('express')
@@ -260,10 +264,10 @@ app.get('/', function (req, res) {
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
 	
-    res.render('defaultresponse',{metricunits: metricUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('defaultresponse',{observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/liveconditions', function (req, res) {
-    res.render('liveconditions',{metricunits: metricUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),day: daytime,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('liveconditions',{observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),day: daytime,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/tileconditions', function (req, res) {
     res.render('tileconditions',{zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
@@ -276,7 +280,7 @@ app.get('/livewind', function (req, res) {
 	directionObj[2] = makeCompassVector(lastDirection1);
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
-    res.render('livewind',{metricunits: metricUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,directionObj: directionObj,speed:speed})
+    res.render('livewind',{observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,directionObj: directionObj,speed:speed})
 })
 app.get('/radar', function (req, res) {
     res.locals.err = false;
@@ -335,11 +339,13 @@ app.get('/charts', function (req, res) {
     lineOptions3.series[1].name = ""
     lineOptions3.series[1].data = []
 
-    if (metricUnits){
+    if (observationUnits.metricTemp)
         lineOptions.yAxis.axisLabel.formatter = "{value} \u00b0C"
+    if (observationUnits.metricSpeed)
         lineOptions2.yAxis.axisLabel.formatter = "{value} km/h"
+    if (observationUnits.metricPressure)
         lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
-    }
+    
 
     res.render('charts',{data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
 })
@@ -392,11 +398,13 @@ app.get('/chartrefresh', function (req, res) {
     lineOptions3.series[1].name = ""
     lineOptions3.series[1].data = []
 
-    if (metricUnits){
+    if (observationUnits.metricTemp)
         lineOptions.yAxis.axisLabel.formatter = "{value} \u00b0C"
+    if (observationUnits.metricSpeed)
         lineOptions2.yAxis.axisLabel.formatter = "{value} km/h"
+    if (observationUnits.metricPressure)
         lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
-    }
+
     res.render('chartrefresh',{data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/testpattern', function (req, res) {
@@ -409,7 +417,7 @@ app.get('/testpattern', function (req, res) {
 	console.log(oTemp.length)
 	for (var x=0;x<oTemp.length;x++)
 		console.log(oTemp[x]);
-    res.render('testpattern',{metricunits: metricUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,moonsize: moonsize,sunrise: sunrise,sunset: sunset,directionObj: directionObj})
+    res.render('testpattern',{observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,moonsize: moonsize,sunrise: sunrise,sunset: sunset,directionObj: directionObj})
 })
 
 
@@ -435,8 +443,12 @@ server.on('message',function(msg,info){
 	     lastDirection = direction;
       }
 	  speed=Math.round(obj.conditions[0].wind_speed_last);
+	  if (observationUnits.metricSpeed)
+		  speed = Math.round(speed * 1.60934)
 	  gustDirection=obj.conditions[0].wind_dir_at_hi_speed_last_10_min;
 	  gustSpeed=Math.round(obj.conditions[0].wind_speed_hi_last_10_min);
+	  if (observationUnits.metricSpeed)
+		  gustSpeed = Math.round(gustSpeed * 1.60934)
 	  //rainStormStart='1603243501';
 	  rainStormStart=obj.conditions[0].rain_storm_start_at
 	  rainStormAmt=(obj.conditions[0].rain_storm *.01).toFixed(2);
@@ -494,17 +506,35 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 		console.log(data.toString())
 		var obj = JSON.parse(data);
 	    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
+	    if (observationUnits.metricSpeed)
+	    	gust = gust * 1.60934
 		avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
+	    if (observationUnits.metricSpeed)
+	    	avgSpeed = Math.round(avgSpeed * 1.60934) 
 		avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
 		inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
+	    if (observationUnits.metricTemp)
+	    	inTemp = Math.round(((inTemp -32) *5)/9)
 		inHum = Math.round(obj.data.conditions[obj.data.conditions.length-2].hum_in);
-		outTempLastReading = outTemp = Math.round(obj.data.conditions[0].temp);
-		outTempLastReading = obj.data.conditions[0].temp;
+		outTemp = Math.round(obj.data.conditions[0].temp);
+		outTempLastReading = Math.round(obj.data.conditions[0].temp);
+	    if (observationUnits.metricTemp){
+	    	outTemp = Math.round(((outTemp -32) *5)/9)
+	    	outTempLastReading = Math.round(((outTempLastReading -32) *5)/9)
+	    }
 		outHum = Math.round(obj.data.conditions[0].hum);
 		outDewPt = Math.round(obj.data.conditions[0].dew_point);
+	    if (observationUnits.metricTemp)
+	    	outDewPt = Math.round(((outDewPt -32) *5)/9)
 		outWindChill = Math.round(obj.data.conditions[0].wind_chill);
 		outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
+	    if (observationUnits.metricTemp){
+	    	outWindChill = Math.round(((outWindChill -32) *5)/9)
+	    	outHeatIdx = Math.round(((outHeatIdx -32) *5)/9)
+	    }
 		inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
+	    if (observationUnits.metricPressure)
+		  inBarometer = Math.round(inBarometer * 33.8639)
 		inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
 		if (oDate.length > 143)
 			oDate = shiftHist(oDate)
@@ -607,86 +637,105 @@ if (myMetarFtpSite.length > 0){
 			   data+=chunk
 		   })
 		   resp.on('end',function(){
-			   console.log('current conditions reply received')
-			   var obj = JSON.parse(data);
-  			   var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
-			   avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
-			   avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
-			   inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
-			   inHum = Math.round(obj.data.conditions[obj.data.conditions.length-2].hum_in);
-			   outTemp = Math.round(obj.data.conditions[0].temp);
-			   outHum = Math.round(obj.data.conditions[0].hum);
-			   outDewPt = Math.round(obj.data.conditions[0].dew_point);
-			   outWindChill = Math.round(obj.data.conditions[0].wind_chill);
-			   outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
-			   inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
-			   inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
-			   if (oDate.length > 143)
-				   oDate = shiftHist(oDate)
-			   oDate.push(new Date());
-		       localStorage.setItem("oDate",JSON.stringify(oDate));
-			   if (oTemp.length > 143)
-				   oTemp = shiftHist(oTemp)
-			   oTemp.push(outTemp);
-			   localStorage.setItem("oTemp",JSON.stringify(oTemp));
-			   if (oHum.length > 143)
-				   oHum = shiftHist(oHum)
-			   oHum.push(outHum);
-			   localStorage.setItem("oHum",JSON.stringify(oHum));
-			   if (oDewpt.length > 143)
-				   oDewpt = shiftHist(oDewpt)
-			   oDewpt.push(outDewPt);
-			   localStorage.setItem("oDewpt",JSON.stringify(oDewpt));
-			   if (oWindspd.length > 143)
-				   oWindspd = shiftHist(oWindspd)
-			   oWindspd.push(avgSpeed);
-			   localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
-			   if (oWinddir.length > 143)
-				   oWinddir = shiftHist(oWinddir)
-			   oWinddir.push(avgDirection);
-			   localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
-			   if (oWindgust.length > 143)
-				   oWindgust = shiftHist(oWindgust)
-			   oWindgust.push(gust);
-			   localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
-			   if (oBarometer.length > 143)
-			   	   oBarometer = shiftHist(oBarometer)
-			   oBarometer.push(inBarometer);
-  		       localStorage.setItem("oBarometer",JSON.stringify(oBarometer));
-			   if (inBarometerTrend < 0)
-				   inBarometerTrend = 'Falling'
-			   else
-			   if (inBarometerTrend > 0)
-				   inBarometerTrend = 'Rising'
-			   else
-				   inBarometerTrend = 'Steady'
-			   if (outTempLastReading == null)
-				   outTempLastReading == obj.data.conditions[0].temp;
-			   if (obj.data.conditions[0].temp > outTempLastReading)
-				   outTempTrend = 1;
-			   else
-			   if (obj.data.conditions[0].temp < outTempLastReading)
-				   outTempTrend = -1;
-			   else
-				   outTempTrend = 0;
-			   outTempLastReading = obj.data.conditions[0].temp;
+			    console.log('current conditions reply received')
+			    var obj = JSON.parse(data);
+			    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
+			    if (observationUnits.metricSpeed)
+			   	    gust = gust * 1.60934
+			    avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
+			    if (observationUnits.metricSpeed)
+			        avgSpeed = Math.round(avgSpeed * 1.60934) 
+			    avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
+				inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
+			    if (observationUnits.metricTemp)
+			    	inTemp = Math.round(((inTemp -32) *5)/9)
+				inHum = Math.round(obj.data.conditions[obj.data.conditions.length-2].hum_in);
+				outTemp = Math.round(obj.data.conditions[0].temp);
+				outTempLastReading = Math.round(obj.data.conditions[0].temp);
+			    if (observationUnits.metricTemp){
+			    	outTemp = Math.round(((outTemp -32) *5)/9)
+			    	outTempLastReading = Math.round(((outTempLastReading -32) *5)/9)
+			    }
+				outHum = Math.round(obj.data.conditions[0].hum);
+				outDewPt = Math.round(obj.data.conditions[0].dew_point);
+			    if (observationUnits.metricTemp)
+			    	outDewPt = Math.round(((outDewPt -32) *5)/9)
+				outWindChill = Math.round(obj.data.conditions[0].wind_chill);
+				outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
+			    if (observationUnits.metricTemp){
+			    	outWindChill = Math.round(((outWindChill -32) *5)/9)
+			    	outHeatIdx = Math.round(((outHeatIdx -32) *5)/9)
+			    }
+				inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
+			    if (observationUnits.metricPressure)
+				  inBarometer = Math.round(inBarometer * 33.8639)
+				inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
+			    if (oDate.length > 143)
+				    oDate = shiftHist(oDate)
+			    oDate.push(new Date());
+		        localStorage.setItem("oDate",JSON.stringify(oDate));
+			    if (oTemp.length > 143)
+				    oTemp = shiftHist(oTemp)
+			    oTemp.push(outTemp);
+			    localStorage.setItem("oTemp",JSON.stringify(oTemp));
+			    if (oHum.length > 143)
+				    oHum = shiftHist(oHum)
+			    oHum.push(outHum);
+			    localStorage.setItem("oHum",JSON.stringify(oHum));
+			    if (oDewpt.length > 143)
+				    oDewpt = shiftHist(oDewpt)
+			    oDewpt.push(outDewPt);
+			    localStorage.setItem("oDewpt",JSON.stringify(oDewpt));
+			    if (oWindspd.length > 143)
+				    oWindspd = shiftHist(oWindspd)
+			    oWindspd.push(avgSpeed);
+			    localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
+			    if (oWinddir.length > 143)
+				    oWinddir = shiftHist(oWinddir)
+			    oWinddir.push(avgDirection);
+			    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
+			    if (oWindgust.length > 143)
+				    oWindgust = shiftHist(oWindgust)
+			    oWindgust.push(gust);
+			    localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
+			    if (oBarometer.length > 143)
+			   	    oBarometer = shiftHist(oBarometer)
+			    oBarometer.push(inBarometer);
+  		        localStorage.setItem("oBarometer",JSON.stringify(oBarometer));
+			    if (inBarometerTrend < 0)
+				    inBarometerTrend = 'Falling'
+			    else
+			    if (inBarometerTrend > 0)
+				    inBarometerTrend = 'Rising'
+			    else
+				    inBarometerTrend = 'Steady'
+			    if (outTempLastReading == null)
+				    outTempLastReading == obj.data.conditions[0].temp;
+			    if (obj.data.conditions[0].temp > outTempLastReading)
+				    outTempTrend = 1;
+			    else
+			    if (obj.data.conditions[0].temp < outTempLastReading)
+				    outTempTrend = -1;
+			    else
+				    outTempTrend = 0;
+			    outTempLastReading = obj.data.conditions[0].temp;
 
-			   console.log('starting WLL UDP refresh request')
-			   req1.end();
-			   var req2 = http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
-				   data = '';
-				   resp.on('data',function(chunk){
-				    data+=chunk
-				   })
-				   resp.on('end',function(){
-				    console.log('UDP request processed')
-				    req2.end();
-				   })
-			   }).on('error',(err) =>{
-				   console.log("UDP request failure")
-				   req2.end();
-			   })
-		   })
+			    console.log('starting WLL UDP refresh request')
+			    req1.end();
+			    var req2 = http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
+				    data = '';
+				    resp.on('data',function(chunk){
+				     data+=chunk
+				    })
+				    resp.on('end',function(){
+				     console.log('UDP request processed')
+				     req2.end();
+				    })
+			    }).on('error',(err) =>{
+			 	    console.log("UDP request failure")
+			 	    req2.end();
+			    })
+		    })
 	   }).on('error',(err) =>{
 		   console.log("Current conditions request failure")
 		   req1.end();

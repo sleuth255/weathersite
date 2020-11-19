@@ -4,10 +4,13 @@ block append content
         - tempunit = "F"
         - pressureunit = '"'
         - rainunit = '"'
-        if (metricunits)
+        if (observationUnits.metricSpeed)
            - speedunit = "km/h"
+        if (observationUnits.metricTemp)
            - tempunit = "C"
+        if (observationUnits.metricPressure)
            - pressureunit = "mb"
+        if (observationUnits.metricRain)
            - rainunit = "mm"
         - offset = 100
         if (rainStormStart.length > 0)

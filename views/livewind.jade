@@ -2,8 +2,9 @@ extends layout
 block append content
        - speedunit = "MPH"
        - tempunit = "F"
-       if (metricunits)
+       if (observationUnits.metricSpeed)
           - speedunit = "km/h"
+       if (observationUnits.metricTemp)
           - tempunit = "C"
        if (directionObj[0].left > 0 && directionObj[0].top > 0)
          img.compasspointer(src='./images/compasspointer.png' style='left:#{directionObj[0].left}px;top:#{directionObj[0].top}px;transform: rotate(#{directionObj[0].rotation}deg); z-index: 5;')
