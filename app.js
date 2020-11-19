@@ -507,7 +507,7 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 		var obj = JSON.parse(data);
 	    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
 	    if (observationUnits.metricSpeed)
-	    	gust = gust * 1.60934
+	    	gust = Math.round(gust * 1.60934)
 		avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
 	    if (observationUnits.metricSpeed)
 	    	avgSpeed = Math.round(avgSpeed * 1.60934) 
@@ -641,7 +641,7 @@ if (myMetarFtpSite.length > 0){
 			    var obj = JSON.parse(data);
 			    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
 			    if (observationUnits.metricSpeed)
-			   	    gust = gust * 1.60934
+			   	    gust = Math.round(gust * 1.60934)
 			    avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
 			    if (observationUnits.metricSpeed)
 			        avgSpeed = Math.round(avgSpeed * 1.60934) 
