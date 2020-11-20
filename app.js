@@ -451,9 +451,15 @@ server.on('message',function(msg,info){
 		  gustSpeed = Math.round(gustSpeed * 1.60934)
 	  //rainStormStart='1603243501';
 	  rainStormStart=obj.conditions[0].rain_storm_start_at
-	  rainStormAmt=(obj.conditions[0].rain_storm *.01).toFixed(2);
-	  rainStormRate=obj.conditions[0].rain_rate_last *.01
-	  
+	  if (observationUnits.metricRain){
+		  rainStormAmt=(obj.conditions[0].rain_storm *.2).toFixed(2);
+		  rainStormRate=obj.conditions[0].rain_rate_last *.2;
+		  
+	  }
+	  else{
+	      rainStormAmt=(obj.conditions[0].rain_storm *.01).toFixed(2);
+	      rainStormRate=obj.conditions[0].rain_rate_last *.01
+	  }
 	  if (rainStormStart == null){
 		  rainStormStart = ''
 	  }
