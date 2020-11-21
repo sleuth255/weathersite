@@ -17,6 +17,7 @@ block append content
       - offset = 50
    body()
      script(type='text/javascript')
+       |  var timeactive = 0;
        |  window.onload = setupRefresh;
        |  function setupRefresh()
        |  {
@@ -66,6 +67,23 @@ block append content
        |  }
        |  function charts(){
        |     window.location = getURL()+"/charts";
+       |  }
+       |  function timetoggle(){
+       |     if (timeactive == 1){
+       |	   timeactive = 0;
+       |       $('.floatingsuntile').show();
+       |       $('.floatingtimetile').hide();
+       |     }
+       |     else{
+       |	   timeactive = 1;
+       |       $('.floatingsuntile').hide();
+       |       $('.floatingtimetile').show();
+       |       setTimeout(function(){
+       |	      timeactive = 0;
+       |          $('.floatingsuntile').show();
+       |          $('.floatingtimetile').hide();
+       |       },10*1000)
+       |     }
        |  }
      div#wind(style='display: block; height: 700px; background-image: url("/images/compassrose.png"); background-repeat: no-repeat;')
        if (directionObj[0].left > 0 && directionObj[0].top > 0)
@@ -185,7 +203,7 @@ block append content
           tr
             td(height=30)
      div#floatingtiles
-       div.floatingsuntile
+       div.floatingsuntile(onClick='timetoggle()')
         table(cellspacing = 0,cellpadding=0, style='width: 150px')
           tr
            td(height=6)
@@ -205,25 +223,25 @@ block append content
            td(style='text-align: center')
              span.smaller.fontcolorblack
                 |#{moment(sunset).format('h:mm a')}
-       div.floatingtimetile
+       div.floatingtimetile(style = 'display: none;' onClick='timetoggle()')
         table(cellspacing = 0,cellpadding=0, style='width: 150px')
           tr
            td(height=6)
           tr
            td(style='text-align: center')
-             span.smallerbold.fontcolorwhite
+             span.smallerbold.fontcolorblack
                 |#{moment(new Date()).format('MMM Do, YYYY')}
           tr
            td(height=35)
           tr
            td(style='text-align: center')
-             span.bigger.fontcolorwhite
+             span.bigger.fontcolorblack
                 |#{moment(new Date()).format('h:mm:ss')}
           tr
            td(height=25)
           tr
            td(style='text-align: center')
-             span.smaller.fontcolorwhite
+             span.smaller.fontcolorblack
                 |#{moment(new Date()).format('dddd')}
        div.floatingmoontile(style='	background: black url("/images/moon#{moonsize}.gif") no-repeat center 40px;background-size: 50%;')
         table(cellspacing = 0,cellpadding=0, style='width: 150px')
