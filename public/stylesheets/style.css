@@ -40,6 +40,20 @@
 	z-index: 2;
 	
 }
+.floatingtimetile{
+	height: 150px;
+	width: 150px;
+	border-radius: 20%;
+	background-color: rgba(0,0,0,1.0);
+	background-size: 65%;
+	position: absolute;
+	display: inline-block;
+	border: 3px solid white;
+	right: 20px;
+	top: 530px;
+	z-index: 2;
+	
+}
 .radartile{
 	height: 550px;
 	width: 650px;
