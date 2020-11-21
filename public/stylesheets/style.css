@@ -90,6 +90,9 @@
 .fontcolorwhite{
 	color: #ffffff;
 }
+.fontcolorgrey{
+	color: #cccccc;
+}
 .compasspointer{
   position: absolute;
   display: inline-block;
