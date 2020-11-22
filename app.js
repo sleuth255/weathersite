@@ -434,6 +434,8 @@ server.on('listening',function(){
 });
 server.on('message',function(msg,info){
 	  //console.log(msg.toString());
+	  if (info.address != myWLLIp) // drop foreign broadcasts
+		  return
 	  var obj = JSON.parse(msg);
 	  direction=obj.conditions[0].wind_dir_last;
 	  if (direction != lastDirection){
