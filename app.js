@@ -376,6 +376,9 @@ app.get('/liveconditions', function (req, res) {
 app.get('/tileconditions', function (req, res) {
     res.render('tileconditions',{zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
 })
+app.get('/refreshsuntile', function (req, res) {
+    res.render('refreshsuntile',{zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
+})
 app.get('/livewind', function (req, res) {
     res.locals.err = false;
 	var directionObj = []

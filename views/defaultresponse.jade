@@ -25,7 +25,8 @@ block append content
        |  {
        |    setInterval("refreshWindBlock();",2.5*1000);
        |    setInterval("refreshConditionsBlock();",30*1000);
-       |    setInterval("refreshTiles();",1*1000);
+       |    setInterval("refreshTiles();",60*1000);
+       |    setInterval("refreshSunTile();",1*1000);
        if((skyconditions[0].skyconditions > 4 && day) || (day && rainStormRate > 0))
           |$('body').css('background', 'url("/images/cloudybackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
@@ -50,6 +51,10 @@ block append content
        |  function refreshConditionsBlock()
        |  {
        |     $('#conditions').load("./liveconditions");
+       |  }
+       |  function refreshSunTile()
+       |  {
+       |     $('#suntile').load("./refreshsuntile");
        |  }
        |  function refreshTiles()
        |  {
@@ -245,7 +250,7 @@ block append content
                  |Rain Storm
           tr
             td(height=30)
-     div#floatingtiles
+     div#suntile
        div.floatingsuntile(onClick='timetoggle()')
         table(cellspacing = 0,cellpadding=0, style='width: 150px')
           tr
@@ -286,6 +291,7 @@ block append content
            td(style='text-align: center')
              span.smaller.fontcolorblack
                 |#{moment(new Date()).format('dddd')}
+     div#floatingtiles
        div.floatingmoontile(style='	background: black url("/images/moon#{moonsize}.gif") no-repeat center 40px;background-size: 50%;')
         table(cellspacing = 0,cellpadding=0, style='width: 150px')
           tr
