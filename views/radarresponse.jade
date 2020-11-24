@@ -10,11 +10,11 @@ block append content
        |  {
        |    setInterval("refreshRadar();",60*1000);
        |    setInterval("refreshTiles();",1*1000);
-       if((skyconditions > 4 && day) || (day && rainStormRate > 0))
+       if((skyconditions[0].skyconditions > 4 && day) || (day && rainStormRate > 0))
           |$('body').css('background', 'url("/images/cloudybackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#ffffff');
-       else if((skyconditions > 4 && !day) || (!day && rainStormRate > 0))
+       else if((skyconditions[0].skyconditions > 4 && !day) || (!day && rainStormRate > 0))
           |$('body').css('background', 'url("/images/cloudynightbackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#ffffff');
@@ -171,8 +171,8 @@ block append content
                    |Waning Crescent
                 else
                    |New Moon
-       if (skyconditions < 5)
-          div.floatingweathertile(style='background: url("/images/DayIcons/skyconditions#{skyconditions}.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #ffffff;')
+       if (skyconditions[0].skyconditions < 5)
+          div.floatingweathertile(style='background: url("/images/DayIcons/skyconditions#{skyconditions[0].skyconditions}.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #ffffff;')
            table(cellspacing = 0,cellpadding=0, style='width: 150px')
              tr
               td(height=6)
@@ -185,16 +185,9 @@ block append content
              tr
               td(style='text-align: center')
                 span.smaller.fontcolorblack
-                   if (skyconditions == 1)
-                      |Clear
-                   else if (skyconditions == 2)
-                      |Mostly Clear
-                   else if (skyconditions == 3)
-                      |Partly Cloudy
-                   else if (skyconditions == 4)
-                      |Mostly Cloudy
+                   |#{skyconditions[0].weather}
        else
-          div.floatingweathertile(style='background: url("/images/DayIcons/skyconditions#{skyconditions}.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #b3b3b3;')
+          div.floatingweathertile(style='background: url("/images/DayIcons/skyconditions#{skyconditions[0].skyconditions}.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #b3b3b3;')
            table(cellspacing = 0,cellpadding=0, style='width: 150px')
              tr
               td(height=6)
@@ -207,14 +200,7 @@ block append content
              tr
               td(style='text-align: center')
                 span.smaller.fontcolorblack
-                   if (skyconditions == 5)
-                      |Overcast
-                   else if (skyconditions == 6)
-                      |Raining
-                   else if (skyconditions == 7)
-                      |Snowing
-                   else if (skyconditions == 8)
-                      |Thunder Storms
+                   |#{skyconditions[0].weather}
      if (zoominradarimage.length > 0)
         div#buttons
            button.button(onClick='conditions()') Conditions

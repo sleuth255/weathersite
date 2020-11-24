@@ -12,8 +12,11 @@ var myWLLIp = '10.0.0.42';
 var myMetarFtpSite = "tgftp.nws.noaa.gov";
 var myMetarFilePath = "/data/observations/metar/stations/KMKE.TXT";
 var myRadarZoominPath = "https://radar.weather.gov/lite/N0R/MKX_loop.gif"
-//var myRadarZoomoutPath = "https://radar.weather.gov/lite/N0Z/MKX_loop.gif"
 var myRadarZoomoutPath = "https://s.w-x.co/staticmaps/wu/wu/wxtype1200_cur/uscad/animate.png"
+var myClimacellApiKey = "";
+// get a free Dev API key from climacell.co to enable active Weather Tile functionality
+// for privacy, the key can also can be stored in local storage in a file called "ccApiKey" 
+// (see local storage initialization below)
 var observationUnits = {
    metricTemp: false,
    metricRain: false,
@@ -28,6 +31,7 @@ var express = require('express')
 , routes = require('routes')
 , user = require('user')
 , http = require('http')
+, https = require('https')
 , LocalStorage = require('node-localstorage').LocalStorage
 , udp = require('dgram')
 , buffer = require('buffer')
@@ -65,6 +69,9 @@ app.locals.moment = require('moment');
 //initialize local storage
 var oDate,oTemp,oHum,oDewpt,oWindspd,oWinddir,oWindgust,oBarometer
 var localStorage = new LocalStorage('/WeathersiteStats'); 
+if ((localStorage.getItem("ccApiKey"))!=null)
+	myClimacellApiKey = localStorage.getItem("ccApiKey"); //optional: make your Dev key secret
+
 if ((localStorage.getItem("oDate"))==null)
 	oDate = [];
 else
@@ -110,6 +117,44 @@ app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.logger('dev'));
 
+/***************************************************************/
+//globals
+let cookie = {};
+var metarObservation = "";
+var direction = 0;
+var lastDirection3 = lastDirection2 = lastDirection1 = lastDirection = 0;
+var speed = 0;
+var gustSpeed = 0;
+var gustDirection = 0;
+var avgSpeed = 0
+var avgDirection = 0
+var inTemp = 0;
+var inHum = 0;
+var outTemp = 0;
+var outTempLastReading = null;
+var outHum = 0;
+var outDewPt = 0;
+var outWindChill = 0;
+var outHeatIdx = 0;
+var outTempTrend = 0;
+var inBarometer = 0;
+var inBarometerTrend;
+var rainStormStart = '';
+var rainStormAmt = 0;
+var rainStormRate = 0;
+var forecastObj = {};
+var sunrise;
+var sunset;
+var now = new Date();
+var moonsize = makeMoonPhaseVector();
+var daytime = suncalc.getTimes(now,myLatitude,myLongitude);
+sunrise = daytime.sunrise;
+sunset = daytime.sunset;
+if ((now > daytime.dusk && now > daytime.dawn) || (now < daytime.dawn && now < daytime.dusk))
+	daytime = 0;
+else
+	daytime = 1;
+
 function shiftHist(array){
 	var newArray = []
 	for(var x = 1; x < array.length; x++)
@@ -117,23 +162,117 @@ function shiftHist(array){
 	return newArray;
 }
 function makeSkyConditionsVector(){
-	var skyconditions = 1;
-	if (metarObservation.indexOf("CLR") != -1)
-		skyconditions = 1;
-	if (metarObservation.indexOf("FEW") != -1)
-		skyconditions = 2;
-	if (metarObservation.indexOf("SCT") != -1)
-		skyconditions = 3;
-	if (metarObservation.indexOf("BKN") != -1)
-		skyconditions = 4;
-	if (metarObservation.indexOf("OVC") != -1)
-		skyconditions = 5;
-    if (rainStormRate > 0)
-		skyconditions = 6;
-	if (metarObservation.indexOf("SN") != -1)
-		skyconditions = 7;
-	if (metarObservation.indexOf("LTG") != -1)
-		skyconditions = 8;
+	var skyconditions = [];
+	var obj = {
+			skyconditions: 1,
+			weather: 'Clear'
+	}
+	if (metarObservation.indexOf("CLR") != -1){
+		obj.skyconditions = 1;
+		obj.weather = 'Clear';
+	}	
+	if (metarObservation.indexOf("FEW") != -1){
+		obj. skyconditions = 2;
+		obj.weather = 'Mostly Clear';
+	}
+	if (metarObservation.indexOf("SCT") != -1){
+		obj.skyconditions = 3;
+		obj.weather = 'Partly Cloudy';
+	}
+	if (metarObservation.indexOf("BKN") != -1){
+		obj.skyconditions = 4;
+		obj.weather = 'Mostly Cloudy';
+    }
+	if (metarObservation.indexOf("OVC") != -1){
+		obj. skyconditions = 5;
+		obj.weather = 'Overcast';
+	}
+    if (rainStormRate > 0){
+		obj.skyconditions = 6;
+		obj.weather = 'Raining';
+    }
+	if (metarObservation.indexOf("SN") != -1){
+		obj.skyconditions = 7;
+		obj.weather = 'Snowing';
+	}
+	if (metarObservation.indexOf("LTG") != -1){
+		obj.skyconditions = 8;
+		obj.weather = 'Thunderstorms';
+	}
+	skyconditions.push(obj);
+	
+// now get forecasts
+	if (forecastObj.length > 0){
+	   for(var x = 1; x<4;x++){
+			var obj = {
+					skyconditions: 1,
+					weather: 'Clear'
+			}
+		   if (forecastObj[x].weather_code.value == 'clear'){
+			   obj.skyconditions = 1;
+			   obj.weather = 'Clear';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'mostly_clear'){
+			   obj.skyconditions = 2;
+			   obj.weather = 'Mostly Clear';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'partly_cloudy'){
+			   obj.skyconditions = 3;
+			   obj.weather = 'Partly Cloudy';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'mostly_cloudy'){
+			   obj.skyconditions = 4;
+			   obj.weather = 'Mostly Cloudy';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'cloudy' || forecastObj[x].weather_code.value == 'fog_light' || forecastObj[x].weather_code.value == 'fog'){
+			   obj.skyconditions = 5;
+ 			   obj.weather = 'Overcast';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'drizzle' || forecastObj[x].weather_code.value == 'rain_light'){
+			   obj.skyconditions = 9;
+			   obj.weather = 'Light Rain';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'rain' || forecastObj[x].weather_code.value == 'rain_heavy'){
+			   obj.skyconditions = 6;
+			   obj.weather = 'Raining';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'tstorm'){
+			   obj.skyconditions = 8;
+			   obj.weather = 'Thunderstorms';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'flurries' || forecastObj[x].weather_code.value == 'snow_light'){
+			   obj.skyconditions = 10;
+			   obj.weather = 'Snow Flurries';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'snow' || forecastObj[x].weather_code.value == 'snow_heavy'){
+			   obj.skyconditions = 9;
+   			   obj.weather = 'Snowing';
+		   }
+		   else
+		   {
+			   obj.skyconditions = 11;
+			   obj.weather = 'Freezing Rain';
+		   }
+		   skyconditions.push(obj);
+	   }
+	}
+	else{
+		var obj = {
+				skyconditions: 1,
+				weather: 'Unavailable'
+		}
+		for(var x=1;x<4;x++)
+		    skyconditions.push(obj)
+	}
 	return skyconditions
 }
 function makeMoonPhaseVector(){
@@ -159,6 +298,7 @@ function makeMoonPhaseVector(){
     return 7;
     	
 }
+
 function makeCompassVector(direction){
 	var left=top=rotation=0;
 	var heading='';
@@ -218,42 +358,6 @@ function makeCompassVector(direction){
     }
     return {heading: heading,left: left,top: top,rotation: rotation};
 }
-/***************************************************************/
-// globals
-let cookie = {};
-var metarObservation = "";
-var direction = 0;
-var lastDirection3 = lastDirection2 = lastDirection1 = lastDirection = 0;
-var speed = 0;
-var gustSpeed = 0;
-var gustDirection = 0;
-var avgSpeed = 0
-var avgDirection = 0
-var inTemp = 0;
-var inHum = 0;
-var outTemp = 0;
-var outTempLastReading = null;
-var outHum = 0;
-var outDewPt = 0;
-var outWindChill = 0;
-var outHeatIdx = 0;
-var outTempTrend = 0;
-var inBarometer = 0;
-var inBarometerTrend;
-var rainStormStart = '';
-var rainStormAmt = 0;
-var rainStormRate = 0;
-var sunrise;
-var sunset;
-var now = new Date();
-var moonsize = makeMoonPhaseVector();
-var daytime = suncalc.getTimes(now,myLatitude,myLongitude);
-sunrise = daytime.sunrise;
-sunset = daytime.sunset;
-if ((now > daytime.dusk && now > daytime.dawn) || (now < daytime.dawn && now < daytime.dusk))
-	daytime = 0;
-else
-	daytime = 1;
 
 //process...
 app.get('/', function (req, res) {
@@ -300,7 +404,7 @@ app.get('/charts', function (req, res) {
     }
     xData = xData.slice(0,oTemp.length)
     var fontColor = "#fff"
-    if (daytime  && makeSkyConditionsVector() < 5)
+    if (daytime  && makeSkyConditionsVector()[0].skyconditions < 5)
     	fontColor = "#000"
 
     var lineOptions = clone(linechart);
@@ -359,7 +463,7 @@ app.get('/chartrefresh', function (req, res) {
     }
     xData = xData.slice(0,oTemp.length)
     var fontColor = "#fff"
-    if (daytime  && makeSkyConditionsVector() < 5)
+    if (daytime  && makeSkyConditionsVector()[0].skyconditions < 5)
     	fontColor = "#000"
 
     var lineOptions = clone(linechart);
@@ -501,9 +605,29 @@ if (myMetarFtpSite.length > 0){
        console.log('Caught Metar Observation error')
    }
 }
+
+// Get initial Climacell forecast
+if (myClimacellApiKey.length > 0){
+   var ccreq = "https://api.climacell.co/v3/weather/forecast/daily?unit_system=si&lat="+myLatitude+"&lon="+myLongitude+"&start_time=now&fields=weather_code&apikey="+myClimacellApiKey
+   var req0 = https.get(ccreq,function(resp){
+	   var ccdata = '';
+	   resp.on('data',function(chunk){
+		   ccdata+=chunk
+	   })
+	   resp.on('end',function(){
+		   console.log(ccdata.toString())
+		   forecastObj = JSON.parse(ccdata);
+		   console.log(forecastObj[1].weather_code.value)
+		   req0.end();
+	   })
+   }).on('error',(err) =>{
+	      console.log("Current conditions initial request failure")
+	      req0.end();
+   })
+}
+
 //Get initial conditions from WLL.
 //Also tell WLL to start broadcasting live UDP Wind/Rainfall data every 5 minutes
-
 console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
 var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 	data = '';
@@ -604,6 +728,28 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 	   console.log("Current conditions initial request failure")
 	   req1.end();
 })
+
+// request the current forecast from ClimaCell every hour
+if (myClimacellApiKey.length > 0){
+   setInterval(function(){
+	   var ccreq = "https://api.climacell.co/v3/weather/forecast/daily?unit_system=si&lat="+myLatitude+"&lon="+myLongitude+"&start_time=now&fields=weather_code&apikey="+myClimacellApiKey
+	   var req0 = https.get(ccreq,function(resp){
+		   var ccdata = '';
+		   resp.on('data',function(chunk){
+			   ccdata+=chunk
+		   })
+		   resp.on('end',function(){
+			   forecastObj = JSON.parse(ccdata);
+			   req0.end();
+		   })
+	   }).on('error',(err) =>{
+		      console.log("ClimaCell Forecast request failure")
+		      req0.end();
+	   })
+
+	
+   },1*60*60*1000) //retrieve new forecast every hour
+}
 
 // Primary 5 minute weather conditions refresh code block follows
 // get METAR Observation from NOAA FTP site and local conditions from WLL  
