@@ -240,7 +240,7 @@ function makeSkyConditionsVector(){
 		   else
 		   if (forecastObj[x].weather_code.value == 'rain' || forecastObj[x].weather_code.value == 'rain_heavy'){
 			   obj.skyconditions = 6;
-			   obj.weather = 'Raining';
+			   obj.weather = 'Rain';
 		   }
 		   else
 		   if (forecastObj[x].weather_code.value == 'tstorm'){
@@ -255,7 +255,7 @@ function makeSkyConditionsVector(){
 		   else
 		   if (forecastObj[x].weather_code.value == 'snow' || forecastObj[x].weather_code.value == 'snow_heavy'){
 			   obj.skyconditions = 9;
-   			   obj.weather = 'Snowing';
+   			   obj.weather = 'Snow';
 		   }
 		   else
 		   {
