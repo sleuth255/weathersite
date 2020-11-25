@@ -328,33 +328,16 @@ block append content
        - hoursout = ["Current Weather","24hr Forecast","48hr Forecast","96hr Forecast"]
        if condition < 5
           - style = 'background: url("/images/DayIcons/skyconditions'+condition+'.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #ffffff;'
-          each x in [0,1,2,3]
-             - weather = skyconditions[x].weather
-             - condition = skyconditions[x].skyconditions
-             if x > 0
-                - style = 'display: none; background: url("/images/DayIcons/skyconditions'+condition+'.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #ffffff;'
-             |<div class=floatingweathertile#{x} style='#{style}' onclick='nextWeatherTile()'>
-             table(cellspacing = 0,cellpadding=0, style='width: 150px')
-                tr
-                 td(height=6)
-                tr
-                 td(style='text-align: center')
-                   span.smallerbold.fontcolorblack
-                      |#{hoursout[x]}
-                tr
-                 td(height=100)
-                tr
-                 td(style='text-align: center')
-                   span.smaller.fontcolorblack
-                      |#{weather}
-             |</div>
        else
           - style = 'background: url("/images/DayIcons/skyconditions'+condition+'.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #b3b3b3;'
           each x in [0,1,2,3]
              - weather = skyconditions[x].weather
              - condition = skyconditions[x].skyconditions
              if x > 0
-                - style = 'display: none; background: url("/images/DayIcons/skyconditions'+condition+'.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #b3b3b3;'
+                if condition < 5
+                   - style = 'display: none; background: url("/images/DayIcons/skyconditions'+condition+'.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #ffffff;'
+                else
+                   - style = 'display: none; background: url("/images/DayIcons/skyconditions'+condition+'.png") no-repeat center 35px;background-size: 100%;border: 3px Solid black;background-color: #b3b3b3;'
              |<div class=floatingweathertile#{x} style='#{style}' onclick='nextWeatherTile()'>
              table(cellspacing = 0,cellpadding=0, style='width: 150px')
                 tr
