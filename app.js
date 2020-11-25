@@ -228,19 +228,39 @@ function makeSkyConditionsVector(){
 			   obj.weather = 'Mostly Cloudy';
 		   }
 		   else
-		   if (forecastObj[x].weather_code.value == 'cloudy' || forecastObj[x].weather_code.value == 'fog_light' || forecastObj[x].weather_code.value == 'fog'){
+		   if (forecastObj[x].weather_code.value == 'cloudy'){
 			   obj.skyconditions = 5;
  			   obj.weather = 'Overcast';
 		   }
 		   else
-		   if (forecastObj[x].weather_code.value == 'drizzle' || forecastObj[x].weather_code.value == 'rain_light'){
+		   if (forecastObj[x].weather_code.value == 'fog_light'){
+			   obj.skyconditions = 5;
+ 			   obj.weather = 'Light Fog';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'fog'){
+			   obj.skyconditions = 5;
+ 			   obj.weather = 'Dense Fog';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'rain_light'){
 			   obj.skyconditions = 9;
 			   obj.weather = 'Light Rain';
 		   }
 		   else
-		   if (forecastObj[x].weather_code.value == 'rain' || forecastObj[x].weather_code.value == 'rain_heavy'){
+		   if (forecastObj[x].weather_code.value == 'drizzle'){
+			   obj.skyconditions = 9;
+			   obj.weather = 'Drizzle';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'rain'){
 			   obj.skyconditions = 6;
 			   obj.weather = 'Rain';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'rain_heavy'){
+			   obj.skyconditions = 6;
+			   obj.weather = 'Heavy Rain';
 		   }
 		   else
 		   if (forecastObj[x].weather_code.value == 'tstorm'){
@@ -248,19 +268,59 @@ function makeSkyConditionsVector(){
 			   obj.weather = 'Thunderstorms';
 		   }
 		   else
-		   if (forecastObj[x].weather_code.value == 'flurries' || forecastObj[x].weather_code.value == 'snow_light'){
+		   if (forecastObj[x].weather_code.value == 'flurries'){
 			   obj.skyconditions = 10;
 			   obj.weather = 'Snow Flurries';
 		   }
 		   else
-		   if (forecastObj[x].weather_code.value == 'snow' || forecastObj[x].weather_code.value == 'snow_heavy'){
+			   if (forecastObj[x].weather_code.value == 'snow_light'){
+				   obj.skyconditions = 10;
+				   obj.weather = 'Light Snow';
+			   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'snow'){
 			   obj.skyconditions = 9;
    			   obj.weather = 'Snow';
 		   }
 		   else
-		   {
+		   if (forecastObj[x].weather_code.value == 'snow_heavy'){
+			   obj.skyconditions = 9;
+			   obj.weather = 'Heavy Snow';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'ice_pellets_light'){
+			   obj.skyconditions = 11;
+			   obj.weather = 'Light Icing';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'ice_pellets'){
+			   obj.skyconditions = 11;
+			   obj.weather = 'Ice Pellets';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'ice_pellets_heavy'){
+			   obj.skyconditions = 11;
+			   obj.weather = 'Heavy Icing';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'freezing_drizzle'){
+			   obj.skyconditions = 11;
+			   obj.weather = 'Freezing drizzle';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'freezing_rain_light'){
+			   obj.skyconditions = 11;
+			   obj.weather = 'Light Freezing Rain';
+		   }
+		   else
+		   if (forecastObj[x].weather_code.value == 'freezing_rain'){
 			   obj.skyconditions = 11;
 			   obj.weather = 'Freezing Rain';
+		   }
+		   else
+		   {
+			   obj.skyconditions = 11;
+			   obj.weather = 'Heavy Freezing Rain';
 		   }
 		   skyconditions.push(obj);
 	   }
@@ -620,11 +680,10 @@ if (myClimacellApiKey.length > 0){
 	   resp.on('end',function(){
 		   console.log(ccdata.toString())
 		   forecastObj = JSON.parse(ccdata);
-		   console.log(forecastObj[1].weather_code.value)
 		   req0.end();
 	   })
    }).on('error',(err) =>{
-	      console.log("Current conditions initial request failure")
+	      console.log("Forecast initial request failure")
 	      req0.end();
    })
 }
@@ -732,7 +791,7 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 	   req1.end();
 })
 
-// request the current forecast from ClimaCell every hour
+// request the current forecast from ClimaCell every 30 minutes
 if (myClimacellApiKey.length > 0){
    setInterval(function(){
 	   var ccreq = "https://api.climacell.co/v3/weather/forecast/daily?unit_system=si&lat="+myLatitude+"&lon="+myLongitude+"&start_time=now&fields=weather_code&apikey="+myClimacellApiKey
@@ -751,7 +810,7 @@ if (myClimacellApiKey.length > 0){
 	   })
 
 	
-   },1*60*60*1000) //retrieve new forecast every hour
+   },30*60*1000) //retrieve new forecast every 30 minutes
 }
 
 // Primary 5 minute weather conditions refresh code block follows
