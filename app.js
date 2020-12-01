@@ -203,7 +203,7 @@ function makeSkyConditionsVector(){
 	
 // now get forecasts
 	if (forecastObj.length > 0){
-	   for(var x = 1; x<4;x++){
+	   for(var x = 0; x<49;x+=24){
 			var obj = {
 					skyconditions: 1,
 					weather: 'Clear'
@@ -671,14 +671,20 @@ if (myMetarFtpSite.length > 0){
 
 // Get initial Climacell forecast
 if (myClimacellApiKey.length > 0){
-   var ccreq = "https://api.climacell.co/v3/weather/forecast/daily?unit_system=si&lat="+myLatitude+"&lon="+myLongitude+"&start_time=now&fields=weather_code&apikey="+myClimacellApiKey
+   dt = new Date()
+   sdt = new Date()
+   edt = new Date()
+   sdt.setDate(dt.getDate()+1)
+   edt.setDate(dt.getDate()+3)
+   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T18:00:00Z';
+   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T18:00:00Z';
+   var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+myLatitude+"&lon="+myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+myClimacellApiKey
    var req0 = https.get(ccreq,function(resp){
 	   var ccdata = '';
 	   resp.on('data',function(chunk){
 		   ccdata+=chunk
 	   })
 	   resp.on('end',function(){
-		   console.log(ccdata.toString())
 		   forecastObj = JSON.parse(ccdata);
 		   req0.end();
 	   })
@@ -794,7 +800,7 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 // request the current forecast from ClimaCell every 30 minutes
 if (myClimacellApiKey.length > 0){
    setInterval(function(){
-	   var ccreq = "https://api.climacell.co/v3/weather/forecast/daily?unit_system=si&lat="+myLatitude+"&lon="+myLongitude+"&start_time=now&fields=weather_code&apikey="+myClimacellApiKey
+	   var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+myLatitude+"&lon="+myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+myClimacellApiKey
 	   var req0 = https.get(ccreq,function(resp){
 		   var ccdata = '';
 		   resp.on('data',function(chunk){
