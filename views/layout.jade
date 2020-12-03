@@ -2,7 +2,8 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    if (changebackgroundto != 0)
+       link(rel='stylesheet', href='/stylesheets/style.css')
     if (zoominradarimage.length > 0)
        link(rel='prefetch',href='#{zoominradarimage}')
     if (zoomoutradarimage.length > 0)
@@ -10,19 +11,19 @@ html
     script
       |if (!window.jQuery) document.write('<script src="/modules/jquery.min.js"><\/script>');
     script
-      if((skyconditions[0].skyconditions > 4 && day) || (day && rainStormRate > 0))
+      if(changebackgroundto == 1)
          |$('body').css('background', 'url("/images/cloudybackground.jpg") no-repeat bottom fixed');
          |$('body').css('background-size', 'cover');
          |$('.fontcolor').css('color','#ffffff');
-       else if((skyconditions[0].skyconditions > 4 && !day) || (!day && rainStormRate > 0))
+       else if(changebackgroundto == 2)
           |$('body').css('background', 'url("/images/cloudynightbackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#ffffff');
-      else if(day)
+      else if(changebackgroundto == 3)
          |$('body').css('background', 'url("/images/sunnybackground.jpg") no-repeat bottom fixed');
          |$('body').css('background-size', 'cover');
          |$('.fontcolor').css('color','#000000');
-      else
+      else if (changebackgroundto == 4)
          |$('body').css('background', 'url("/images/starrybackground.jpg") no-repeat bottom fixed');
          |$('body').css('background-size', 'cover');
          |$('.fontcolor').css('color','#ffffff');
