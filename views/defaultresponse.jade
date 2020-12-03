@@ -27,19 +27,19 @@ block append content
        |    setInterval("refreshConditionsBlock();",30*1000);
        |    setInterval("refreshTiles();",60*1000);
        |    setInterval("refreshSunTile();",1*1000);
-       if(changebackgroundto == 1)
+       if(((skyconditions[0].skyconditions > 4 && day) || (day && rainStormRate > 0)) && changebackgroundto != 1)
           |$('body').css('background', 'url("/images/cloudybackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#ffffff');
-        else if(changebackgroundto == 2)
-           |$('body').css('background', 'url("/images/cloudynightbackground.jpg") no-repeat bottom fixed');
-           |$('body').css('background-size', 'cover');
-           |$('.fontcolor').css('color','#ffffff');
-       else if(changebackgroundto == 3)
+       else if(((skyconditions[0].skyconditions > 4 && !day) || (!day && rainStormRate > 0)) && changebackgroundto != 2)
+          |$('body').css('background', 'url("/images/cloudynightbackground.jpg") no-repeat bottom fixed');
+          |$('body').css('background-size', 'cover');
+          |$('.fontcolor').css('color','#ffffff');
+       else if(day && changebackgroundto != 3)
           |$('body').css('background', 'url("/images/sunnybackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#000000');
-       else if (changebackgroundto == 4)
+       else if (changebackgroundto != 4)
           |$('body').css('background', 'url("/images/starrybackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#ffffff');
