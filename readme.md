@@ -23,7 +23,7 @@ node /weathersite/app.js
 
 http://localhost:5000
 or
-http://<ip address of site>:5000
+http://[ip address of site]:5000
 
 You will be taken to the default conditions page
 
