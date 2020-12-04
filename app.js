@@ -724,7 +724,6 @@ if (myClimacellApiKey.length > 0){
    sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T18:00:00Z';
    edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T18:00:00Z';
    var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+myLatitude+"&lon="+myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+myClimacellApiKey
-   console.log(ccreq)
    var req0 = https.get(ccreq,function(resp){
 	   var ccdata = '';
 	   resp.on('data',function(chunk){
