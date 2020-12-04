@@ -1,3 +1,45 @@
+script.
+  function nextWeatherTile(){
+      clearTimeout(handle2);
+      weathertile++;
+      if (weathertile > 3)
+         weathertile = 0;
+      if (weathertile == 0){
+         $('.floatingweathertile0').show();
+         $('.floatingweathertile1').hide();
+         $('.floatingweathertile2').hide();
+         $('.floatingweathertile3').hide();
+      }
+      else
+      if (weathertile == 1){
+         $('.floatingweathertile1').show();
+         $('.floatingweathertile0').hide();
+         $('.floatingweathertile2').hide();
+         $('.floatingweathertile3').hide();
+      }
+      else
+      if (weathertile == 2){
+         $('.floatingweathertile2').show();
+         $('.floatingweathertile1').hide();
+         $('.floatingweathertile0').hide();
+         $('.floatingweathertile3').hide();
+      }
+      else
+      if (weathertile == 3){
+         $('.floatingweathertile3').show();
+         $('.floatingweathertile1').hide();
+         $('.floatingweathertile2').hide();
+         $('.floatingweathertile0').hide();
+      }
+      handle2 = setTimeout(function(){
+          weathertile = 0;
+           $('.floatingweathertile0').show();
+           $('.floatingweathertile1').hide();
+           $('.floatingweathertile2').hide();
+           $('.floatingweathertile3').hide();
+      },5*1000)
+  }
+
 div#floatingtiles
    div.floatingmoontile(style='	background: black url("/images/moon#{moonsize}.gif") no-repeat center 40px;background-size: 50%;')
         table(cellspacing = 0,cellpadding=0, style='width: 150px')

@@ -54,64 +54,6 @@ block append content
        |  function conditions(){
        |     window.location = getURL()+"/";
        |  }
-       |  function timetoggle(){
-       |     if (timeactive == 1){
-       |	   timeactive = 0;
-       |       $('.floatingsuntile').show();
-       |       $('.floatingtimetile').hide();
-       |     }
-       |     else{
-       |	   timeactive = 1;
-       |       clearTimeout(handle);
-       |       $('.floatingsuntile').hide();
-       |       $('.floatingtimetile').show();
-       |       handle = setTimeout(function(){
-       |	      timeactive = 0;
-       |          $('.floatingsuntile').show();
-       |          $('.floatingtimetile').hide();
-       |       },60*1000)
-       |     }
-       |  }
-       | function nextWeatherTile(){
-       |       clearTimeout(handle2);
-       |       weathertile++;
-       |       if (weathertile > 3)
-       |          weathertile = 0;
-       |	   if (weathertile == 0){
-       |          $('.floatingweathertile0').show();
-       |          $('.floatingweathertile1').hide();
-       |          $('.floatingweathertile2').hide();
-       |          $('.floatingweathertile3').hide();
-       |       }
-       |       else
-       |	   if (weathertile == 1){
-       |          $('.floatingweathertile1').show();
-       |          $('.floatingweathertile0').hide();
-       |          $('.floatingweathertile2').hide();
-       |          $('.floatingweathertile3').hide();
-       |       }
-       |       else
-       |	   if (weathertile == 2){
-       |          $('.floatingweathertile2').show();
-       |          $('.floatingweathertile1').hide();
-       |          $('.floatingweathertile0').hide();
-       |          $('.floatingweathertile3').hide();
-       |       }
-       |       else
-       |	   if (weathertile == 3){
-       |          $('.floatingweathertile3').show();
-       |          $('.floatingweathertile1').hide();
-       |          $('.floatingweathertile2').hide();
-       |          $('.floatingweathertile0').hide();
-       |       }
-       |       handle2 = setTimeout(function(){
-       |	      weathertile = 0;
-       |          $('.floatingweathertile0').show();
-       |          $('.floatingweathertile1').hide();
-       |          $('.floatingweathertile2').hide();
-       |          $('.floatingweathertile3').hide();
-       |       },5*1000)
-       |}
    body()
    
        div#charts(style='display: block; height: 700px;')

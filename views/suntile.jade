@@ -1,3 +1,23 @@
+script.
+  function timetoggle(){
+     if (timeactive == 1){
+       timeactive = 0;
+       $('.floatingsuntile').show();
+       $('.floatingtimetile').hide();
+     }
+     else{
+       timeactive = 1;
+       clearTimeout(handle);
+       $('.floatingsuntile').hide();
+       $('.floatingtimetile').show();
+       handle = setTimeout(function(){
+          timeactive = 0;
+          $('.floatingsuntile').show();
+          $('.floatingtimetile').hide();
+          },60*1000)
+       }
+  }
+
 div#suntile
    div.floatingsuntile(onClick='timetoggle()')
         table(cellspacing = 0,cellpadding=0, style='width: 150px')

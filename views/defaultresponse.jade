@@ -75,64 +75,6 @@ block append content
        |  function charts(){
        |     window.location = getURL()+"/charts";
        |  }
-       |  function timetoggle(){
-       |     if (timeactive == 1){
-       |	   timeactive = 0;
-       |       $('.floatingsuntile').show();
-       |       $('.floatingtimetile').hide();
-       |     }
-       |     else{
-       |	   timeactive = 1;
-       |       clearTimeout(handle);
-       |       $('.floatingsuntile').hide();
-       |       $('.floatingtimetile').show();
-       |       handle = setTimeout(function(){
-       |	      timeactive = 0;
-       |          $('.floatingsuntile').show();
-       |          $('.floatingtimetile').hide();
-       |       },60*1000)
-       |     }
-       |  }
-       | function nextWeatherTile(){
-       |       clearTimeout(handle2);
-       |       weathertile++;
-       |       if (weathertile > 3)
-       |          weathertile = 0;
-       |	   if (weathertile == 0){
-       |          $('.floatingweathertile0').show();
-       |          $('.floatingweathertile1').hide();
-       |          $('.floatingweathertile2').hide();
-       |          $('.floatingweathertile3').hide();
-       |       }
-       |       else
-       |	   if (weathertile == 1){
-       |          $('.floatingweathertile1').show();
-       |          $('.floatingweathertile0').hide();
-       |          $('.floatingweathertile2').hide();
-       |          $('.floatingweathertile3').hide();
-       |       }
-       |       else
-       |	   if (weathertile == 2){
-       |          $('.floatingweathertile2').show();
-       |          $('.floatingweathertile1').hide();
-       |          $('.floatingweathertile0').hide();
-       |          $('.floatingweathertile3').hide();
-       |       }
-       |       else
-       |	   if (weathertile == 3){
-       |          $('.floatingweathertile3').show();
-       |          $('.floatingweathertile1').hide();
-       |          $('.floatingweathertile2').hide();
-       |          $('.floatingweathertile0').hide();
-       |       }
-       |       handle2 = setTimeout(function(){
-       |	      weathertile = 0;
-       |          $('.floatingweathertile0').show();
-       |          $('.floatingweathertile1').hide();
-       |          $('.floatingweathertile2').hide();
-       |          $('.floatingweathertile3').hide();
-       |       },5*1000)
-       |}
      div#wind(style='display: block; height: 700px; background-image: url("/images/compassrose.png"); background-repeat: no-repeat;')
        if (directionObj[0].left > 0 && directionObj[0].top > 0)
          img.compasspointer(src='./images/compasspointer.png' style='left:#{directionObj[0].left}px;top:#{directionObj[0].top}px;transform: rotate(#{directionObj[0].rotation}deg);z-index: 5;')
