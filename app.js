@@ -155,6 +155,8 @@ if ((now > daytime.dusk && now > daytime.dawn) || (now < daytime.dawn && now < d
 else
 	daytime = 1;
 
+// Global functions
+
 function shiftHist(array){
 	var newArray = []
 	for(var x = 1; x < array.length; x++)
