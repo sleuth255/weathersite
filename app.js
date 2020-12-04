@@ -983,8 +983,6 @@ setInterval(function(){
 	moonsize = makeMoonPhaseVector();
 }, 10*60*1000); 
 
-console.log("Current Moon phase fraction is "+suncalc.getMoonIllumination(now).phase)
-
 //Start up  Web server
 
 http.createServer(app).listen(app.get('port'), function(){
