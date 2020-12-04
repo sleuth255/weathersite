@@ -31,6 +31,8 @@ You will be taken to the default conditions page
 ## Known issues/Todos
 * no issues currently
 * todo: add settings page
+* todo: activate moon tile with disk illumination percent and next phase date
+* todo: add wind direction to charts
  
 
 ## Changelog:

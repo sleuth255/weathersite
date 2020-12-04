@@ -2,10 +2,15 @@ extends layout
 block append content
    script(type='text/javascript' src='/modules/echarts.min.js')
    script(type='text/javascript')
+       |  var timeactive = 0;
+       |  var weathertile = 0;
+       |  var handle, handle2;
        |  window.onload = setupRefresh;
        |  function setupRefresh()
        |  {
        |    setInterval("refreshCharts();",5*60*1000);
+       |    setInterval("refreshTiles();",60*1000);
+       |    setInterval("refreshSunTile();",1*1000);
        if(((skyconditions[0].skyconditions > 4 && day) || (day && rainStormRate > 0)) && changebackgroundto != 1)
           |$('body').css('background', 'url("/images/cloudybackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
@@ -22,6 +27,13 @@ block append content
           |$('body').css('background', 'url("/images/starrybackground.jpg") no-repeat bottom fixed');
           |$('body').css('background-size', 'cover');
           |$('.fontcolor').css('color','#ffffff');
+       |  }
+       |  {
+       |     $('#floatingtiles').load("./tileconditions");
+       |  }
+       |  function refreshSunTile()
+       |  {
+       |     $('#suntile').load("./refreshsuntile");
        |  }
        |  function refreshCharts()
        |  {
@@ -42,6 +54,64 @@ block append content
        |  function conditions(){
        |     window.location = getURL()+"/";
        |  }
+       |  function timetoggle(){
+       |     if (timeactive == 1){
+       |	   timeactive = 0;
+       |       $('.floatingsuntile').show();
+       |       $('.floatingtimetile').hide();
+       |     }
+       |     else{
+       |	   timeactive = 1;
+       |       clearTimeout(handle);
+       |       $('.floatingsuntile').hide();
+       |       $('.floatingtimetile').show();
+       |       handle = setTimeout(function(){
+       |	      timeactive = 0;
+       |          $('.floatingsuntile').show();
+       |          $('.floatingtimetile').hide();
+       |       },60*1000)
+       |     }
+       |  }
+       | function nextWeatherTile(){
+       |       clearTimeout(handle2);
+       |       weathertile++;
+       |       if (weathertile > 3)
+       |          weathertile = 0;
+       |	   if (weathertile == 0){
+       |          $('.floatingweathertile0').show();
+       |          $('.floatingweathertile1').hide();
+       |          $('.floatingweathertile2').hide();
+       |          $('.floatingweathertile3').hide();
+       |       }
+       |       else
+       |	   if (weathertile == 1){
+       |          $('.floatingweathertile1').show();
+       |          $('.floatingweathertile0').hide();
+       |          $('.floatingweathertile2').hide();
+       |          $('.floatingweathertile3').hide();
+       |       }
+       |       else
+       |	   if (weathertile == 2){
+       |          $('.floatingweathertile2').show();
+       |          $('.floatingweathertile1').hide();
+       |          $('.floatingweathertile0').hide();
+       |          $('.floatingweathertile3').hide();
+       |       }
+       |       else
+       |	   if (weathertile == 3){
+       |          $('.floatingweathertile3').show();
+       |          $('.floatingweathertile1').hide();
+       |          $('.floatingweathertile2').hide();
+       |          $('.floatingweathertile0').hide();
+       |       }
+       |       handle2 = setTimeout(function(){
+       |	      weathertile = 0;
+       |          $('.floatingweathertile0').show();
+       |          $('.floatingweathertile1').hide();
+       |          $('.floatingweathertile2').hide();
+       |          $('.floatingweathertile3').hide();
+       |       },5*1000)
+       |}
    body()
    
        div#charts(style='display: block; height: 700px;')
@@ -52,7 +122,6 @@ block append content
                   #chart2.chart(style="width: 900px; height: 180px;")
                   #chart3.chart(style="width: 900px; height: 180px;")
                td(width="10%",style='vertical-align: top;')
-                  img(src='/images/weathersitelogo.png')
           script.
             var chartoptions = !{data}
             var chart = echarts.init(document.getElementById('chart'));
@@ -63,6 +132,9 @@ block append content
             chartoptions = !{data3}
             var chart3 = echarts.init(document.getElementById('chart3'));
             chart3.setOption(chartoptions);    
+       include suntile.jade
+       include floatingtiles.jade
        div#buttons
           button.button(onClick='conditions()') Conditions 
           button.button2(onClick='radar()') Radar 
+      
