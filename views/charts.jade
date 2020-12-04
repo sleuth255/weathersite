@@ -3,8 +3,9 @@ block append content
    script(type='text/javascript' src='/modules/echarts.min.js')
    script(type='text/javascript')
        |  var timeactive = 0;
+       |  var detailactive = 0;
        |  var weathertile = 0;
-       |  var handle, handle2;
+       |  var handle, handle2, handle3;
        |  window.onload = setupRefresh;
        |  function setupRefresh()
        |  {

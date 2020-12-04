@@ -146,6 +146,7 @@ var forecastObj = {};
 var sunrise;
 var sunset;
 var now = new Date();
+var moonIllumination;
 var moonsize = makeMoonPhaseVector();
 var daytime = suncalc.getTimes(now,myLatitude,myLongitude);
 sunrise = daytime.sunrise;
@@ -337,6 +338,50 @@ function makeSkyConditionsVector(){
 	}
 	return skyconditions
 }
+function getLunarDetails(){
+	var now = new Date();
+	var moonIllumination = Math.floor(suncalc.getMoonIllumination(now).fraction * 100);
+	var newVector = 0;
+	var start = new Date(app.locals.moment(new Date()).format('MMMM DD,YYYY 00:00:00'));
+	var daystart = new Date(start)
+	var dayend = new Date(start)
+	for (var x=1; x < 31; x++){
+		daystart = new Date(start)
+        daystart.setDate(daystart.getDate()+x)
+        dayend.setDate(daystart.getDate()+1)
+    	var dayStartPhase = suncalc.getMoonIllumination(daystart).phase
+    	var dayEndPhase = suncalc.getMoonIllumination(dayend).phase
+    	if (dayStartPhase > dayEndPhase){
+    		newVector = 0;
+    		break;
+    	}
+    	else
+        if (dayStartPhase < .25 && dayEndPhase > .25){
+        	newVector = 2;
+        	break;
+        }
+        else
+        if (dayStartPhase < .5 && dayEndPhase > .5){
+        	newVector = 4;
+        	break;
+        }
+        else
+        if (dayStartPhase < .75 && dayEndPhase > .75){
+        	newVector = 6;
+        	break;
+        }
+	}
+	 var moonPhase = 'New Moon'
+     if (newVector == 2)
+        moonPhase = 'First Quarter';
+     else 
+     if (newVector == 4)
+        moonPhase = 'Full Moon';
+     else 
+     if (newVector == 6)
+        moonPhase = 'Third Quarter';
+	return {illumination: moonIllumination,nextPhaseDate: app.locals.moment(daystart).format('ddd MMM Do'), nextPhaseType: moonPhase}
+}
 function makeMoonPhaseVector(){
 	var daystart = new Date(app.locals.moment(new Date()).format('MMMM DD,YYYY 00:00:00'));
 	var dayend = new Date(daystart)
@@ -430,16 +475,16 @@ app.get('/', function (req, res) {
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
 	
-    res.render('defaultresponse',{loadstylesheet: true,observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('defaultresponse',{loadstylesheet: true,observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/liveconditions', function (req, res) {
     res.render('liveconditions',{loadstylesheet: false,observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),day: daytime,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/tileconditions', function (req, res) {
-    res.render('tileconditions',{loadstylesheet: false,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
+    res.render('tileconditions',{loadstylesheet: false,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/refreshsuntile', function (req, res) {
-    res.render('refreshsuntile',{loadstylesheet: false,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
+    res.render('refreshsuntile',{loadstylesheet: false,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/livewind', function (req, res) {
     res.locals.err = false;
@@ -452,11 +497,11 @@ app.get('/livewind', function (req, res) {
     res.render('livewind',{loadstylesheet: false,observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,directionObj: directionObj,speed:speed})
 })
 app.get('/radar', function (req, res) {
-	res.render('radarresponse',{loadstylesheet: true,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
+	res.render('radarresponse',{loadstylesheet: true,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
 })
 app.get('/radarrefresh', function (req, res) {
     res.locals.err = false;
-	res.render('radarrefresh',{loadstylesheet: false,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
+	res.render('radarrefresh',{loadstylesheet: false,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
 })
 app.get('/charts', function (req, res) {
     var xData = ["|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"];
@@ -514,7 +559,7 @@ app.get('/charts', function (req, res) {
         lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
     
 
-    res.render('charts',{loadstylesheet: true,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
+    res.render('charts',{loadstylesheet: true,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/chartrefresh', function (req, res) {
     res.locals.err = false;
@@ -572,7 +617,7 @@ app.get('/chartrefresh', function (req, res) {
     if (observationUnits.metricPressure)
         lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
 
-    res.render('chartrefresh',{loadstylesheet: false,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,sunrise: sunrise,sunset: sunset,day: daytime})
+    res.render('chartrefresh',{loadstylesheet: false,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/testpattern', function (req, res) {
     res.locals.err = false;
@@ -584,7 +629,7 @@ app.get('/testpattern', function (req, res) {
 	console.log(oTemp.length)
 	for (var x=0;x<oTemp.length;x++)
 		console.log(oTemp[x]);
-    res.render('testpattern',{observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,moonsize: moonsize,sunrise: sunrise,sunset: sunset,directionObj: directionObj})
+    res.render('testpattern',{observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,directionObj: directionObj})
 })
 
 

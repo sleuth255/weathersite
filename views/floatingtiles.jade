@@ -1,4 +1,22 @@
 script.
+  function moondetailtoggle(){
+     if (detailactive == 1){
+       detailactive = 0;
+       $('.floatingmoontile').show();
+       $('.moondetailtile').hide();
+     }
+     else{
+       detailactive = 1;
+       clearTimeout(handle3);
+       $('.floatingmoontile').hide();
+       $('.moondetailtile').show();
+       handle3 = setTimeout(function(){
+          detailactive = 0;
+          $('.floatingmoontile').show();
+          $('.moondetailtile').hide();
+          },10*1000)
+       }
+  }
   function nextWeatherTile(){
       clearTimeout(handle2);
       weathertile++;
@@ -41,7 +59,7 @@ script.
   }
 
 div#floatingtiles
-   div.floatingmoontile(style='	background: black url("/images/moon#{moonsize}.gif") no-repeat center 40px;background-size: 50%;')
+   div.floatingmoontile(style='	background: black url("/images/moon#{moonsize}.gif") no-repeat center 40px;background-size: 50%;' onClick='moondetailtoggle()')
         table(cellspacing = 0,cellpadding=0, style='width: 150px')
           tr
            td(height=6)
@@ -72,6 +90,40 @@ div#floatingtiles
                    |Waning Crescent
                 else
                    |New Moon
+   div.moondetailtile(style = 'display: none;' onClick='moondetailtoggle()')
+        table(cellspacing = 0,cellpadding=0, style='width: 150px')
+          tr
+           td(height=6)
+          tr
+           td(style='text-align: center')
+             span.smallerbold.fontcolorwhite
+                |Lunar Details
+          tr
+           td(height=12)
+          tr
+           td(style='text-align: left')
+             span.smallerbold.fontcolorwhite
+                |&nbsp;&nbsp;&nbsp;Illumination:
+          tr
+           td(style='text-align: left')
+             span.smaller.fontcolorwhite
+                |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#{lunarDetails.illumination}%
+          tr
+           td(height=5)
+          tr
+           td(style='text-align: left')
+             span.smallerbold.fontcolorwhite
+                |&nbsp;&nbsp;&nbsp;Next Phase:
+          tr
+           td(style='text-align: left')
+             span.smaller.fontcolorwhite
+                |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#{lunarDetails.nextPhaseDate}
+          tr
+           td(height=11)
+          tr
+           td(style='text-align: center')
+             span.smaller.fontcolorwhite
+                |(#{lunarDetails.nextPhaseType})
        - condition = skyconditions[0].skyconditions
        - weather = ''
        - hoursout = ["Current Weather","24hr Forecast","48hr Forecast","72hr Forecast"]
