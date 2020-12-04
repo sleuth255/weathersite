@@ -2,7 +2,7 @@ doctype html
 html
   head
     title= title
-    if (loadstylesheet == 1)
+    if (loadstylesheet)
        link(rel='stylesheet', href='/stylesheets/style.css')
     if (zoominradarimage.length > 0)
        link(rel='prefetch',href='#{zoominradarimage}')
