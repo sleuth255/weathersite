@@ -29,12 +29,15 @@ You will be taken to the default conditions page
 
 
 ## Known issues/Todos
-* issue: add another decimal point of accuracy to metric pressure (mb)
+* no issues currently
 * todo: add settings page
 * todo: add wind direction to charts
  
 
 ## Changelog:
+
+### v1.2
+* Fix issue: add another decimal point of accuracy to metric pressure (mb)
 
 ### v1.1
 * Activate moon tile with disk illumination percent, next phase date, and next phase type

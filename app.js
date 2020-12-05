@@ -557,9 +557,9 @@ app.get('/charts', function (req, res) {
         lineOptions2.yAxis.axisLabel.formatter = "{value} km/h"
             if (observationUnits.metricPressure){
                 lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
-                lineOptions.grid.left = "8%"
-                lineOptions2.grid.left = "8%"
-                lineOptions3.grid.left = "8%"
+                lineOptions.grid.left = "8.2%"
+                lineOptions2.grid.left = "8.2%"
+                lineOptions3.grid.left = "8.2%"
             }
     
 
@@ -620,9 +620,9 @@ app.get('/chartrefresh', function (req, res) {
         lineOptions2.yAxis.axisLabel.formatter = "{value} km/h"
     if (observationUnits.metricPressure){
         lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
-        lineOptions.grid.left = "8%"
-        lineOptions2.grid.left = "8%"
-        lineOptions3.grid.left = "8%"
+        lineOptions.grid.left = "8.2%"
+        lineOptions2.grid.left = "8.2%"
+        lineOptions3.grid.left = "8.2%"
     }
 
     res.render('chartrefresh',{loadstylesheet: false,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
