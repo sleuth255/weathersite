@@ -555,8 +555,12 @@ app.get('/charts', function (req, res) {
         lineOptions.yAxis.axisLabel.formatter = "{value} \u00b0C"
     if (observationUnits.metricSpeed)
         lineOptions2.yAxis.axisLabel.formatter = "{value} km/h"
-    if (observationUnits.metricPressure)
-        lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
+            if (observationUnits.metricPressure){
+                lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
+                lineOptions.grid.left = "8%"
+                lineOptions2.grid.left = "8%"
+                lineOptions3.grid.left = "8%"
+            }
     
 
     res.render('charts',{loadstylesheet: true,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
@@ -614,8 +618,12 @@ app.get('/chartrefresh', function (req, res) {
         lineOptions.yAxis.axisLabel.formatter = "{value} \u00b0C"
     if (observationUnits.metricSpeed)
         lineOptions2.yAxis.axisLabel.formatter = "{value} km/h"
-    if (observationUnits.metricPressure)
+    if (observationUnits.metricPressure){
         lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
+        lineOptions.grid.left = "8%"
+        lineOptions2.grid.left = "8%"
+        lineOptions3.grid.left = "8%"
+    }
 
     res.render('chartrefresh',{loadstylesheet: false,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
 })
@@ -781,7 +789,7 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 	    }
 		inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
 	    if (observationUnits.metricPressure)
-		  inBarometer = Math.round(inBarometer * 33.8639)
+		  inBarometer = (inBarometer * 33.8639).toFixed(1);
 		inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
 		if (oDate.length > 143)
 			oDate = shiftHist(oDate)
@@ -939,7 +947,7 @@ if (myMetarFtpSite.length > 0){
 			    }
 				inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
 			    if (observationUnits.metricPressure)
-				  inBarometer = Math.round(inBarometer * 33.8639)
+				  inBarometer = (inBarometer * 33.8639).toFixed(1);
 				inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
 			    if (oDate.length > 143)
 				    oDate = shiftHist(oDate)

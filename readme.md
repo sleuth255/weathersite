@@ -29,7 +29,7 @@ You will be taken to the default conditions page
 
 
 ## Known issues/Todos
-* no issues currently
+* issue: add another decimal point of accuracy to metric pressure (mb)
 * todo: add settings page
 * todo: add wind direction to charts
  
