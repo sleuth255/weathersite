@@ -88,6 +88,8 @@ block append content
              img.downarrow(src='/images/DownArrowTransparent.png', onclick='downarrowclicked()')
             td(style='text-align: center')
              img(src='/images/weathersitelogo.png')
+             span.smaller(style = 'position: relative; left: -80px; top: -100px; color: #27485d;')
+                |v#{weatherSiteVersion}
      include suntile.jade
      include floatingtiles.jade
      div#buttons

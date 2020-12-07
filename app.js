@@ -6,6 +6,7 @@
 // now do: git pull origin master
 // The codebase will be updated.  Then open app.js in an editor and paste your settings back in.
 //
+var weatherSiteVersion = '1.2'
 var myLatitude = 42.9764;
 var myLongitude = -88.1084;
 var myWLLIp = '10.0.0.42';
@@ -356,17 +357,17 @@ function getLunarDetails(){
     		break;
     	}
     	else
-        if (dayStartPhase < .25 && dayEndPhase > .25){
+        if (dayStartPhase <= .25 && dayEndPhase > .25){
         	newVector = 2;
         	break;
         }
         else
-        if (dayStartPhase < .5 && dayEndPhase > .5){
+        if (dayStartPhase <= .5 && dayEndPhase > .5){
         	newVector = 4;
         	break;
         }
         else
-        if (dayStartPhase < .75 && dayEndPhase > .75){
+        if (dayStartPhase <= .75 && dayEndPhase > .75){
         	newVector = 6;
         	break;
         }
@@ -497,11 +498,11 @@ app.get('/livewind', function (req, res) {
     res.render('livewind',{loadstylesheet: false,observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,directionObj: directionObj,speed:speed})
 })
 app.get('/radar', function (req, res) {
-	res.render('radarresponse',{loadstylesheet: true,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
+	res.render('radarresponse',{weatherSiteVersion: weatherSiteVersion,loadstylesheet: true,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
 })
 app.get('/radarrefresh', function (req, res) {
     res.locals.err = false;
-	res.render('radarrefresh',{loadstylesheet: false,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
+	res.render('radarrefresh',{weatherSiteVersion: weatherSiteVersion,loadstylesheet: false,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
 })
 app.get('/charts', function (req, res) {
     var xData = ["|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"];
