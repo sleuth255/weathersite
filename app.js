@@ -732,6 +732,7 @@ if (myClimacellApiKey.length > 0){
    sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T18:00:00Z';
    edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T18:00:00Z';
    var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+myLatitude+"&lon="+myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+myClimacellApiKey
+   //console.log(ccreq)    
    var req0 = https.get(ccreq,function(resp){
 	   var ccdata = '';
 	   resp.on('data',function(chunk){
@@ -855,6 +856,13 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 // request the current forecast from ClimaCell every 30 minutes
 if (myClimacellApiKey.length > 0){
    setInterval(function(){
+	   dt = new Date()
+	   sdt = new Date()
+	   edt = new Date()
+	   sdt.setDate(dt.getDate()+1)
+	   edt.setDate(dt.getDate()+3)
+	   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T18:00:00Z';
+	   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T18:00:00Z';
 	   var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+myLatitude+"&lon="+myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+myClimacellApiKey
 	   var req0 = https.get(ccreq,function(resp){
 		   var ccdata = '';
