@@ -6,7 +6,7 @@
 // now do: git pull origin master
 // The codebase will be updated.  Then open app.js in an editor and paste your settings back in.
 //
-var weatherSiteVersion = '1.2'
+var weatherSiteVersion = '1.3'
 var myLatitude = 42.9764;
 var myLongitude = -88.1084;
 var myWLLIp = '10.0.0.42';

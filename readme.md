@@ -31,10 +31,12 @@ You will be taken to the default conditions page
 ## Known issues/Todos
 * no issues currently
 * todo: add settings page
-* todo: add wind direction to charts
  
 
 ## Changelog:
+
+### v1.3
+* add wind direction to charts
 
 ### v1.2
 * Fix issue: add another decimal point of accuracy to metric pressure (mb)
