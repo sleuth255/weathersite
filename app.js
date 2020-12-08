@@ -506,11 +506,14 @@ app.get('/radarrefresh', function (req, res) {
 	res.render('radarrefresh',{weatherSiteVersion: weatherSiteVersion,loadstylesheet: false,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
 })
 app.get('/charts', function (req, res) {
-    var xData = ["|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"];
+    var xData = [" "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "];
+    var hrStart = app.locals.moment(oDate[0]).format('HH')
     for (var x=0;x<xData.length;x++){
-    	if (xData[x] == "|")
+    	if (app.locals.moment(oDate[x]).format('HH') != hrStart){
+    		hrStart = app.locals.moment(oDate[x]).format('HH');
     		if (x < oDate.length)
     			xData[x] = app.locals.moment(oDate[x]).format('ha')
+    	}
     }
     xData = xData.slice(0,oTemp.length)
     var fontColor = "#fff"
@@ -638,11 +641,22 @@ app.get('/charts', function (req, res) {
 })
 app.get('/chartrefresh', function (req, res) {
     res.locals.err = false;
+/*
     var xData = ["|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"];
     for (var x=0;x<xData.length;x++){
     	if (xData[x] == "|")
     		if (x < oDate.length)
     			xData[x] = app.locals.moment(oDate[x]).format('ha')
+    }
+*/
+    var xData = [" "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "];
+    var hrStart = app.locals.moment(oDate[0]).format('HH')
+    for (var x=0;x<xData.length;x++){
+    	if (app.locals.moment(oDate[x]).format('HH') != hrStart){
+    		hrStart = app.locals.moment(oDate[x]).format('HH');
+    		if (x < oDate.length)
+    			xData[x] = app.locals.moment(oDate[x]).format('ha')
+    	}
     }
     xData = xData.slice(0,oTemp.length)
     var fontColor = "#fff"
