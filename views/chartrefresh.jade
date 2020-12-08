@@ -7,6 +7,9 @@ block append content
                   #chart.chart(style="width: 900px; height: 180px;")
                   #chart2.chart(style="width: 900px; height: 180px;")
                   #chart3.chart(style="width: 900px; height: 180px;")
+                  each obj in chartvectors
+                     div(style ='position: absolute; top: 217px; left: #{obj.left}px; z-index: 2')
+                        img(src='/images/wb-#{obj.direction}.png' height='25px' width= '25px')
                td(width="10%",style='vertical-align: top;')
           script.
             var chartoptions = !{data}
@@ -18,5 +21,3 @@ block append content
             chartoptions = !{data3}
             var chart3 = echarts.init(document.getElementById('chart3'));
             chart3.setOption(chartoptions);    
-           
-                   

@@ -551,7 +551,7 @@ app.get('/charts', function (req, res) {
     lineOptions3.series[0].data = oBarometer
     lineOptions3.series[1].name = ""
     lineOptions3.series[1].data = []
-
+    
     if (observationUnits.metricTemp)
         lineOptions.yAxis.axisLabel.formatter = "{value} \u00b0C"
     if (observationUnits.metricSpeed)
@@ -562,9 +562,76 @@ app.get('/charts', function (req, res) {
                 lineOptions2.grid.left = "8.2%"
                 lineOptions3.grid.left = "8.2%"
             }
+
+    var avgDir = oWinddir[0]*6;
+    var dirArray = []
+    for(var x=0;x< xData.length+1; x++){
+    	if (x %6 == 0){
+    		avgDir = Math.floor(avgDir / 6)
+    		avgDir = 22.5 * Math.round(avgDir / 22.5)
+       		if (avgDir == 22.5)
+       			dirArray.push('nne')
+    		else
+       		if (avgDir == 45)
+       			dirArray.push('ne')
+    		else
+       		if (avgDir == 67.5)
+       			dirArray.push('ene')
+    		else
+       		if (avgDir == 90)
+       			dirArray.push('e')
+    		else
+       		if (avgDir == 112.5)
+       			dirArray.push('ese')
+    		else
+       		if (avgDir == 135.5)
+       			dirArray.push('se')
+    		else
+       		if (avgDir == 157.5)
+       			dirArray.push('sse')
+    		else
+       		if (avgDir == 180)
+       			dirArray.push('s')
+    		else
+       		if (avgDir == 202.5)
+       			dirArray.push('ssw')
+    		else
+       		if (avgDir == 225)
+       			dirArray.push('sw')
+    		else
+       		if (avgDir == 247.5)
+       			dirArray.push('wsw')
+    		else
+       		if (avgDir == 270)
+       			dirArray.push('w')
+    		else
+       		if (avgDir == 292.5)
+       			dirArray.push('wnw')
+    		else
+       		if (avgDir == 315)
+       			dirArray.push('nw')
+    		else
+       		if (avgDir == 337.5)
+       			dirArray.push('nnw')
+    		else
+       			dirArray.push('n')
+       		avgDir = 0;
+    	}
+    	avgDir += oWinddir[x];
+    }
+    var chartVectors = [];
+	var leftPosition = 90;
+	var leftPositionIncrement = Math.floor((900 - leftPosition) / dirArray.length)
+	for (x=0; x < dirArray.length; x++){
+		var positionObj = {}
+		positionObj.direction = dirArray[x];
+		positionObj.left = leftPosition;
+		chartVectors.push(positionObj)
+		leftPosition+= leftPositionIncrement
+	}
     
 
-    res.render('charts',{loadstylesheet: true,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
+    res.render('charts',{chartvectors: chartVectors,loadstylesheet: true,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/chartrefresh', function (req, res) {
     res.locals.err = false;
@@ -626,7 +693,74 @@ app.get('/chartrefresh', function (req, res) {
         lineOptions3.grid.left = "8.2%"
     }
 
-    res.render('chartrefresh',{loadstylesheet: false,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
+    var avgDir = oWinddir[0]*6;
+    var dirArray = []
+    for(var x=0;x< xData.length+1; x++){
+    	if (x %6 == 0){
+    		avgDir = Math.floor(avgDir / 6)
+    		avgDir = 22.5 * Math.round(avgDir / 22.5)
+       		if (avgDir == 22.5)
+       			dirArray.push('nne')
+    		else
+       		if (avgDir == 45)
+       			dirArray.push('ne')
+    		else
+       		if (avgDir == 67.5)
+       			dirArray.push('ene')
+    		else
+       		if (avgDir == 90)
+       			dirArray.push('e')
+    		else
+       		if (avgDir == 112.5)
+       			dirArray.push('ese')
+    		else
+       		if (avgDir == 135.5)
+       			dirArray.push('se')
+    		else
+       		if (avgDir == 157.5)
+       			dirArray.push('sse')
+    		else
+       		if (avgDir == 180)
+       			dirArray.push('s')
+    		else
+       		if (avgDir == 202.5)
+       			dirArray.push('ssw')
+    		else
+       		if (avgDir == 225)
+       			dirArray.push('sw')
+    		else
+       		if (avgDir == 247.5)
+       			dirArray.push('wsw')
+    		else
+       		if (avgDir == 270)
+       			dirArray.push('w')
+    		else
+       		if (avgDir == 292.5)
+       			dirArray.push('wnw')
+    		else
+       		if (avgDir == 315)
+       			dirArray.push('nw')
+    		else
+       		if (avgDir == 337.5)
+       			dirArray.push('nnw')
+    		else
+       			dirArray.push('n')
+       		avgDir = 0;
+    	}
+    	avgDir += oWinddir[x];
+    }
+    var chartVectors = [];
+	var leftPosition = 90;
+	var leftPositionIncrement = Math.floor((900 - leftPosition) / dirArray.length)
+	for (x=0; x < dirArray.length; x++){
+		var positionObj = {}
+		positionObj.direction = dirArray[x];
+		positionObj.left = leftPosition;
+		chartVectors.push(positionObj)
+		leftPosition+= leftPositionIncrement
+	}
+
+    res.render('chartrefresh',{chartvectors: chartVectors,loadstylesheet: false,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/testpattern', function (req, res) {
     res.locals.err = false;

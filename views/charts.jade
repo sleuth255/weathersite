@@ -63,8 +63,11 @@ block append content
             tr
               td(width="90%")
                   #chart.chart(style="width: 905px; height: 180px;")
-                  #chart2.chart(style="width: 905px; height: 180px;")
+                  #chart2.chart(style="width: 905px; height: 180px; z-index: 1;")
                   #chart3.chart(style="width: 905px; height: 180px;")
+                  each obj in chartvectors
+                     div(style ='position: absolute; top: 217px; left: #{obj.left}px; z-index: 2')
+                        img(src='/images/wb-#{obj.direction}.png' height='25px' width= '25px')
                td(width="10%",style='vertical-align: top;')
           script.
             var chartoptions = !{data}

@@ -35,6 +35,9 @@
         "axisLabel": {
             "formatter": "{value} \u00b0F"
             },
+        "axisTick": {
+            "show": true
+            },
         "axisLine":{
             "lineStyle":{
             	  "color": "#000"
