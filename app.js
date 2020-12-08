@@ -410,55 +410,56 @@ function makeMoonPhaseVector(){
 function makeCompassVector(direction){
 	var left=top=rotation=0;
 	var heading='';
+	direction = 22.5 * Math.round(direction / 22.5)
     switch(true){
     case (direction == 0):
            break;
-       case (direction < 22.5):
+       case (direction == 360):
  	       heading='N';left=226;top=103;rotation=0;
  	       break;
-       case (direction < 45):
+       case (direction == 22.5):
     	   heading='NNE';left=276;top=113;rotation=22.5;
     	   break;
-       case (direction < 67.5):
+       case (direction == 45):
     	   heading='NE';left=318;top=142;rotation=45;
     	   break;
-       case (direction < 90):
+       case (direction == 67.5):
     	   heading='ENE';left=346;top=185;rotation=67.5;
     	   break;
-       case (direction < 112.5):
+       case (direction == 90):
     	   heading='E';left=355;top=235;rotation=90;
     	   break;
-       case (direction < 135):
+       case (direction == 112.5):
     	   heading='ESE';left=345;top=283;rotation=112.50;
     	   break;
-       case (direction < 157.5):
+       case (direction == 135):
     	   heading='SE';left=316;top=325;rotation=135;
     	   break;
-       case (direction < 180):
+       case (direction == 157.5):
     	   heading='SSE';left=273;top=353;rotation=157.5;
     	   break;
-       case (direction < 202.5):
+       case (direction == 180):
     	   heading='S';left=224;top=362;rotation=180;
     	   break;
-       case (direction < 225):
+       case (direction == 202.5):
     	   heading='SSW';left=174;top=351;rotation=202.5;
     	   break;
-       case (direction < 247.5):
+       case (direction == 225):
     	   heading='SW';left=132;top=323;rotation=225;
     	   break;
-       case (direction < 270):
+       case (direction == 247.5):
     	   heading='WSW';left=104;top=280;rotation=247.5;
     	   break;
-       case (direction < 292.5):
+       case (direction == 270):
     	   heading='W';left=95;top=231;rotation=270;
     	   break;
-       case (direction < 315):
+       case (direction == 292.5):
     	   heading='WNW';left=105;top=183;rotation=292.5;
     	   break;
-       case (direction < 337.5):
+       case (direction == 315):
     	   heading='NW';left=133;top=141;rotation=315;
     	   break;
-       case (direction < 361):
+       case (direction == 337.5):
     	   heading='NNW';left=176;top=112;rotation=337.5;
     	   break;
        default:
