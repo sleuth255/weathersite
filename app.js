@@ -414,9 +414,6 @@ function makeCompassVector(direction){
     switch(true){
     case (direction == 0):
            break;
-       case (direction == 360):
- 	       heading='N';left=226;top=103;rotation=0;
- 	       break;
        case (direction == 22.5):
     	   heading='NNE';left=276;top=113;rotation=22.5;
     	   break;
@@ -462,6 +459,9 @@ function makeCompassVector(direction){
        case (direction == 337.5):
     	   heading='NNW';left=176;top=112;rotation=337.5;
     	   break;
+       case (direction == 360):
+ 	       heading='N';left=226;top=103;rotation=0;
+ 	       break;
        default:
            break;
     }
@@ -531,7 +531,7 @@ app.get('/charts', function (req, res) {
     var lineOptions2 = clone(linechart);
     lineOptions.yAxis.axisLabel.formatter = "{value} \u00b0F"
     lineOptions2.yAxis.axisLabel.formatter = "{value} mph"
-    lineOptions2.legend.data = ["Wind Speed", "Wind Gust"]
+    lineOptions2.legend.data = ["Wind Speed","Wind Gust","Wind Direction"]
     lineOptions2.legend.textStyle.color = fontColor
     lineOptions2.xAxis.data = xData;
     lineOptions2.xAxis.axisLine.lineStyle.color = fontColor;
@@ -540,6 +540,8 @@ app.get('/charts', function (req, res) {
     lineOptions2.series[0].data = oWindspd
     lineOptions2.series[1].name = "Wind Gust"
     lineOptions2.series[1].data = oWindgust
+    lineOptions2.series[2].name = "Wind Direction"
+    lineOptions2.series[2].data = []
 
     var lineOptions3 = clone(linechart);
     lineOptions3.yAxis.axisLabel.formatter = "{value}\u201d"
@@ -661,7 +663,7 @@ app.get('/chartrefresh', function (req, res) {
 
     var lineOptions2 = clone(linechart);
     lineOptions2.yAxis.axisLabel.formatter = "{value} mph"
-    lineOptions2.legend.data = ["Wind Speed","Wind Gust"]
+    lineOptions2.legend.data = ["Wind Speed","Wind Gust","Wind Direction"]
     lineOptions2.legend.textStyle.color = fontColor
     lineOptions2.xAxis.data = xData;
     lineOptions2.xAxis.axisLine.lineStyle.color = fontColor;
@@ -670,6 +672,8 @@ app.get('/chartrefresh', function (req, res) {
     lineOptions2.series[0].data = oWindspd
     lineOptions2.series[1].name = "Wind Gust"
     lineOptions2.series[1].data = oWindgust
+    lineOptions2.series[2].name = "Wind Direction"
+    lineOptions2.series[2].data = []
 
     var lineOptions3 = clone(linechart);
     lineOptions3.yAxis.axisLabel.formatter = "{value}\u201d"

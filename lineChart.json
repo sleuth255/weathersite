@@ -9,7 +9,7 @@
 	"tooltip":{
 		"trigger": "axis"
 	},
-	"color": ["#f00", "#0f0"],
+	"color": ["#f00", "#0f0", "#00f"],
 	"legend": {
         "data": [],
         "textStyle":{
@@ -56,6 +56,12 @@
             "data": [],
             "type": "line",
             "symbol": "none",
+            "smooth": true
+        },{
+            "name": "name3",
+            "data": [],
+            "type": "radar",
+            "symbol": "image://./images/wb-label.png",
             "smooth": true
         }
     ]
