@@ -6,7 +6,6 @@
 // now do: git pull origin master
 // The codebase will be updated.  Then open app.js in an editor and paste your settings back in.
 //
-var weatherSiteVersion = '1.3'
 var myLatitude = 42.9764;
 var myLongitude = -88.1084;
 var myWLLIp = '10.0.0.42';
@@ -27,6 +26,7 @@ var observationUnits = {
 	
 //end of settings that you need to change
 //
+var weatherSiteVersion = '1.3'
 var express = require('express')
 , request = require('request')
 , routes = require('routes')
@@ -1174,6 +1174,13 @@ if (myMetarFtpSite.length > 0){
 		   req1.end();
 	   })
 }, 5*60*1000); 
+
+// test code: make it night in 30 seconds
+/*
+setTimeout(function(){
+	daytime = 0
+}, 30*1000)
+*/
 
 // periodically determine day/night and moon phase
 
