@@ -283,12 +283,12 @@ function makeSkyConditionsVector(){
 			   }
 		   else
 		   if (forecastObj[x].weather_code.value == 'snow'){
-			   obj.skyconditions = 9;
+			   obj.skyconditions = 7;
    			   obj.weather = 'Snow';
 		   }
 		   else
 		   if (forecastObj[x].weather_code.value == 'snow_heavy'){
-			   obj.skyconditions = 9;
+			   obj.skyconditions = 7;
 			   obj.weather = 'Heavy Snow';
 		   }
 		   else
