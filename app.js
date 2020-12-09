@@ -508,14 +508,14 @@ app.get('/radarrefresh', function (req, res) {
 app.get('/charts', function (req, res) {
     var xData = [" "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "];
     var hrStart = app.locals.moment(oDate[0]).format('HH')
-    for (var x=0;x<xData.length;x++){
+    for (var x=0;x<oDate.length;x++){
     	if (app.locals.moment(oDate[x]).format('HH') != hrStart){
     		hrStart = app.locals.moment(oDate[x]).format('HH');
     		if (x < oDate.length)
     			xData[x] = app.locals.moment(oDate[x]).format('ha')
     	}
     }
-    xData = xData.slice(0,oTemp.length)
+    xData = xData.slice(0,oDate.length)
     var fontColor = "#fff"
     if (daytime  && makeSkyConditionsVector()[0].skyconditions < 5)
     	fontColor = "#000"
@@ -641,24 +641,16 @@ app.get('/charts', function (req, res) {
 })
 app.get('/chartrefresh', function (req, res) {
     res.locals.err = false;
-/*
-    var xData = ["|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"," "," "," "," "," "," "," "," "," "," "," ","|"];
-    for (var x=0;x<xData.length;x++){
-    	if (xData[x] == "|")
-    		if (x < oDate.length)
-    			xData[x] = app.locals.moment(oDate[x]).format('ha')
-    }
-*/
     var xData = [" "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "];
     var hrStart = app.locals.moment(oDate[0]).format('HH')
-    for (var x=0;x<xData.length;x++){
+    for (var x=0;x<oDate.length;x++){
     	if (app.locals.moment(oDate[x]).format('HH') != hrStart){
     		hrStart = app.locals.moment(oDate[x]).format('HH');
     		if (x < oDate.length)
     			xData[x] = app.locals.moment(oDate[x]).format('ha')
     	}
     }
-    xData = xData.slice(0,oTemp.length)
+    xData = xData.slice(0,oDate.length)
     var fontColor = "#fff"
     if (daytime  && makeSkyConditionsVector()[0].skyconditions < 5)
     	fontColor = "#000"
