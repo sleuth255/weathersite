@@ -39,7 +39,6 @@ var express = require('express')
 , suncalc = require('suncalc')
 , jsftp = require("jsftp")
 , clone = require("clone")
-, barchart = require('./barChart.json')
 , linechart = require('./lineChart.json')
 , path = require('path');
 
