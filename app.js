@@ -407,10 +407,10 @@ function makeMoonPhaseVector(){
 }
 
 function makeCompassVector(direction){
-	if (direction == 0)
-		break;
 	var left=top=rotation=0;
 	var heading='';
+	if (direction == 0)
+       return {heading: heading,left: left,top: top,rotation: rotation};
 	direction = 22.5 * Math.round(direction / 22.5)
     switch(true){
     case (direction == 0):
