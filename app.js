@@ -407,11 +407,14 @@ function makeMoonPhaseVector(){
 }
 
 function makeCompassVector(direction){
+	if (direction == 0)
+		break;
 	var left=top=rotation=0;
 	var heading='';
 	direction = 22.5 * Math.round(direction / 22.5)
     switch(true){
     case (direction == 0):
+	       heading='N';left=226;top=103;rotation=0;
            break;
        case (direction == 22.5):
     	   heading='NNE';left=276;top=113;rotation=22.5;
@@ -510,8 +513,7 @@ app.get('/charts', function (req, res) {
     for (var x=0;x<oDate.length;x++){
     	if (app.locals.moment(oDate[x]).format('HH') != hrStart){
     		hrStart = app.locals.moment(oDate[x]).format('HH');
-    		if (x < oDate.length)
-    			xData[x] = app.locals.moment(oDate[x]).format('ha')
+   			xData[x] = app.locals.moment(oDate[x]).format('ha');
     	}
     }
     xData = xData.slice(0,oDate.length)
@@ -645,8 +647,7 @@ app.get('/chartrefresh', function (req, res) {
     for (var x=0;x<oDate.length;x++){
     	if (app.locals.moment(oDate[x]).format('HH') != hrStart){
     		hrStart = app.locals.moment(oDate[x]).format('HH');
-    		if (x < oDate.length)
-    			xData[x] = app.locals.moment(oDate[x]).format('ha')
+   			xData[x] = app.locals.moment(oDate[x]).format('ha');
     	}
     }
     xData = xData.slice(0,oDate.length)
