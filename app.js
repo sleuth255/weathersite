@@ -570,10 +570,11 @@ app.get('/charts', function (req, res) {
                 lineOptions3.grid.left = "8.2%"
             }
 
-    var avgDir = oWinddir[0]*6;
+
+    var avgDir = 0
     var dirArray = []
-    for(var x=0;x< xData.length+1; x++){
-    	if (x %6 == 0){
+    for(var x=0;x<= xData.length; x++){
+    	if (x %6 == 0 && x > 0){
     		avgDir = Math.floor(avgDir / 6)
     		avgDir = 22.5 * Math.round(avgDir / 22.5)
        		if (avgDir == 22.5)
@@ -626,9 +627,10 @@ app.get('/charts', function (req, res) {
     	}
     	avgDir += oWinddir[x];
     }
+
     var chartVectors = [];
-	var leftPosition = 90;
-	var leftPositionIncrement = Math.floor((900 - leftPosition) / dirArray.length)
+	var leftPosition = 80;
+	var leftPositionIncrement = Math.floor((920 - leftPosition) / dirArray.length)
 	for (x=0; x < dirArray.length; x++){
 		var positionObj = {}
 		positionObj.direction = dirArray[x];
@@ -704,10 +706,10 @@ app.get('/chartrefresh', function (req, res) {
         lineOptions3.grid.left = "8.2%"
     }
 
-    var avgDir = oWinddir[0]*6;
+    var avgDir = 0
     var dirArray = []
-    for(var x=0;x< xData.length+1; x++){
-    	if (x %6 == 0){
+    for(var x=0;x<= xData.length; x++){
+    	if (x %6 == 0 && x > 0){
     		avgDir = Math.floor(avgDir / 6)
     		avgDir = 22.5 * Math.round(avgDir / 22.5)
        		if (avgDir == 22.5)
