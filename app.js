@@ -194,7 +194,7 @@ function makeSkyConditionsVector(){
 		obj.skyconditions = 6;
 		obj.weather = 'Raining';
     }
-	if (metarObservation.indexOf("SN") != -1){
+	if (metarObservation.indexOf("SN") != -1 && metarObservation.indexOf("SNE") == -1){
 		obj.skyconditions = 7;
 		obj.weather = 'Snowing';
 	}
