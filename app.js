@@ -763,8 +763,8 @@ app.get('/chartrefresh', function (req, res) {
     	avgDir += oWinddir[x];
     }
     var chartVectors = [];
-	var leftPosition = 90;
-	var leftPositionIncrement = Math.floor((900 - leftPosition) / dirArray.length)
+	var leftPosition = 80;
+	var leftPositionIncrement = Math.floor((920 - leftPosition) / dirArray.length)
 	for (x=0; x < dirArray.length; x++){
 		var positionObj = {}
 		positionObj.direction = dirArray[x];
