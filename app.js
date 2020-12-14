@@ -1202,13 +1202,11 @@ setInterval(function(){
 
 //Start up  Web server
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log("\nWeathersite is online at "+myUrl+'\n');
-});
 
-setTimeout(function(){
-	spawn('python3',['/stats.py'])
-}, 10*1000)
+	http.createServer(app).listen(app.get('port'), function(){
+		  console.log("\nWeathersite is online at "+myUrl+'\n');
+		  spawn('python3',['/stats.py'])
+		});
 
 
 
