@@ -36,6 +36,7 @@ var express = require('express')
 , LocalStorage = require('node-localstorage').LocalStorage
 , udp = require('dgram')
 , buffer = require('buffer')
+, spawn = require('child_process').spawn
 , suncalc = require('suncalc')
 , jsftp = require("jsftp")
 , clone = require("clone")
@@ -1204,5 +1205,6 @@ setInterval(function(){
 http.createServer(app).listen(app.get('port'), function(){
   console.log("\nWeathersite is online at "+myUrl+'\n');
 });
+spawn('python3',['/stats.py'])
 
 
