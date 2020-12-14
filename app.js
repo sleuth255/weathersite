@@ -39,6 +39,7 @@ var express = require('express')
 , suncalc = require('suncalc')
 , jsftp = require("jsftp")
 , clone = require("clone")
+, ip = require("ip")
 , linechart = require('./lineChart.json')
 , path = require('path');
 
@@ -117,9 +118,11 @@ app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.logger('dev'));
 
+
 /***************************************************************/
 //globals
-let cookie = {};
+var myIpAddress = ip.address();
+var myUrl = "http://"+myIpAddress+":"+app.get('port')
 var metarObservation = "";
 var direction = 0;
 var lastDirection3 = lastDirection2 = lastDirection1 = lastDirection = 0;
@@ -797,8 +800,6 @@ server.on('listening',function(){
   var family = address.family;
   var ipaddr = address.address;
   console.log('UDP Server is listening at port ' + port);
-  console.log('UDP Server IP is ' + ipaddr);
-  console.log('UDP Server is : ' + family);
 });
 server.on('message',function(msg,info){
 	  //console.log(msg.toString());
@@ -1201,7 +1202,7 @@ setInterval(function(){
 //Start up  Web server
 
 http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+  console.log("\nWeathersite is online at "+myUrl+'\n');
 });
 
 
