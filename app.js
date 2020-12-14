@@ -908,7 +908,7 @@ var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 		data+=chunk
 	})
 	resp.on('end',function(){
-		console.log(data.toString())
+		//console.log(data.toString())
 		var obj = JSON.parse(data);
 	    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
 	    if (observationUnits.metricSpeed)
