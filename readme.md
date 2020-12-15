@@ -35,6 +35,10 @@ You will be taken to the default conditions page
 
 ## Changelog:
 
+### v1.4
+* duplicate last chart entry if current conditions request fails
+* find WLL automatically if myWLLIp variable isn't filled in.
+
 ### v1.3
 * add wind direction to charts
 
