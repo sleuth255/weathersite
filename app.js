@@ -1175,6 +1175,43 @@ if (myMetarFtpSite.length > 0){
 		    })
 	   }).on('error',(err) =>{
 		   console.log("Current conditions request failure")
+			    oDate.push(new Date());
+		        localStorage.setItem("oDate",JSON.stringify(oDate));
+			    if (oTemp.length > 143)
+				    oTemp = shiftHist(oTemp)
+			    oTemp.push(outTemp);
+			    localStorage.setItem("oTemp",JSON.stringify(oTemp));
+			    if (oHum.length > 143)
+				    oHum = shiftHist(oHum)
+			    oHum.push(outHum);
+			    localStorage.setItem("oHum",JSON.stringify(oHum));
+			    if (oDewpt.length > 143)
+				    oDewpt = shiftHist(oDewpt)
+			    oDewpt.push(outDewPt);
+			    localStorage.setItem("oDewpt",JSON.stringify(oDewpt));
+			    if (oWindspd.length > 143)
+				    oWindspd = shiftHist(oWindspd)
+			    oWindspd.push(avgSpeed);
+			    localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
+			    if (oWinddir.length > 143)
+				    oWinddir = shiftHist(oWinddir)
+			    oWinddir.push(avgDirection);
+			    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
+			    if (oWindgust.length > 143)
+				    oWindgust = shiftHist(oWindgust)
+			    oWindgust.push(gust);
+			    localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
+			    if (oBarometer.length > 143)
+			   	    oBarometer = shiftHist(oBarometer)
+			    oBarometer.push(inBarometer);
+  		        localStorage.setItem("oBarometer",JSON.stringify(oBarometer));
+			    if (inBarometerTrend < 0)
+				    inBarometerTrend = 'Falling'
+			    else
+			    if (inBarometerTrend > 0)
+				    inBarometerTrend = 'Rising'
+			    else
+				    inBarometerTrend = 'Steady'
 		   req1.end();
 	   })
 }, 5*60*1000); 
