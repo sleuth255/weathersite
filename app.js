@@ -3,7 +3,9 @@
 //
 // To refresh weathersite code, first copy these to the clipboard
 // then open up a command prompt/terminal window and switch to the /weathersite directory
-// now do: git pull origin master
+// now do:
+//    git reset --hard origin/master
+//    git pull origin master
 // The codebase will be updated.  Then open app.js in an editor and paste your settings back in.
 //
 var myLatitude = 42.9764;
