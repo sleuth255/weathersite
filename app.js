@@ -75,7 +75,10 @@ app.locals.moment = require('moment');
 var oDate,oTemp,oHum,oDewpt,oWindspd,oWinddir,oWindgust,oBarometer
 var localStorage = new LocalStorage('/WeathersiteStats'); 
 if ((localStorage.getItem("ccApiKey"))!=null)
-	myClimacellApiKey = localStorage.getItem("ccApiKey"); //optional: make your Dev key secret
+	myClimacellApiKey = localStorage.getItem("ccApiKey");
+else
+if (myClimacellApiKey.length > 0)
+	localStorage.setItem("ccApiKey",myClimacellApiKey)
 
 if ((localStorage.getItem("myWLLIp"))!=null)
 	myWLLIp = localStorage.getItem("myWLLIp");
