@@ -8,7 +8,7 @@
 //
 var myLatitude = 42.9764;
 var myLongitude = -88.1084;
-var myWLLIp = ''; //weathersite will attempt to find your WLL if this not filled in
+var myWLLIp = ''; //weathersite will attempt to find your WLL if this not filled in first
 var myMetarFtpSite = "tgftp.nws.noaa.gov";
 var myMetarFilePath = "/data/observations/metar/stations/KMKE.TXT";
 var myRadarZoominPath = "https://radar.weather.gov/lite/N0R/MKX_loop.gif"
