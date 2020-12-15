@@ -78,6 +78,10 @@ if ((localStorage.getItem("ccApiKey"))!=null)
 
 if ((localStorage.getItem("myWLLIp"))!=null)
 	myWLLIp = localStorage.getItem("myWLLIp");
+else
+if (myWLLIp.length > 0) // set local storage if hardcoded
+	localStorage.setItem("myWLLIp",myWLLIp);
+
 
 if ((localStorage.getItem("oDate"))==null)
 	oDate = [];
