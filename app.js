@@ -8,7 +8,7 @@
 //
 var myLatitude = 42.9764;
 var myLongitude = -88.1084;
-var myWLLIp = '10.0.0.42';
+var myWLLIp = '';
 var myMetarFtpSite = "tgftp.nws.noaa.gov";
 var myMetarFilePath = "/data/observations/metar/stations/KMKE.TXT";
 var myRadarZoominPath = "https://radar.weather.gov/lite/N0R/MKX_loop.gif"
@@ -40,8 +40,10 @@ var express = require('express')
 , suncalc = require('suncalc')
 , jsftp = require("jsftp")
 , clone = require("clone")
-, ip = require("ip")
+, myIpAddress = require("ip").address()
+, ifaces = require("os").networkInterfaces()
 , linechart = require('./lineChart.json')
+, portscanner = require('portscanner')
 , path = require('path');
 
 var app = express();
@@ -73,6 +75,9 @@ var oDate,oTemp,oHum,oDewpt,oWindspd,oWinddir,oWindgust,oBarometer
 var localStorage = new LocalStorage('/WeathersiteStats'); 
 if ((localStorage.getItem("ccApiKey"))!=null)
 	myClimacellApiKey = localStorage.getItem("ccApiKey"); //optional: make your Dev key secret
+
+if ((localStorage.getItem("myWLLIp"))!=null)
+	myWLLIp = localStorage.getItem("myWLLIp");
 
 if ((localStorage.getItem("oDate"))==null)
 	oDate = [];
@@ -122,7 +127,6 @@ app.use(express.logger('dev'));
 
 /***************************************************************/
 //globals
-var myIpAddress = ip.address();
 var myUrl = "http://"+myIpAddress+":"+app.get('port')
 var metarObservation = "";
 var direction = 0;
@@ -162,6 +166,330 @@ else
 
 // Global functions
 
+function startWLLqueries(){
+	//Get initial conditions from WLL.
+	//Also tell WLL to start broadcasting live UDP Wind/Rainfall data every 5 minutes
+	console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
+	var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
+		data = '';
+		resp.on('data',function(chunk){
+			data+=chunk
+		})
+		resp.on('end',function(){
+			//console.log(data.toString())
+			var obj = JSON.parse(data);
+		    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
+		    if (observationUnits.metricSpeed)
+		    	gust = Math.round(gust * 1.60934)
+			avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
+		    if (observationUnits.metricSpeed)
+		    	avgSpeed = Math.round(avgSpeed * 1.60934) 
+			avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
+			inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
+		    if (observationUnits.metricTemp)
+		    	inTemp = Math.round(((inTemp -32) *5)/9)
+			inHum = Math.round(obj.data.conditions[obj.data.conditions.length-2].hum_in);
+			outTemp = Math.round(obj.data.conditions[0].temp);
+			outTempLastReading = Math.round(obj.data.conditions[0].temp);
+		    if (observationUnits.metricTemp){
+		    	outTemp = Math.round(((outTemp -32) *5)/9)
+		    	outTempLastReading = Math.round(((outTempLastReading -32) *5)/9)
+		    }
+			outHum = Math.round(obj.data.conditions[0].hum);
+			outDewPt = Math.round(obj.data.conditions[0].dew_point);
+		    if (observationUnits.metricTemp)
+		    	outDewPt = Math.round(((outDewPt -32) *5)/9)
+			outWindChill = Math.round(obj.data.conditions[0].wind_chill);
+			outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
+		    if (observationUnits.metricTemp){
+		    	outWindChill = Math.round(((outWindChill -32) *5)/9)
+		    	outHeatIdx = Math.round(((outHeatIdx -32) *5)/9)
+		    }
+			inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
+		    if (observationUnits.metricPressure)
+			  inBarometer = (inBarometer * 33.8639).toFixed(1);
+			inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
+			if (oDate.length > 143)
+				oDate = shiftHist(oDate)
+			oDate.push(new Date());
+		    localStorage.setItem("oDate",JSON.stringify(oDate));
+			if (oTemp.length > 143)
+				oTemp = shiftHist(oTemp)
+			oTemp.push(outTemp);
+		    localStorage.setItem("oTemp",JSON.stringify(oTemp));
+			if (oHum.length > 143)
+				oHum = shiftHist(oHum)
+			oHum.push(outHum);
+		    localStorage.setItem("oHum",JSON.stringify(oHum));
+			if (oDewpt.length > 143)
+				oDewpt = shiftHist(oDewpt)
+			oDewpt.push(outDewPt);
+		    localStorage.setItem("oDewpt",JSON.stringify(oDewpt));
+			if (oWindspd.length > 143)
+				oWindspd = shiftHist(oWindspd)
+			oWindspd.push(avgSpeed);
+		    localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
+			if (oWinddir.length > 143)
+				oWinddir = shiftHist(oWinddir)
+			oWinddir.push(avgDirection);
+		    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
+			if (oWindgust.length > 143)
+				oWindgust = shiftHist(oWindgust)
+			oWindgust.push(gust);
+		    localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
+			if (oBarometer.length > 143)
+				oBarometer = shiftHist(oBarometer)
+			oBarometer.push(inBarometer);
+		    localStorage.setItem("oBarometer",JSON.stringify(oBarometer));
+			if (inBarometerTrend < 0)
+				inBarometerTrend = 'Falling'
+			else
+			if (inBarometerTrend > 0)
+				inBarometerTrend = 'Rising'
+			else
+				inBarometerTrend = 'Steady'
+			req1.end();
+			console.log('UDP broadcast request begins')
+			var req2 = http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
+				data = '';
+				resp.on('data',function(chunk){
+					data+=chunk
+				})
+				resp.on('end',function(){
+					console.log('UDP Broadcast request accepted')
+					req2.end();
+					//console.log(data.toString())
+				})
+			}).on('error',(err) =>{
+				   console.log("UDP broadcast initial request failure")
+				   req2.end();
+			})
+		})
+	}).on('error',(err) =>{
+		   console.log("Current conditions initial request failure")
+		   req1.end();
+	})
+	// Primary 5 minute weather conditions refresh code block follows
+	// get METAR Observation from NOAA FTP site and local conditions from WLL  
+	// Tell WLL server to continue to send UDP packets
+
+	setInterval(function(){
+		   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
+	if (myMetarFtpSite.length > 0){
+		   var Observation = ""; // Will store the contents of the file
+		   try{
+		      console.log('Retrieving METAR observation');
+	          ftp.get(myMetarFilePath, (err, socket) => {
+	            if (err) {
+	              return;
+	            }
+
+	            socket.on("data", d => {
+	              Observation += d.toString();
+	            });
+
+	            socket.on("close", err => {
+	              if (err) {
+	                console.error("METAR data retrieval error");
+	                return;
+	              }
+	              metarObservation = Observation;
+	              console.log("METAR observation retrieved");
+	            });
+	            socket.resume();
+	          });
+	   	      }
+		      catch(err){
+			      console.log('Caught Metar Observation error')
+		      }
+	       }
+		   var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
+			   data = '';
+			   resp.on('data',function(chunk){
+				   data+=chunk
+			   })
+			   resp.on('end',function(){
+				    console.log('current conditions reply received')
+				    var obj = JSON.parse(data);
+				    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
+				    if (observationUnits.metricSpeed)
+				   	    gust = Math.round(gust * 1.60934)
+				    avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
+				    if (observationUnits.metricSpeed)
+				        avgSpeed = Math.round(avgSpeed * 1.60934) 
+				    avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
+					inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
+				    if (observationUnits.metricTemp)
+				    	inTemp = Math.round(((inTemp -32) *5)/9)
+					inHum = Math.round(obj.data.conditions[obj.data.conditions.length-2].hum_in);
+					outTemp = Math.round(obj.data.conditions[0].temp);
+					outTempLastReading = Math.round(obj.data.conditions[0].temp);
+				    if (observationUnits.metricTemp){
+				    	outTemp = Math.round(((outTemp -32) *5)/9)
+				    	outTempLastReading = Math.round(((outTempLastReading -32) *5)/9)
+				    }
+					outHum = Math.round(obj.data.conditions[0].hum);
+					outDewPt = Math.round(obj.data.conditions[0].dew_point);
+				    if (observationUnits.metricTemp)
+				    	outDewPt = Math.round(((outDewPt -32) *5)/9)
+					outWindChill = Math.round(obj.data.conditions[0].wind_chill);
+					outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
+				    if (observationUnits.metricTemp){
+				    	outWindChill = Math.round(((outWindChill -32) *5)/9)
+				    	outHeatIdx = Math.round(((outHeatIdx -32) *5)/9)
+				    }
+					inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
+				    if (observationUnits.metricPressure)
+					  inBarometer = (inBarometer * 33.8639).toFixed(1);
+					inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
+				    if (oDate.length > 143)
+					    oDate = shiftHist(oDate)
+				    oDate.push(new Date());
+			        localStorage.setItem("oDate",JSON.stringify(oDate));
+				    if (oTemp.length > 143)
+					    oTemp = shiftHist(oTemp)
+				    oTemp.push(outTemp);
+				    localStorage.setItem("oTemp",JSON.stringify(oTemp));
+				    if (oHum.length > 143)
+					    oHum = shiftHist(oHum)
+				    oHum.push(outHum);
+				    localStorage.setItem("oHum",JSON.stringify(oHum));
+				    if (oDewpt.length > 143)
+					    oDewpt = shiftHist(oDewpt)
+				    oDewpt.push(outDewPt);
+				    localStorage.setItem("oDewpt",JSON.stringify(oDewpt));
+				    if (oWindspd.length > 143)
+					    oWindspd = shiftHist(oWindspd)
+				    oWindspd.push(avgSpeed);
+				    localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
+				    if (oWinddir.length > 143)
+					    oWinddir = shiftHist(oWinddir)
+				    oWinddir.push(avgDirection);
+				    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
+				    if (oWindgust.length > 143)
+					    oWindgust = shiftHist(oWindgust)
+				    oWindgust.push(gust);
+				    localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
+				    if (oBarometer.length > 143)
+				   	    oBarometer = shiftHist(oBarometer)
+				    oBarometer.push(inBarometer);
+	  		        localStorage.setItem("oBarometer",JSON.stringify(oBarometer));
+				    if (inBarometerTrend < 0)
+					    inBarometerTrend = 'Falling'
+				    else
+				    if (inBarometerTrend > 0)
+					    inBarometerTrend = 'Rising'
+				    else
+					    inBarometerTrend = 'Steady'
+				    if (outTempLastReading == null)
+					    outTempLastReading == obj.data.conditions[0].temp;
+				    if (obj.data.conditions[0].temp > outTempLastReading)
+					    outTempTrend = 1;
+				    else
+				    if (obj.data.conditions[0].temp < outTempLastReading)
+					    outTempTrend = -1;
+				    else
+					    outTempTrend = 0;
+				    outTempLastReading = obj.data.conditions[0].temp;
+
+				    console.log('starting WLL UDP refresh request')
+				    req1.end();
+				    var req2 = http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
+					    data = '';
+					    resp.on('data',function(chunk){
+					     data+=chunk
+					    })
+					    resp.on('end',function(){
+					     console.log('UDP request processed')
+					     req2.end();
+					    })
+				    }).on('error',(err) =>{
+				 	    console.log("UDP request failure")
+				 	    req2.end();
+				    })
+			    })
+		   }).on('error',(err) =>{
+			   console.log("Current conditions request failure")
+				    oDate.push(new Date());
+			        localStorage.setItem("oDate",JSON.stringify(oDate));
+				    if (oTemp.length > 143)
+					    oTemp = shiftHist(oTemp)
+				    oTemp.push(outTemp);
+				    localStorage.setItem("oTemp",JSON.stringify(oTemp));
+				    if (oHum.length > 143)
+					    oHum = shiftHist(oHum)
+				    oHum.push(outHum);
+				    localStorage.setItem("oHum",JSON.stringify(oHum));
+				    if (oDewpt.length > 143)
+					    oDewpt = shiftHist(oDewpt)
+				    oDewpt.push(outDewPt);
+				    localStorage.setItem("oDewpt",JSON.stringify(oDewpt));
+				    if (oWindspd.length > 143)
+					    oWindspd = shiftHist(oWindspd)
+				    oWindspd.push(avgSpeed);
+				    localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
+				    if (oWinddir.length > 143)
+					    oWinddir = shiftHist(oWinddir)
+				    oWinddir.push(avgDirection);
+				    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
+				    if (oWindgust.length > 143)
+					    oWindgust = shiftHist(oWindgust)
+				    oWindgust.push(gust);
+				    localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
+				    if (oBarometer.length > 143)
+				   	    oBarometer = shiftHist(oBarometer)
+				    oBarometer.push(inBarometer);
+	  		        localStorage.setItem("oBarometer",JSON.stringify(oBarometer));
+				    if (inBarometerTrend < 0)
+					    inBarometerTrend = 'Falling'
+				    else
+				    if (inBarometerTrend > 0)
+					    inBarometerTrend = 'Rising'
+				    else
+					    inBarometerTrend = 'Steady'
+			   req1.end();
+		   })
+	}, 5*60*1000); 
+}
+
+function iterateHttpTargets(list,current){
+	portscanner.checkPortStatus(80,list[current],function(error,status){
+	   if (status == 'open')
+	      request({url: 'http://'+list[current]+'/v1/current_conditions',timeout: 5*1000},function(error,response,body){
+		      if (!error && response.statusCode == 200 && body.substr(0,14) == '{"data":{"did"'){
+		          console.log('found WLL at '+list[current])
+		          localStorage.setItem("myWLLIp",list[current])
+		          myWLLIp = list[current];
+		          startWLLqueries();
+		      }
+		      else
+		      if (current < list.length)
+			      iterateHttpTargets(list,++current)
+		      else
+				console.log("WLL not found")
+	      })
+	   else
+       if (current < list.length)
+		   iterateHttpTargets(list,++current)
+	   else
+		   console.log("WLL not found")
+	})
+}
+function findWLL(){
+	console.log("starting WLL search")
+	var ipcidr = require('ip-cidr')
+	var myNetMask, myCIDR;
+	for (var key in ifaces){
+		var info = ifaces[key]
+		for(var x=0;x<info.length;x++)
+			if (info[x].address == myIpAddress){
+	            myNetMask = info[x].netmask
+	            myCIDR = info[x].cidr
+			}
+	}
+	var cidr = new ipcidr(myCIDR)
+	iterateHttpTargets(cidr.toArray(),0)
+}
 function shiftHist(array){
 	var newArray = []
 	for(var x = 1; x < array.length; x++)
@@ -792,6 +1120,13 @@ app.get('/testpattern', function (req, res) {
     res.render('testpattern',{observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,directionObj: directionObj})
 })
 
+//Find my WLL if necessary 
+if (myWLLIp.length == 0)
+    findWLL();
+else{
+    console.log("Attached to WLL at "+myWLLIp)
+	startWLLqueries();
+}
 
 //UDP Server
 
@@ -900,108 +1235,6 @@ if (myClimacellApiKey.length > 0){
    })
 }
 
-//Get initial conditions from WLL.
-//Also tell WLL to start broadcasting live UDP Wind/Rainfall data every 5 minutes
-console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
-var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
-	data = '';
-	resp.on('data',function(chunk){
-		data+=chunk
-	})
-	resp.on('end',function(){
-		//console.log(data.toString())
-		var obj = JSON.parse(data);
-	    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
-	    if (observationUnits.metricSpeed)
-	    	gust = Math.round(gust * 1.60934)
-		avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
-	    if (observationUnits.metricSpeed)
-	    	avgSpeed = Math.round(avgSpeed * 1.60934) 
-		avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
-		inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
-	    if (observationUnits.metricTemp)
-	    	inTemp = Math.round(((inTemp -32) *5)/9)
-		inHum = Math.round(obj.data.conditions[obj.data.conditions.length-2].hum_in);
-		outTemp = Math.round(obj.data.conditions[0].temp);
-		outTempLastReading = Math.round(obj.data.conditions[0].temp);
-	    if (observationUnits.metricTemp){
-	    	outTemp = Math.round(((outTemp -32) *5)/9)
-	    	outTempLastReading = Math.round(((outTempLastReading -32) *5)/9)
-	    }
-		outHum = Math.round(obj.data.conditions[0].hum);
-		outDewPt = Math.round(obj.data.conditions[0].dew_point);
-	    if (observationUnits.metricTemp)
-	    	outDewPt = Math.round(((outDewPt -32) *5)/9)
-		outWindChill = Math.round(obj.data.conditions[0].wind_chill);
-		outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
-	    if (observationUnits.metricTemp){
-	    	outWindChill = Math.round(((outWindChill -32) *5)/9)
-	    	outHeatIdx = Math.round(((outHeatIdx -32) *5)/9)
-	    }
-		inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
-	    if (observationUnits.metricPressure)
-		  inBarometer = (inBarometer * 33.8639).toFixed(1);
-		inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
-		if (oDate.length > 143)
-			oDate = shiftHist(oDate)
-		oDate.push(new Date());
-	    localStorage.setItem("oDate",JSON.stringify(oDate));
-		if (oTemp.length > 143)
-			oTemp = shiftHist(oTemp)
-		oTemp.push(outTemp);
-	    localStorage.setItem("oTemp",JSON.stringify(oTemp));
-		if (oHum.length > 143)
-			oHum = shiftHist(oHum)
-		oHum.push(outHum);
-	    localStorage.setItem("oHum",JSON.stringify(oHum));
-		if (oDewpt.length > 143)
-			oDewpt = shiftHist(oDewpt)
-		oDewpt.push(outDewPt);
-	    localStorage.setItem("oDewpt",JSON.stringify(oDewpt));
-		if (oWindspd.length > 143)
-			oWindspd = shiftHist(oWindspd)
-		oWindspd.push(avgSpeed);
-	    localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
-		if (oWinddir.length > 143)
-			oWinddir = shiftHist(oWinddir)
-		oWinddir.push(avgDirection);
-	    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
-		if (oWindgust.length > 143)
-			oWindgust = shiftHist(oWindgust)
-		oWindgust.push(gust);
-	    localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
-		if (oBarometer.length > 143)
-			oBarometer = shiftHist(oBarometer)
-		oBarometer.push(inBarometer);
-	    localStorage.setItem("oBarometer",JSON.stringify(oBarometer));
-		if (inBarometerTrend < 0)
-			inBarometerTrend = 'Falling'
-		else
-		if (inBarometerTrend > 0)
-			inBarometerTrend = 'Rising'
-		else
-			inBarometerTrend = 'Steady'
-		req1.end();
-		console.log('UDP broadcast request begins')
-		var req2 = http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
-			data = '';
-			resp.on('data',function(chunk){
-				data+=chunk
-			})
-			resp.on('end',function(){
-				console.log('UDP Broadcast request accepted')
-				req2.end();
-				//console.log(data.toString())
-			})
-		}).on('error',(err) =>{
-			   console.log("UDP broadcast initial request failure")
-			   req2.end();
-		})
-	})
-}).on('error',(err) =>{
-	   console.log("Current conditions initial request failure")
-	   req1.end();
-})
 
 // request the current forecast from ClimaCell every 30 minutes
 if (myClimacellApiKey.length > 0){
@@ -1034,187 +1267,6 @@ if (myClimacellApiKey.length > 0){
    },30*60*1000) //retrieve new forecast every 30 minutes
 }
 
-// Primary 5 minute weather conditions refresh code block follows
-// get METAR Observation from NOAA FTP site and local conditions from WLL  
-// Tell WLL server to continue to send UDP packets
-
-setInterval(function(){
-	   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
-if (myMetarFtpSite.length > 0){
-	   var Observation = ""; // Will store the contents of the file
-	   try{
-	      console.log('Retrieving METAR observation');
-          ftp.get(myMetarFilePath, (err, socket) => {
-            if (err) {
-              return;
-            }
-
-            socket.on("data", d => {
-              Observation += d.toString();
-            });
-
-            socket.on("close", err => {
-              if (err) {
-                console.error("METAR data retrieval error");
-                return;
-              }
-              metarObservation = Observation;
-              console.log("METAR observation retrieved");
-            });
-            socket.resume();
-          });
-   	      }
-	      catch(err){
-		      console.log('Caught Metar Observation error')
-	      }
-       }
-	   var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
-		   data = '';
-		   resp.on('data',function(chunk){
-			   data+=chunk
-		   })
-		   resp.on('end',function(){
-			    console.log('current conditions reply received')
-			    var obj = JSON.parse(data);
-			    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
-			    if (observationUnits.metricSpeed)
-			   	    gust = Math.round(gust * 1.60934)
-			    avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
-			    if (observationUnits.metricSpeed)
-			        avgSpeed = Math.round(avgSpeed * 1.60934) 
-			    avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
-				inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
-			    if (observationUnits.metricTemp)
-			    	inTemp = Math.round(((inTemp -32) *5)/9)
-				inHum = Math.round(obj.data.conditions[obj.data.conditions.length-2].hum_in);
-				outTemp = Math.round(obj.data.conditions[0].temp);
-				outTempLastReading = Math.round(obj.data.conditions[0].temp);
-			    if (observationUnits.metricTemp){
-			    	outTemp = Math.round(((outTemp -32) *5)/9)
-			    	outTempLastReading = Math.round(((outTempLastReading -32) *5)/9)
-			    }
-				outHum = Math.round(obj.data.conditions[0].hum);
-				outDewPt = Math.round(obj.data.conditions[0].dew_point);
-			    if (observationUnits.metricTemp)
-			    	outDewPt = Math.round(((outDewPt -32) *5)/9)
-				outWindChill = Math.round(obj.data.conditions[0].wind_chill);
-				outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
-			    if (observationUnits.metricTemp){
-			    	outWindChill = Math.round(((outWindChill -32) *5)/9)
-			    	outHeatIdx = Math.round(((outHeatIdx -32) *5)/9)
-			    }
-				inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
-			    if (observationUnits.metricPressure)
-				  inBarometer = (inBarometer * 33.8639).toFixed(1);
-				inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
-			    if (oDate.length > 143)
-				    oDate = shiftHist(oDate)
-			    oDate.push(new Date());
-		        localStorage.setItem("oDate",JSON.stringify(oDate));
-			    if (oTemp.length > 143)
-				    oTemp = shiftHist(oTemp)
-			    oTemp.push(outTemp);
-			    localStorage.setItem("oTemp",JSON.stringify(oTemp));
-			    if (oHum.length > 143)
-				    oHum = shiftHist(oHum)
-			    oHum.push(outHum);
-			    localStorage.setItem("oHum",JSON.stringify(oHum));
-			    if (oDewpt.length > 143)
-				    oDewpt = shiftHist(oDewpt)
-			    oDewpt.push(outDewPt);
-			    localStorage.setItem("oDewpt",JSON.stringify(oDewpt));
-			    if (oWindspd.length > 143)
-				    oWindspd = shiftHist(oWindspd)
-			    oWindspd.push(avgSpeed);
-			    localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
-			    if (oWinddir.length > 143)
-				    oWinddir = shiftHist(oWinddir)
-			    oWinddir.push(avgDirection);
-			    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
-			    if (oWindgust.length > 143)
-				    oWindgust = shiftHist(oWindgust)
-			    oWindgust.push(gust);
-			    localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
-			    if (oBarometer.length > 143)
-			   	    oBarometer = shiftHist(oBarometer)
-			    oBarometer.push(inBarometer);
-  		        localStorage.setItem("oBarometer",JSON.stringify(oBarometer));
-			    if (inBarometerTrend < 0)
-				    inBarometerTrend = 'Falling'
-			    else
-			    if (inBarometerTrend > 0)
-				    inBarometerTrend = 'Rising'
-			    else
-				    inBarometerTrend = 'Steady'
-			    if (outTempLastReading == null)
-				    outTempLastReading == obj.data.conditions[0].temp;
-			    if (obj.data.conditions[0].temp > outTempLastReading)
-				    outTempTrend = 1;
-			    else
-			    if (obj.data.conditions[0].temp < outTempLastReading)
-				    outTempTrend = -1;
-			    else
-				    outTempTrend = 0;
-			    outTempLastReading = obj.data.conditions[0].temp;
-
-			    console.log('starting WLL UDP refresh request')
-			    req1.end();
-			    var req2 = http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
-				    data = '';
-				    resp.on('data',function(chunk){
-				     data+=chunk
-				    })
-				    resp.on('end',function(){
-				     console.log('UDP request processed')
-				     req2.end();
-				    })
-			    }).on('error',(err) =>{
-			 	    console.log("UDP request failure")
-			 	    req2.end();
-			    })
-		    })
-	   }).on('error',(err) =>{
-		   console.log("Current conditions request failure")
-			    oDate.push(new Date());
-		        localStorage.setItem("oDate",JSON.stringify(oDate));
-			    if (oTemp.length > 143)
-				    oTemp = shiftHist(oTemp)
-			    oTemp.push(outTemp);
-			    localStorage.setItem("oTemp",JSON.stringify(oTemp));
-			    if (oHum.length > 143)
-				    oHum = shiftHist(oHum)
-			    oHum.push(outHum);
-			    localStorage.setItem("oHum",JSON.stringify(oHum));
-			    if (oDewpt.length > 143)
-				    oDewpt = shiftHist(oDewpt)
-			    oDewpt.push(outDewPt);
-			    localStorage.setItem("oDewpt",JSON.stringify(oDewpt));
-			    if (oWindspd.length > 143)
-				    oWindspd = shiftHist(oWindspd)
-			    oWindspd.push(avgSpeed);
-			    localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
-			    if (oWinddir.length > 143)
-				    oWinddir = shiftHist(oWinddir)
-			    oWinddir.push(avgDirection);
-			    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
-			    if (oWindgust.length > 143)
-				    oWindgust = shiftHist(oWindgust)
-			    oWindgust.push(gust);
-			    localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
-			    if (oBarometer.length > 143)
-			   	    oBarometer = shiftHist(oBarometer)
-			    oBarometer.push(inBarometer);
-  		        localStorage.setItem("oBarometer",JSON.stringify(oBarometer));
-			    if (inBarometerTrend < 0)
-				    inBarometerTrend = 'Falling'
-			    else
-			    if (inBarometerTrend > 0)
-				    inBarometerTrend = 'Rising'
-			    else
-				    inBarometerTrend = 'Steady'
-		   req1.end();
-	   })
-}, 5*60*1000); 
 
 // test code: make it night in 30 seconds
 /*
