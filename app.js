@@ -76,6 +76,7 @@ app.locals.moment = require('moment');
 //initialize local storage
 var oDate,oTemp,oHum,oDewpt,oWindspd,oWinddir,oWindgust,oBarometer
 var localStorage = new LocalStorage('/WeathersiteStats'); 
+
 if ((localStorage.getItem("ccApiKey"))!=null)
 	myClimacellApiKey = localStorage.getItem("ccApiKey");
 else
@@ -1302,7 +1303,12 @@ setInterval(function(){
 
 	http.createServer(app).listen(app.get('port'), function(){
 		  console.log("\nWeathersite is online at "+myUrl+'\n');
-		  spawn('python3',['/stats.py'])
+		  try{
+		      spawn('python3',['/stats.py'])
+		  }
+		  catch(err){
+			  // toss any errors because this only works on the Pi build with display hat
+		  }
 		});
 
 
