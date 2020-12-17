@@ -1099,7 +1099,6 @@ if (myWLLIp.length == 0)
     findWLL();
 else{
     console.log("Attached to WLL at "+myWLLIp)
-    spawn('python3',[__dirname+'/pidisplay.py','skip','skip','WLL is '+myWLLIp])
 	startWLLqueries();
 }
 
@@ -1292,12 +1291,16 @@ setInterval(function(){
 }, 10*60*1000); 
 
 //Start up  Web server
-
+var arg3 = ''
+if (myWLLIp.length == 0)
+	arg3 = 'WLL not found'
+else
+   arg3 = "WLL is "+myWLLIp	
 http.createServer(app).listen(app.get('port'), function(){
     console.log("\nWeathersite is online at "+myUrl+'\n');
-    spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000','skip'])
+	var handle = spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000',arg3])
+	handle.stderr.on('data', function(){}) //toss errors
 });
-console.log('python3',[__dirname+'/pidisplay.py', 'Weathersite is Online', myIpAddress+':5000', 'skip'])
 
 
 
