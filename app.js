@@ -65,7 +65,7 @@ if (myMetarFtpSite.length > 0){
 	   host: myMetarFtpSite
    });
    ftp.keepAlive();
-   ftp.on('error', function(err){
+   ftp.on('error', function(){
 	   console.log('Ftp error caught');
 	   ftp.raw("QUIT");
 	   ftp.destroy();
@@ -159,7 +159,6 @@ var forecastObj = {};
 var sunrise;
 var sunset;
 var now = new Date();
-var moonIllumination;
 var moonsize = makeMoonPhaseVector();
 var daytime = suncalc.getTimes(now,myLatitude,myLongitude);
 sunrise = daytime.sunrise;
@@ -265,12 +264,12 @@ function startWLLqueries(){
 					req2.end();
 					//console.log(data.toString())
 				})
-			}).on('error',(err) =>{
+			}).on('error',function(){
 				   console.log("UDP broadcast initial request failure")
 				   req2.end();
 			})
 		})
-	}).on('error',(err) =>{
+	}).on('error',function(){
 		   console.log("Current conditions initial request failure")
 		   req1.end();
 	})
@@ -380,12 +379,12 @@ function startWLLqueries(){
 					     console.log('UDP request processed')
 					     req2.end();
 					    })
-				    }).on('error',(err) =>{
+				    }).on('error',function(){
 				 	    console.log("UDP request failure")
 				 	    req2.end();
 				    })
 			    })
-		   }).on('error',(err) =>{
+		   }).on('error',function(){
 			   console.log("Current conditions request failure")
 				    oDate.push(new Date());
 			        localStorage.setItem("oDate",JSON.stringify(oDate));
@@ -437,19 +436,24 @@ function iterateHttpTargets(list,current){
 		          console.log('found WLL at '+list[current])
 		          localStorage.setItem("myWLLIp",list[current])
 		          myWLLIp = list[current];
+	              spawn('python3',[__dirname+'/pidisplay.py','skip','WLL found: '+myWLLIp,'skip']).on('error',function(){}); //toss error
 		          startWLLqueries();
 		      }
 		      else
 		      if (current < list.length)
 			      iterateHttpTargets(list,++current)
-		      else
+		      else{
 				console.log("WLL not found")
+	            spawn('python3',[__dirname+'/pidisplay.py','skip','WLL not found','skip']).on('error',function(){}); //toss error
+			  }
 	      })
 	   else
        if (current < list.length)
 		   iterateHttpTargets(list,++current)
-	   else
+	   else{
 		   console.log("WLL not found")
+           spawn('python3',[__dirname+'/pidisplay.py','skip','WLL not found','skip']).on('error',function(){}); //toss error
+		}
 	})
 }
 function findWLL(){
@@ -1234,7 +1238,7 @@ if (myClimacellApiKey.length > 0){
 			   forecastObj = forecastObjTmp;
 		   req0.end();
 	   })
-   }).on('error',(err) =>{
+   }).on('error',function(){
 	      console.log("Forecast initial request failure")
 	      req0.end();
    })
@@ -1259,7 +1263,7 @@ if (myClimacellApiKey.length > 0){
 				   forecastObj = forecastObjTmp;
 			   req0.end();
 		   })
-	   }).on('error',(err) =>{
+	   }).on('error',function(){
 		      console.log("ClimaCell Forecast request failure")
 		      req0.end();
 	   })
@@ -1293,7 +1297,7 @@ setInterval(function(){
 //Start up  Web server
 var arg3 = ''
 if (myWLLIp.length == 0)
-	arg3 = 'WLL not found'
+	arg3 = 'Searching for WLL'
 else
    arg3 = "WLL is "+myWLLIp	
 http.createServer(app).listen(app.get('port'), function(){
