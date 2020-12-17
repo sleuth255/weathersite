@@ -60,7 +60,7 @@ draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
 # Draw some shapes.
 # First define some constants to allow easy resizing of shapes.
-padding = -2
+padding = -8
 top = padding
 bottom = height - padding
 # Move left to right keeping track of the current x position for drawing shapes.
@@ -79,19 +79,13 @@ font = ImageFont.load_default()
 # Draw a black filled box to clear the image.
 draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-# Shell scripts for system monitoring from here:
-# https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-cmd = "hostname -I"
-myIP = subprocess.check_output(cmd,shell=True).decode("utf-8")
-myIP = myIP.strip('\n')
-myIP = myIP.strip(' ')
 # Write four lines of text.
 
-if sys.argv[1] != "skip"
+if sys.argv[1] != "skip":
    draw.text((x, top + 10), sys.argv[1], font=font, fill=255)
-if sys.argv[2] != "skip"
+if sys.argv[2] != "skip""
 	draw.text((x, top + 20), sys.argv[2], font=font, fill=255)
-if sys.argv[3] != "skip"
+if sys.argv[3] != "skip":
 	draw.text((x, top + 30), sys.argv[3], font=font, fill=255)
 # Display image.
 disp.image(image)

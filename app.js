@@ -32,13 +32,10 @@ var observationUnits = {
 var weatherSiteVersion = '1.4'
 var express = require('express')
 , request = require('request')
-, routes = require('routes')
-, user = require('user')
 , http = require('http')
 , https = require('https')
 , LocalStorage = require('node-localstorage').LocalStorage
 , udp = require('dgram')
-, buffer = require('buffer')
 , spawn = require('child_process').spawn
 , suncalc = require('suncalc')
 , jsftp = require("jsftp")
@@ -1102,6 +1099,7 @@ if (myWLLIp.length == 0)
     findWLL();
 else{
     console.log("Attached to WLL at "+myWLLIp)
+    spawn('python3',['./pidisplay.py','skip','skip','WLL is '+myWLLIp])
 	startWLLqueries();
 }
 
@@ -1113,8 +1111,6 @@ server.bind(22222);
 server.on('listening',function(){
   var address = server.address();
   var port = address.port;
-  var family = address.family;
-  var ipaddr = address.address;
   console.log('UDP Server is listening at port ' + port);
 });
 server.on('message',function(msg,info){
@@ -1300,7 +1296,7 @@ setInterval(function(){
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log("\nWeathersite is online at "+myUrl+'\n');
-    spawn('python3',['./pidisplay.py','Hello World'])
+    spawn('python3',['./pidisplay.py','Weathersite is Online',myIpAddress+':5000','skip'])
 });
 
 
