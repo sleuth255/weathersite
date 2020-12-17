@@ -83,7 +83,7 @@ draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
 if sys.argv[1] != "skip":
    draw.text((x, top + 10), sys.argv[1], font=font, fill=255)
-if sys.argv[2] != "skip""
+if sys.argv[2] != "skip":
 	draw.text((x, top + 20), sys.argv[2], font=font, fill=255)
 if sys.argv[3] != "skip":
 	draw.text((x, top + 30), sys.argv[3], font=font, fill=255)

@@ -1292,7 +1292,7 @@ setInterval(function(){
 }, 10*60*1000); 
 
 //Start up  Web server
-
+console.log(__dirname+'/pidisplay.py')
 http.createServer(app).listen(app.get('port'), function(){
     console.log("\nWeathersite is online at "+myUrl+'\n');
     spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000','skip'])
