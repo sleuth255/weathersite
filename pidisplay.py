@@ -90,7 +90,7 @@ if sys.argv[3] != "skip":
 # Display image.
 disp.image(image)
 disp.show()
-time.sleep(10)
+time.sleep(60*60)
 draw.rectangle((0, 0, width, height), outline=0, fill=0)
 disp.image(image)
 disp.show()
