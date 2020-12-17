@@ -96,6 +96,4 @@ time.sleep(10)
 draw.rectangle((0, 0, width, height), outline=0, fill=0)
 disp.image(image)
 disp.show()
-print(f"Arguments count: {len(sys.argv)}")
-for i, arg in enumerate(sys.argv):
-    print(f"Argument {i:>6}: {arg}")
+print(sys.argv[1])
