@@ -44,12 +44,25 @@ var express = require('express')
 , jsftp = require("jsftp")
 , clone = require("clone")
 , myIpAddress = require("ip").address()
+, ipcidr = require('ip-cidr')
 , ifaces = require("os").networkInterfaces()
 , linechart = require('./lineChart.json')
 , portscanner = require('portscanner')
 , path = require('path');
 
 var app = express();
+app.set('port', process.env.PORT || 5000);
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
+app.use(express.favicon());
+app.use(express.bodyParser());
+app.use(express.methodOverride());
+app.use(app.router);
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.logger('dev'));
+app.locals.moment = require('moment');
+
+
 if (myMetarFtpSite.length > 0){
    var ftp = new jsftp({
 	   host: myMetarFtpSite
@@ -68,10 +81,6 @@ if (myMetarFtpSite.length > 0){
 process.on('uncaughtException', function(err){
 	console.error(err.stack);
 })
-
-var server = udp.createSocket('udp4'); 
-server.bind(22222);
-app.locals.moment = require('moment');
 
 //initialize local storage
 var oDate,oTemp,oHum,oDewpt,oWindspd,oWinddir,oWindgust,oBarometer
@@ -122,18 +131,6 @@ if ((localStorage.getItem("oBarometer"))==null)
 	oBarometer = [];
 else
 	oBarometer = JSON.parse(localStorage.getItem("oBarometer"));
-
-//all environments
-
-app.set('port', process.env.PORT || 5000);
-app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
-app.use(express.favicon());
-app.use(express.bodyParser());
-app.use(express.methodOverride());
-app.use(app.router);
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.logger('dev'));
 
 
 /***************************************************************/
@@ -281,39 +278,11 @@ function startWLLqueries(){
 		   req1.end();
 	})
 	// Primary 5 minute weather conditions refresh code block follows
-	// get METAR Observation from NOAA FTP site and local conditions from WLL  
+	// get local conditions from WLL  
 	// Tell WLL server to continue to send UDP packets
 
 	setInterval(function(){
 		   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
-	if (myMetarFtpSite.length > 0){
-		   var Observation = ""; // Will store the contents of the file
-		   try{
-		      console.log('Retrieving METAR observation');
-	          ftp.get(myMetarFilePath, (err, socket) => {
-	            if (err) {
-	              return;
-	            }
-
-	            socket.on("data", d => {
-	              Observation += d.toString();
-	            });
-
-	            socket.on("close", err => {
-	              if (err) {
-	                console.error("METAR data retrieval error");
-	                return;
-	              }
-	              metarObservation = Observation;
-	              console.log("METAR observation retrieved");
-	            });
-	            socket.resume();
-	          });
-	   	      }
-		      catch(err){
-			      console.log('Caught Metar Observation error')
-		      }
-	       }
 		   var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
 			   data = '';
 			   resp.on('data',function(chunk){
@@ -488,7 +457,6 @@ function iterateHttpTargets(list,current){
 }
 function findWLL(){
 	console.log("starting WLL search")
-	var ipcidr = require('ip-cidr')
 	var myCIDR;
 	for (var key in ifaces){
 		var info = ifaces[key]
@@ -1139,6 +1107,9 @@ else{
 
 //UDP Server
 
+var server = udp.createSocket('udp4'); 
+server.bind(22222);
+
 server.on('listening',function(){
   var address = server.address();
   var port = address.port;
@@ -1184,8 +1155,8 @@ server.on('message',function(msg,info){
 	  }
 });
 
-
-// Get initial METAR observation
+// METAR observation logic
+// Get initial observation
 if (myMetarFtpSite.length > 0){
    var Observation = ""; // Will store the contents of the file
    try{
@@ -1214,8 +1185,38 @@ if (myMetarFtpSite.length > 0){
    catch(err){
        console.log('Caught Metar Observation error')
    }
+   // Get additional observations every hour
+   setInterval (function(){
+	   var Observation = ""; // Will store the contents of the file
+	   try{
+	      console.log('Retrieving METAR observation');
+          ftp.get(myMetarFilePath, (err, socket) => {
+             if (err) {
+               return;
+             }
+            
+             socket.on("data", d => {
+                Observation += d.toString();
+             });
+
+		     socket.on("close", err => {
+		        if (err) {
+		           console.error("METAR data retrieval error");
+		           return;
+		        }
+		        metarObservation = Observation;
+		        console.log("METAR observation retrieved");
+		      });
+		      socket.resume();
+		  });
+	   }
+		  catch(err){
+		      console.log('Caught Metar Observation error')
+	   }
+   },60*60*1000)
 }
 
+// Climacell forecast logic
 // Get initial Climacell forecast
 if (myClimacellApiKey.length > 0){
    dt = new Date()
@@ -1242,11 +1243,7 @@ if (myClimacellApiKey.length > 0){
 	      console.log("Forecast initial request failure")
 	      req0.end();
    })
-}
-
-
-// request the current forecast from ClimaCell every 30 minutes
-if (myClimacellApiKey.length > 0){
+   // get additional forecast data every 30 minutes
    setInterval(function(){
 	   dt = new Date()
 	   sdt = new Date()
@@ -1273,7 +1270,7 @@ if (myClimacellApiKey.length > 0){
 	   })
 
 	
-   },30*60*1000) //retrieve new forecast every 30 minutes
+   },30*60*1000) 
 }
 
 
@@ -1301,15 +1298,10 @@ setInterval(function(){
 //Start up  Web server
 
 
-	http.createServer(app).listen(app.get('port'), function(){
-		  console.log("\nWeathersite is online at "+myUrl+'\n');
-		  try{
-		      spawn('python3',['/stats.py'])
-		  }
-		  catch(err){
-			  // toss any errors because this only works on the Pi build with display hat
-		  }
-		});
+http.createServer(app).listen(app.get('port'), function(){
+    console.log("\nWeathersite is online at "+myUrl+'\n');
+    spawn('python3',['/stats.py'])
+});
 
 
 
