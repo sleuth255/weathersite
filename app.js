@@ -436,7 +436,7 @@ function iterateHttpTargets(list,current){
 		          console.log('found WLL at '+list[current])
 		          localStorage.setItem("myWLLIp",list[current])
 		          myWLLIp = list[current];
-	              spawn('python3',[__dirname+'/pidisplay.py','skip','WLL found: '+myWLLIp,'skip']).on('error',function(){}); //toss error
+	              spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000','WLL found: '+myWLLIp]).on('error',function(){}); //toss error
 		          startWLLqueries();
 		      }
 		      else
@@ -444,7 +444,7 @@ function iterateHttpTargets(list,current){
 			      iterateHttpTargets(list,++current)
 		      else{
 				console.log("WLL not found")
-	            spawn('python3',[__dirname+'/pidisplay.py','skip','WLL not found','skip']).on('error',function(){}); //toss error
+                spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000','WLL not found']).on('error',function(){}); //toss error
 			  }
 	      })
 	   else
@@ -452,7 +452,7 @@ function iterateHttpTargets(list,current){
 		   iterateHttpTargets(list,++current)
 	   else{
 		   console.log("WLL not found")
-           spawn('python3',[__dirname+'/pidisplay.py','skip','WLL not found','skip']).on('error',function(){}); //toss error
+           spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000','WLL not found']).on('error',function(){}); //toss error
 		}
 	})
 }
