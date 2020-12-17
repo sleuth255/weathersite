@@ -87,8 +87,12 @@ myIP = myIP.strip('\n')
 myIP = myIP.strip(' ')
 # Write four lines of text.
 
-draw.text((x, top + 10), "Weathersite is online", font=font, fill=255)
-draw.text((x, top + 20), "http://"+myIP+":5000", font=font, fill=255)
+if sys.argv[1] != "skip"
+   draw.text((x, top + 10), sys.argv[1], font=font, fill=255)
+if sys.argv[2] != "skip"
+	draw.text((x, top + 20), sys.argv[2], font=font, fill=255)
+if sys.argv[3] != "skip"
+	draw.text((x, top + 30), sys.argv[3], font=font, fill=255)
 # Display image.
 disp.image(image)
 disp.show()
@@ -96,4 +100,4 @@ time.sleep(10)
 draw.rectangle((0, 0, width, height), outline=0, fill=0)
 disp.image(image)
 disp.show()
-print(sys.argv[1])
+
