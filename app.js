@@ -1300,7 +1300,7 @@ setInterval(function(){
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log("\nWeathersite is online at "+myUrl+'\n');
-    spawn('python3',['/stats.py'])
+    spawn('python3',['./pidisplay.py','Hello World'])
 });
 
 
