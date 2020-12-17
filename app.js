@@ -1298,8 +1298,7 @@ else
    arg3 = "WLL is "+myWLLIp	
 http.createServer(app).listen(app.get('port'), function(){
     console.log("\nWeathersite is online at "+myUrl+'\n');
-	var handle = spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000',arg3])
-	handle.stderr.on('data', function(){}) //toss errors
+	spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000',arg3]).on('error',function(){}); //toss error
 });
 
 
