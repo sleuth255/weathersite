@@ -158,6 +158,7 @@ var rainStormRate = 0;
 var forecastObj = {};
 var sunrise;
 var sunset;
+var gust;
 var now = new Date();
 var moonsize = makeMoonPhaseVector();
 var daytime = suncalc.getTimes(now,myLatitude,myLongitude);
@@ -182,7 +183,7 @@ function startWLLqueries(){
 		resp.on('end',function(){
 			//console.log(data.toString())
 			var obj = JSON.parse(data);
-		    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
+		    gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
 		    if (observationUnits.metricSpeed)
 		    	gust = Math.round(gust * 1.60934)
 			avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
@@ -436,7 +437,7 @@ function iterateHttpTargets(list,current){
 		          console.log('found WLL at '+list[current])
 		          localStorage.setItem("myWLLIp",list[current])
 		          myWLLIp = list[current];
-	              spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000','WLL found: '+myWLLIp]).on('error',function(){}); //toss error
+	              spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000','WLL is '+myWLLIp]).on('error',function(){}); //toss error
 		          startWLLqueries();
 		      }
 		      else
