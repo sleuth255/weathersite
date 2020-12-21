@@ -13,7 +13,7 @@ var myLongitude = -88.1084;
 var myWLLIp = ''; //weathersite will attempt to find your WLL if this not filled in
 var myMetarFtpSite = "tgftp.nws.noaa.gov";
 var myMetarFilePath = "/data/observations/metar/stations/KMKE.TXT";
-var myRadarZoominPath = "https://radar.weather.gov/lite/N0R/MKX_loop.gif"
+var myRadarZoominPath = "https://radblast.wunderground.com/cgi-bin/radar/WUNIDS_map?num=15&type=N0R&frame=0&scale=1&delay=15&severe=1&smooth=1&station=MKX&rainsnow=1&lightning=1&noclutter=1&showlabels=1&showstorms=1"
 var myRadarZoomoutPath = "https://s.w-x.co/staticmaps/wu/wu/wxtype1200_cur/uscad/animate.png"
 var myClimacellApiKey = "";
 // get a free Dev API key from climacell.co to enable active Weather Tile functionality
