@@ -123,7 +123,7 @@
 }
 .uparrow{
 	position: absolute;
-	left: 70px;
+	left: 550px;
 	top: 165px;
 	z-index: 3;
 }
@@ -131,7 +131,7 @@
 
 .downarrow{
 	position: absolute;
-	left: 70px;
+	left: 550px;
 	top: 275px;
 	z-index: 3;
 }
