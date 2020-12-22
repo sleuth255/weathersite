@@ -895,7 +895,7 @@ app.get('/', function (req, res) {
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
 	
-    res.render('defaultresponse',{loadstylesheet: true,observationUnits: us.observationUnits,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('defaultresponse',{response: req.query.response,loadstylesheet: true,observationUnits: us.observationUnits,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/liveconditions', function (req, res) {
     res.render('liveconditions',{loadstylesheet: false,observationUnits: us.observationUnits,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),day: daytime,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
@@ -1222,8 +1222,7 @@ app.get('/settings', function (req, res) {
 	if (cidr.contains(ip) || ip.length < 4) // localhost is always allowed
 		res.render('settings',{weatherSiteVersion: weatherSiteVersion,response: req.query.response,mySettingsCIDR: us.mySettingsCIDR,myClimacellApiKey: us.myClimacellApiKey,myMetarFilePath: us.myMetarFilePath,myMetarFtpSite: us.myMetarFtpSite,myWLLIp: us.myWLLIp,observationUnits: us.observationUnits,myRadarZoominPath: us.myRadarZoominPath,myRadarZoomoutPath: us.myRadarZoomoutPath,myLatitude: us.myLatitude,myLongitude: us.myLongitude,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath, loadstylesheet: true})
 	else{
-		alert('Settings not Authorized')
-		return res.redirect('/');
+		return res.redirect('/?response=Settings Not Authorized');
 	}
 
 })
@@ -1232,6 +1231,7 @@ app.post('/dosettings', function (req, res) {
 	var oldLatitude = us.myLatitude;
 	var oldLongitude = us.myLongitude;
 	var oldClimacellApiKey = us.myClimacellApiKey
+	var oldWLLIp = us.myWLLIp;
 	us.myLatitude = req.body.myLatitude;
 	us.myLongitude = req.body.myLongitude;
 	us.myWLLIp = req.body.myWLLIp;
@@ -1242,6 +1242,8 @@ app.post('/dosettings', function (req, res) {
 	us.myClimacellApiKey = req.body.myClimacellApiKey;
 	us.mySettingsCIDR = req.body.mySettingsCIDR;
 	localStorage.setItem("userSettings",JSON.stringify(us))
+	if (oldWLLIp != us.myWLLIp)
+		startWLLqueries();
 	if (oldMetarFtpSite != us.myMetarFtpSite) // Metar data was set up
 		startMETARqueries();
 	if (oldClimacellApiKey != us.myClimacellApiKey)
