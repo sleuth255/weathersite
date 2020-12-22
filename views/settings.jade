@@ -1,0 +1,148 @@
+extends layout
+block append content
+   script(type='text/javascript')
+       |  window.onload = setupRefresh;
+       |  function setupRefresh()
+       |  {
+       |  setTimeout(function(){$('#response').hide();}, 2*1000);
+       if(((skyconditions[0].skyconditions > 4 && day) || (day && rainStormRate > 0)) && changebackgroundto != 1)
+          |$('body').css('background', 'url("/images/cloudybackground.jpg") no-repeat bottom fixed');
+          |$('body').css('background-size', 'cover');
+          |$('.fontcolor').css('color','#ffffff');
+       else if(((skyconditions[0].skyconditions > 4 && !day) || (!day && rainStormRate > 0)) && changebackgroundto != 2)
+          |$('body').css('background', 'url("/images/cloudynightbackground.jpg") no-repeat bottom fixed');
+          |$('body').css('background-size', 'cover');
+          |$('.fontcolor').css('color','#ffffff');
+       else if(day && changebackgroundto != 3)
+          |$('body').css('background', 'url("/images/sunnybackground.jpg") no-repeat bottom fixed');
+          |$('body').css('background-size', 'cover');
+          |$('.fontcolor').css('color','#000000');
+       else if (changebackgroundto != 4)
+          |$('body').css('background', 'url("/images/starrybackground.jpg") no-repeat bottom fixed');
+          |$('body').css('background-size', 'cover');
+          |$('.fontcolor').css('color','#ffffff');
+       |  }
+       |  function getURL(){
+       |     var url = location.href;
+       |     var idx = url.indexOf('?')
+       |     if (idx !== -1)
+       |        url = url.substring(0,idx);
+       |     idx = url.lastIndexOf('/');
+       |     url = url.substring(0,idx);
+       |     return url;
+       |  }
+   body()
+        table
+          tr
+            td(style='text-align: center')
+              img(src='/images/weathersitelogo.png')
+              span.smallerer(style = 'position: relative; left: -80px; top: -100px; color: #27485d;')
+                |v#{weatherSiteVersion}
+            td
+              span.bigger.fontcolor
+                |Weathersite Settings	  
+        table
+          tr
+            td(height='50px',valign='top')
+              span.small#response(style='font-weight: bold;color: red;')
+                | #{response}
+        form#editform(method="POST" , action="/dosettings")
+          input(type='hidden', name='returnurl', value='/')
+          table
+            tr
+              td(width='165px')
+                 span.smaller.fontcolor 
+                    | My Latitude
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 input#myLatitude(type='text', size=20, name='myLatitude', value='#{myLatitude}',onClick='$(this).select()')
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 span.smaller.fontcolor 
+                    | example: 84.532 (negative for south latitude)
+            tr
+              td 
+                 span.smaller.fontcolor 
+                    | My Longitude
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 input#myLongitude(type='text', size=20, name='myLongitude', value='#{myLongitude}',onClick='$(this).select()')
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 span.smaller.fontcolor 
+                    | example: -87.234 (negative for west Longitude)
+          table
+            tr
+              td(width='165px')
+                 span.smaller.fontcolor 
+                    | WLL IP Address
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 input#myWLLIp(type='text', size=20, name='myWLLIp', value='#{myWLLIp}',onClick='$(this).select()')
+            tr
+              td 
+                 span.smaller.fontcolor 
+                    | METAR FTP Site
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 input#myMetarFtpSite(type='text', size=20, name='myMetarFtpSite', value='#{myMetarFtpSite}',onClick='$(this).select()')
+            tr
+              td 
+                 span.smaller.fontcolor 
+                    | METAR File Path
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 input#myMetarFilePath(type='text', size=40, name='myMetarFilePath', value='#{myMetarFilePath}',onClick='$(this).select()')
+            tr
+              td 
+                 span.smaller.fontcolor 
+                    | Zoomed-in Radar Path
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 input#myRadarZoominPath(type='text', size=150, name='myRadarZoominPath', value='#{myRadarZoominPath}',onClick='$(this).select()')
+            tr
+              td 
+                 span.smaller.fontcolor 
+                    | Zoomed-out Radar Path
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 input#myRadarZoomoutPath(type='text', size=150, name='myRadarZoomoutPath', value='#{myRadarZoomoutPath}',onClick='$(this).select()')
+            tr
+              td 
+                 span.smaller.fontcolor 
+                    | Climacell API Key
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 input#myClimacellApiKey(type='text', size=35, name='myClimacellApiKey', value='#{myClimacellApiKey}',onClick='$(this).select()')
+            tr
+              td 
+                 span.smaller.fontcolor 
+                    | Settings Subnet
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 input#mySettingsCIDR(type='text', size=20, name='mySettingsCIDR', value='#{mySettingsCIDR}',onClick='$(this).select()')
+             
+
+          table                       
+            tr
+              td
+                span(style="display:block; width: 80px")
+              td   
+                p: button(type="submit", value='1',name='changetype') Update
+              td      
+              td 
+                p: button(type="button", onclick="onBackClicked()") Reset
+              td      
+              td 
+                p: button(type="button", onclick="window.location = getURL()+'/'") Exit Settings

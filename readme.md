@@ -30,10 +30,12 @@ You will be taken to the default conditions page
 
 ## Known issues/Todos
 * no issues currently
-* todo: add settings page
  
 
 ## Changelog:
+
+### v1.5
+* add Settings Page
 
 ### v1.4
 * duplicate last chart entry if current conditions request fails

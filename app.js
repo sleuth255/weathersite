@@ -1,35 +1,26 @@
 //
-// Settings that you need to change.  
-//
-// To refresh weathersite code, first copy these to the clipboard
-// then open up a command prompt/terminal window and switch to the /weathersite directory
-// now do:
-//    git reset --hard origin/master
-//    git pull origin master
-// The codebase will be updated.  Then open app.js in an editor and paste your settings back in.
-//
-var myLatitude = 42.9764;
-var myLongitude = -88.1084;
-var myWLLIp = ''; //weathersite will attempt to find your WLL if this not filled in
-var myMetarFtpSite = "tgftp.nws.noaa.gov";
-var myMetarFilePath = "/data/observations/metar/stations/KMKE.TXT";
-var myRadarZoominPath = "https://radblast.wunderground.com/cgi-bin/radar/WUNIDS_map?num=15&type=N0R&frame=0&scale=1&delay=15&severe=1&smooth=1&station=MKX&rainsnow=1&lightning=1&noclutter=1&showlabels=1&showstorms=1"
-var myRadarZoomoutPath = "https://s.w-x.co/staticmaps/wu/wu/wxtype1200_cur/uscad/animate.png"
-var myClimacellApiKey = "";
-// get a free Dev API key from climacell.co to enable active Weather Tile functionality
-// for privacy, the key can also can be stored in local storage in a file called "ccApiKey" 
-// (see local storage initialization below)
-var observationUnits = {
-   metricTemp: false,
-   metricRain: false,
-   metricPressure:  false,
-   metricSpeed: false
-}
-	
-//end of settings that you need to change
 //
 
-var weatherSiteVersion = '1.4'
+var us = {
+    myLatitude: 0,
+    myLongitude: 0,
+    myWLLIp: '', 
+    myMetarFtpSite: '',
+    myMetarFilePath: '',
+    myRadarZoominPath: '',
+    myRadarZoomoutPath: '',
+	myClimacellApiKey: '',
+	mySettingsCIDR: '',
+    observationUnits: {
+      metricTemp: false,
+      metricRain: false,
+      metricPressure: false,
+      metricSpeed: false
+    }
+}
+	
+
+var weatherSiteVersion = '1.5'
 var express = require('express')
 , request = require('request')
 , http = require('http')
@@ -60,40 +51,17 @@ app.use(express.logger('dev'));
 app.locals.moment = require('moment');
 
 
-if (myMetarFtpSite.length > 0){
-   var ftp = new jsftp({
-	   host: myMetarFtpSite
-   });
-   ftp.keepAlive();
-   ftp.on('error', function(){
-	   console.log('Ftp error caught');
-	   ftp.raw("QUIT");
-	   ftp.destroy();
-	   ftp = new jsftp({
-		   host: myMetarFtpSite
-	   });
-   })
-}
-
 process.on('uncaughtException', function(err){
 	console.error(err.stack);
 })
 
 //initialize local storage
+
 var oDate,oTemp,oHum,oDewpt,oWindspd,oWinddir,oWindgust,oBarometer
 var localStorage = new LocalStorage('/WeathersiteStats'); 
 
-if ((localStorage.getItem("ccApiKey"))!=null)
-	myClimacellApiKey = localStorage.getItem("ccApiKey");
-else
-if (myClimacellApiKey.length > 0)
-	localStorage.setItem("ccApiKey",myClimacellApiKey)
-
-if ((localStorage.getItem("myWLLIp"))!=null)
-	myWLLIp = localStorage.getItem("myWLLIp");
-else
-if (myWLLIp.length > 0) // set local storage if hardcoded
-	localStorage.setItem("myWLLIp",myWLLIp);
+if ((localStorage.getItem("userSettings"))!=null)
+   us = JSON.parse(localStorage.getItem("userSettings"))
 
 
 if ((localStorage.getItem("oDate"))==null)
@@ -130,6 +98,8 @@ else
 	oBarometer = JSON.parse(localStorage.getItem("oBarometer"));
 
 
+
+
 /***************************************************************/
 //globals
 var myUrl = "http://"+myIpAddress+":"+app.get('port')
@@ -159,9 +129,13 @@ var forecastObj = {};
 var sunrise;
 var sunset;
 var gust;
+var ftp;
+var metarHandle = null;
+var climacellHandle = null;
+var WLLHandle = null;
 var now = new Date();
 var moonsize = makeMoonPhaseVector();
-var daytime = suncalc.getTimes(now,myLatitude,myLongitude);
+var daytime = suncalc.getTimes(now,us.myLatitude,us.myLongitude);
 sunrise = daytime.sunrise;
 sunset = daytime.sunset;
 if ((now > daytime.dusk && now > daytime.dawn) || (now < daytime.dawn && now < daytime.dusk))
@@ -171,11 +145,140 @@ else
 
 // Global functions
 
+function startClimacellqueries(){
+   dt = new Date()
+   sdt = new Date()
+   edt = new Date()
+   sdt.setDate(dt.getDate()+1)
+   edt.setDate(dt.getDate()+3)
+   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T18:00:00Z';
+   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T18:00:00Z';
+   var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+us.myLatitude+"&lon="+us.myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+us.myClimacellApiKey
+   //console.log(ccreq)    
+   var req0 = https.get(ccreq,function(resp){
+	   var ccdata = '';
+	   resp.on('data',function(chunk){
+		   ccdata+=chunk
+	   })
+	   resp.on('end',function(){
+		   var forecastObjTmp = JSON.parse(ccdata);
+		   if (forecastObjTmp.length > 0)
+			   forecastObj = forecastObjTmp;
+		   req0.end();
+	   })
+   }).on('error',function(){
+	      console.log("Forecast initial request failure")
+	      req0.end();
+   })
+   // get additional forecast data every 30 minutes
+   clearInterval(climacellHandle)
+   climacellHandle = setInterval(function(){
+	   dt = new Date()
+	   sdt = new Date()
+	   edt = new Date()
+	   sdt.setDate(dt.getDate()+1)
+	   edt.setDate(dt.getDate()+3)
+	   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T18:00:00Z';
+	   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T18:00:00Z';
+	   var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+us.myLatitude+"&lon="+us.myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+us.myClimacellApiKey
+	   var req0 = https.get(ccreq,function(resp){
+		   var ccdata = '';
+		   resp.on('data',function(chunk){
+			   ccdata+=chunk
+		   })
+		   resp.on('end',function(){
+			   var forecastObjTmp = JSON.parse(ccdata);
+			   if (forecastObjTmp.length > 0)
+				   forecastObj = forecastObjTmp;
+			   req0.end();
+		   })
+	   }).on('error',function(){
+		      console.log("ClimaCell Forecast request failure")
+		      req0.end();
+	   })
+
+	
+   },30*60*1000) 
+}
+function startMETARqueries(){
+   // log onto FTP site
+   ftp = new jsftp({
+      host: us.myMetarFtpSite
+   });
+   ftp.keepAlive();
+   ftp.on('error', function(){
+      console.log('Ftp error caught');
+      ftp.raw("QUIT");
+      ftp.destroy();
+      ftp = new jsftp({
+        host: us.myMetarFtpSite
+      });
+   })
+   // METAR observation logic
+   // Get initial observation
+   var Observation = ""; // Will store the contents of the file
+   try{
+      console.log('Retrieving METAR observation');
+      ftp.get(us.myMetarFilePath, (err, socket) => {
+        if (err) {
+          return;
+        }
+
+        socket.on("data", d => {
+          Observation += d.toString();
+        });
+
+        socket.on("close", err => {
+          if (err) {
+            console.error("Metar Observation retrieval error.");
+            return
+          }
+          metarObservation = Observation;
+          console.log("METAR observation retrieved");
+        });
+
+        socket.resume();
+      });
+      }
+   catch(err){
+       console.log('Caught Metar Observation error')
+   }
+   // Get additional observations every hour
+   clearInterval(metarHandle);
+   metarHandle = setInterval (function(){
+	   var Observation = ""; // Will store the contents of the file
+	   try{
+	      console.log('Retrieving METAR observation');
+          ftp.get(us.myMetarFilePath, (err, socket) => {
+             if (err) {
+               return;
+             }
+            
+             socket.on("data", d => {
+                Observation += d.toString();
+             });
+
+		     socket.on("close", err => {
+		        if (err) {
+		           console.error("METAR data retrieval error");
+		           return;
+		        }
+		        metarObservation = Observation;
+		        console.log("METAR observation retrieved");
+		      });
+		      socket.resume();
+		  });
+	   }
+		  catch(err){
+		      console.log('Caught Metar Observation error')
+	   }
+   },60*60*1000)
+}
 function startWLLqueries(){
 	//Get initial conditions from WLL.
 	//Also tell WLL to start broadcasting live UDP Wind/Rainfall data every 5 minutes
 	console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
-	var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
+	var req1 = http.get('http://'+us.myWLLIp+'/v1/current_conditions',function(resp){
 		data = '';
 		resp.on('data',function(chunk){
 			data+=chunk
@@ -184,34 +287,34 @@ function startWLLqueries(){
 			//console.log(data.toString())
 			var obj = JSON.parse(data);
 		    gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
-		    if (observationUnits.metricSpeed)
+		    if (us.observationUnits.metricSpeed)
 		    	gust = Math.round(gust * 1.60934)
 			avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
-		    if (observationUnits.metricSpeed)
+		    if (us.observationUnits.metricSpeed)
 		    	avgSpeed = Math.round(avgSpeed * 1.60934) 
 			avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
 			inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
-		    if (observationUnits.metricTemp)
+		    if (us.observationUnits.metricTemp)
 		    	inTemp = Math.round(((inTemp -32) *5)/9)
 			inHum = Math.round(obj.data.conditions[obj.data.conditions.length-2].hum_in);
 			outTemp = Math.round(obj.data.conditions[0].temp);
 			outTempLastReading = Math.round(obj.data.conditions[0].temp);
-		    if (observationUnits.metricTemp){
+		    if (us.observationUnits.metricTemp){
 		    	outTemp = Math.round(((outTemp -32) *5)/9)
 		    	outTempLastReading = Math.round(((outTempLastReading -32) *5)/9)
 		    }
 			outHum = Math.round(obj.data.conditions[0].hum);
 			outDewPt = Math.round(obj.data.conditions[0].dew_point);
-		    if (observationUnits.metricTemp)
+		    if (us.observationUnits.metricTemp)
 		    	outDewPt = Math.round(((outDewPt -32) *5)/9)
 			outWindChill = Math.round(obj.data.conditions[0].wind_chill);
 			outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
-		    if (observationUnits.metricTemp){
+		    if (us.observationUnits.metricTemp){
 		    	outWindChill = Math.round(((outWindChill -32) *5)/9)
 		    	outHeatIdx = Math.round(((outHeatIdx -32) *5)/9)
 		    }
 			inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
-		    if (observationUnits.metricPressure)
+		    if (us.observationUnits.metricPressure)
 			  inBarometer = (inBarometer * 33.8639).toFixed(1);
 			inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
 			if (oDate.length > 143)
@@ -255,7 +358,7 @@ function startWLLqueries(){
 				inBarometerTrend = 'Steady'
 			req1.end();
 			console.log('UDP broadcast request begins')
-			var req2 = http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
+			var req2 = http.get('http://'+us.myWLLIp+'/v1/real_time?duration=300',function(resp){
 				data = '';
 				resp.on('data',function(chunk){
 					data+=chunk
@@ -277,10 +380,10 @@ function startWLLqueries(){
 	// Primary 5 minute weather conditions refresh code block follows
 	// get local conditions from WLL  
 	// Tell WLL server to continue to send UDP packets
-
-	setInterval(function(){
+    clearInterval(WLLHandle)
+	WLLHandle = setInterval(function(){
 		   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
-		   var req1 = http.get('http://'+myWLLIp+'/v1/current_conditions',function(resp){
+		   var req1 = http.get('http://'+us.myWLLIp+'/v1/current_conditions',function(resp){
 			   data = '';
 			   resp.on('data',function(chunk){
 				   data+=chunk
@@ -289,34 +392,34 @@ function startWLLqueries(){
 				    console.log('current conditions reply received')
 				    var obj = JSON.parse(data);
 				    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
-				    if (observationUnits.metricSpeed)
+				    if (us.observationUnits.metricSpeed)
 				   	    gust = Math.round(gust * 1.60934)
 				    avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
-				    if (observationUnits.metricSpeed)
+				    if (us.observationUnits.metricSpeed)
 				        avgSpeed = Math.round(avgSpeed * 1.60934) 
 				    avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
 					inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
-				    if (observationUnits.metricTemp)
+				    if (us.observationUnits.metricTemp)
 				    	inTemp = Math.round(((inTemp -32) *5)/9)
 					inHum = Math.round(obj.data.conditions[obj.data.conditions.length-2].hum_in);
 					outTemp = Math.round(obj.data.conditions[0].temp);
 					outTempLastReading = Math.round(obj.data.conditions[0].temp);
-				    if (observationUnits.metricTemp){
+				    if (us.observationUnits.metricTemp){
 				    	outTemp = Math.round(((outTemp -32) *5)/9)
 				    	outTempLastReading = Math.round(((outTempLastReading -32) *5)/9)
 				    }
 					outHum = Math.round(obj.data.conditions[0].hum);
 					outDewPt = Math.round(obj.data.conditions[0].dew_point);
-				    if (observationUnits.metricTemp)
+				    if (us.observationUnits.metricTemp)
 				    	outDewPt = Math.round(((outDewPt -32) *5)/9)
 					outWindChill = Math.round(obj.data.conditions[0].wind_chill);
 					outHeatIdx = Math.round(obj.data.conditions[0].heat_index);
-				    if (observationUnits.metricTemp){
+				    if (us.observationUnits.metricTemp){
 				    	outWindChill = Math.round(((outWindChill -32) *5)/9)
 				    	outHeatIdx = Math.round(((outHeatIdx -32) *5)/9)
 				    }
 					inBarometer = Math.round((obj.data.conditions[obj.data.conditions.length-1].bar_sea_level)*100)/100
-				    if (observationUnits.metricPressure)
+				    if (us.observationUnits.metricPressure)
 					  inBarometer = (inBarometer * 33.8639).toFixed(1);
 					inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
 				    if (oDate.length > 143)
@@ -371,7 +474,7 @@ function startWLLqueries(){
 
 				    console.log('starting WLL UDP refresh request')
 				    req1.end();
-				    var req2 = http.get('http://'+myWLLIp+'/v1/real_time?duration=300',function(resp){
+				    var req2 = http.get('http://'+us.myWLLIp+'/v1/real_time?duration=300',function(resp){
 					    data = '';
 					    resp.on('data',function(chunk){
 					     data+=chunk
@@ -435,9 +538,9 @@ function iterateHttpTargets(list,current){
 	      request({url: 'http://'+list[current]+'/v1/current_conditions',timeout: 5*1000},function(error,response,body){
 		      if (!error && response.statusCode == 200 && body.substr(0,14) == '{"data":{"did"'){
 		          console.log('found WLL at '+list[current])
-		          localStorage.setItem("myWLLIp",list[current])
-		          myWLLIp = list[current];
-	              spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000','WLL is '+myWLLIp]).on('error',function(){}); //toss error
+		          us.myWLLIp = list[current];
+		          localStorage.setItem("userSettings",JSON.stringify(us))
+	              spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000','WLL is '+us.myWLLIp]).on('error',function(){}); //toss error
 		          startWLLqueries();
 		      }
 		      else
@@ -783,6 +886,8 @@ function makeCompassVector(direction){
 
 //process...
 app.get('/', function (req, res) {
+	if (us.myLatitude.length == 0 && us.myLongitude.length == 0)
+	   return(res.redirect('/settings?response=Initial Weathersite Setup'))
 	var directionObj = []
 	directionObj[0] = makeCompassVector(direction)
 	directionObj[1] = makeCompassVector(lastDirection);
@@ -790,16 +895,16 @@ app.get('/', function (req, res) {
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
 	
-    res.render('defaultresponse',{loadstylesheet: true,observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('defaultresponse',{loadstylesheet: true,observationUnits: us.observationUnits,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,directionObj: directionObj,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,speed:speed,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/liveconditions', function (req, res) {
-    res.render('liveconditions',{loadstylesheet: false,observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),day: daytime,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
+    res.render('liveconditions',{loadstylesheet: false,observationUnits: us.observationUnits,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),day: daytime,rainStormStart: rainStormStart,rainStormAmt: rainStormAmt,rainStormRate: rainStormRate,outTempTrend: outTempTrend,inBarometer: inBarometer,inBarometerTrend: inBarometerTrend,outWindChill, outWindChill, outHeatIdx: outHeatIdx,inTemp: inTemp, inHum: inHum, outTemp: outTemp, outHum: outHum, outDewPt: outDewPt,avgSpeed: avgSpeed,avgDirection: makeCompassVector(avgDirection).heading,gustSpeed: gustSpeed,gustDirection: makeCompassVector(gustDirection).heading})
 })
 app.get('/tileconditions', function (req, res) {
-    res.render('tileconditions',{loadstylesheet: false,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
+    res.render('tileconditions',{loadstylesheet: false,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/refreshsuntile', function (req, res) {
-    res.render('refreshsuntile',{loadstylesheet: false,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
+    res.render('refreshsuntile',{loadstylesheet: false,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/livewind', function (req, res) {
     res.locals.err = false;
@@ -809,14 +914,14 @@ app.get('/livewind', function (req, res) {
 	directionObj[2] = makeCompassVector(lastDirection1);
 	directionObj[3] = makeCompassVector(lastDirection2);
 	directionObj[4] = makeCompassVector(lastDirection3);
-    res.render('livewind',{loadstylesheet: false,observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,directionObj: directionObj,speed:speed})
+    res.render('livewind',{loadstylesheet: false,observationUnits: us.observationUnits,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,directionObj: directionObj,speed:speed})
 })
 app.get('/radar', function (req, res) {
-	res.render('radarresponse',{weatherSiteVersion: weatherSiteVersion,loadstylesheet: true,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
+	res.render('radarresponse',{weatherSiteVersion: weatherSiteVersion,loadstylesheet: true,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath})
 })
 app.get('/radarrefresh', function (req, res) {
     res.locals.err = false;
-	res.render('radarrefresh',{weatherSiteVersion: weatherSiteVersion,loadstylesheet: false,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath})
+	res.render('radarrefresh',{weatherSiteVersion: weatherSiteVersion,loadstylesheet: false,skyconditions: makeSkyConditionsVector(),moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath})
 })
 app.get('/charts', function (req, res) {
     var xData = [" "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "];
@@ -870,11 +975,11 @@ app.get('/charts', function (req, res) {
     lineOptions3.series[1].name = ""
     lineOptions3.series[1].data = []
     
-    if (observationUnits.metricTemp)
+    if (us.observationUnits.metricTemp)
         lineOptions.yAxis.axisLabel.formatter = "{value} \u00b0C"
-    if (observationUnits.metricSpeed)
+    if (us.observationUnits.metricSpeed)
         lineOptions2.yAxis.axisLabel.formatter = "{value} km/h"
-            if (observationUnits.metricPressure){
+            if (us.observationUnits.metricPressure){
                 lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
                 lineOptions.grid.left = "8.2%"
                 lineOptions2.grid.left = "8.2%"
@@ -951,7 +1056,7 @@ app.get('/charts', function (req, res) {
 	}
     
 
-    res.render('charts',{chartvectors: chartVectors,loadstylesheet: true,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
+    res.render('charts',{chartvectors: chartVectors,loadstylesheet: true,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/chartrefresh', function (req, res) {
     res.locals.err = false;
@@ -1006,11 +1111,11 @@ app.get('/chartrefresh', function (req, res) {
     lineOptions3.series[1].name = ""
     lineOptions3.series[1].data = []
 
-    if (observationUnits.metricTemp)
+    if (us.observationUnits.metricTemp)
         lineOptions.yAxis.axisLabel.formatter = "{value} \u00b0C"
-    if (observationUnits.metricSpeed)
+    if (us.observationUnits.metricSpeed)
         lineOptions2.yAxis.axisLabel.formatter = "{value} km/h"
-    if (observationUnits.metricPressure){
+    if (us.observationUnits.metricPressure){
         lineOptions3.yAxis.axisLabel.formatter = "{value} mb"
         lineOptions.grid.left = "8.2%"
         lineOptions2.grid.left = "8.2%"
@@ -1084,7 +1189,7 @@ app.get('/chartrefresh', function (req, res) {
 		leftPosition+= leftPositionIncrement
 	}
 
-    res.render('chartrefresh',{chartvectors: chartVectors,loadstylesheet: false,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
+    res.render('chartrefresh',{chartvectors: chartVectors,loadstylesheet: false,data: JSON.stringify(lineOptions),data2: JSON.stringify(lineOptions2),data3: JSON.stringify(lineOptions3),skyconditions: makeSkyConditionsVector(),zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath,rainStormRate: rainStormRate,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,day: daytime})
 })
 app.get('/testpattern', function (req, res) {
     res.locals.err = false;
@@ -1096,15 +1201,79 @@ app.get('/testpattern', function (req, res) {
 	console.log(oTemp.length)
 	for (var x=0;x<oTemp.length;x++)
 		console.log(oTemp[x]);
-    res.render('testpattern',{observationUnits: observationUnits,zoominradarimage: myRadarZoominPath,zoomoutradarimage: myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,directionObj: directionObj})
+    res.render('testpattern',{observationUnits: us.observationUnits,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,moonsize: moonsize,lunarDetails: getLunarDetails(),sunrise: sunrise,sunset: sunset,directionObj: directionObj})
+})
+
+app.get('/settings', function (req, res) {
+	res.locals.err = false;
+	if (us.mySettingsCIDR.length == 0){
+	   var myCIDR;
+	   for (var key in ifaces){
+		   var info = ifaces[key]
+		   for(var x=0;x<info.length;x++)
+			   if (info[x].address == myIpAddress)
+				   myCIDR = info[x].cidr
+	   }
+	   us.mySettingsCIDR = myCIDR
+       localStorage.setItem("userSettings",JSON.stringify(us))
+	}
+	var cidr = new ipcidr(us.mySettingsCIDR);
+	var ip = req.ip.substring(req.ip.lastIndexOf(':')+1)
+	if (cidr.contains(ip) || ip.length < 4) // localhost is always allowed
+		res.render('settings',{weatherSiteVersion: weatherSiteVersion,response: req.query.response,mySettingsCIDR: us.mySettingsCIDR,myClimacellApiKey: us.myClimacellApiKey,myMetarFilePath: us.myMetarFilePath,myMetarFtpSite: us.myMetarFtpSite,myWLLIp: us.myWLLIp,observationUnits: us.observationUnits,myRadarZoominPath: us.myRadarZoominPath,myRadarZoomoutPath: us.myRadarZoomoutPath,myLatitude: us.myLatitude,myLongitude: us.myLongitude,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath, loadstylesheet: true})
+	else{
+		alert('Settings not Authorized')
+		return res.redirect('/');
+	}
+
+})
+app.post('/dosettings', function (req, res) {
+	var oldMetarFtpSite = us.myMetarFtpSite;
+	var oldLatitude = us.myLatitude;
+	var oldLongitude = us.myLongitude;
+	var oldClimacellApiKey = us.myClimacellApiKey
+	us.myLatitude = req.body.myLatitude;
+	us.myLongitude = req.body.myLongitude;
+	us.myWLLIp = req.body.myWLLIp;
+	us.myMetarFtpSite = req.body.myMetarFtpSite;
+	us.myMetarFilePath = req.body.myMetarFilePath;
+	us.myRadarZoominPath = req.body.myRadarZoominPath;
+	us.myRadarZoomoutPath = req.body.myRadarZoomoutPath;
+	us.myClimacellApiKey = req.body.myClimacellApiKey;
+	us.mySettingsCIDR = req.body.mySettingsCIDR;
+	localStorage.setItem("userSettings",JSON.stringify(us))
+	if (oldMetarFtpSite != us.myMetarFtpSite) // Metar data was set up
+		startMETARqueries();
+	if (oldClimacellApiKey != us.myClimacellApiKey)
+	    startClimacellqueries();
+	if (oldLatitude != us.myLatitude || oldLongitude != us.myLongitude){
+	   var now = new Date();
+	   var obj = suncalc.getTimes(now,us.myLatitude,us.myLongitude)
+	   if ((now > obj.dusk && now > obj.dawn) || (now < obj.dawn && now < obj.dusk))
+		   daytime = 0;
+	   else
+		   daytime = 1;
+	   sunrise = obj.sunrise;
+	   sunset = obj.sunset;
+	   moonsize = makeMoonPhaseVector();
+	}
+	return(res.redirect('/settings?response=Settings Updated'))
 })
 
 //Find my WLL if necessary 
-if (myWLLIp.length == 0)
+if (us.myWLLIp.length == 0)
     findWLL();
 else{
-    console.log("Attached to WLL at "+myWLLIp)
+    console.log("Attached to WLL at "+us.myWLLIp)
 	startWLLqueries();
+}
+//Start Metar Queries if set up
+if (us.myMetarFtpSite.length > 0)
+    startMETARqueries()
+
+// Start Climacell forecasts if set up
+if (us.myClimacellApiKey.length > 0){
+   startClimacellqueries()
 }
 
 //UDP Server
@@ -1119,7 +1288,7 @@ server.on('listening',function(){
 });
 server.on('message',function(msg,info){
 	  //console.log(msg.toString());
-	  if (info.address != myWLLIp) // drop foreign broadcasts
+	  if (info.address != us.myWLLIp) // drop foreign broadcasts
 		  return
 	  var obj = JSON.parse(msg);
 	  direction=obj.conditions[0].wind_dir_last;
@@ -1130,15 +1299,15 @@ server.on('message',function(msg,info){
 	     lastDirection = direction;
       }
 	  speed=Math.round(obj.conditions[0].wind_speed_last);
-	  if (observationUnits.metricSpeed)
+	  if (us.observationUnits.metricSpeed)
 		  speed = Math.round(speed * 1.60934)
 	  gustDirection=obj.conditions[0].wind_dir_at_hi_speed_last_10_min;
 	  gustSpeed=Math.round(obj.conditions[0].wind_speed_hi_last_10_min);
-	  if (observationUnits.metricSpeed)
+	  if (us.observationUnits.metricSpeed)
 		  gustSpeed = Math.round(gustSpeed * 1.60934)
 	  //rainStormStart='1603243501';
 	  rainStormStart=obj.conditions[0].rain_storm_start_at
-	  if (observationUnits.metricRain){
+	  if (us.observationUnits.metricRain){
 		  rainStormAmt=(obj.conditions[0].rain_storm *.2).toFixed(2);
 		  rainStormRate=obj.conditions[0].rain_rate_last *.2;
 		  
@@ -1155,123 +1324,6 @@ server.on('message',function(msg,info){
 	  }
 });
 
-// METAR observation logic
-// Get initial observation
-if (myMetarFtpSite.length > 0){
-   var Observation = ""; // Will store the contents of the file
-   try{
-   console.log('Retrieving METAR observation');
-   ftp.get(myMetarFilePath, (err, socket) => {
-     if (err) {
-       return;
-     }
-
-     socket.on("data", d => {
-       Observation += d.toString();
-     });
-
-     socket.on("close", err => {
-       if (err) {
-         console.error("Metar Observation retrieval error.");
-         return
-       }
-       metarObservation = Observation;
-       console.log("METAR observation retrieved");
-     });
-
-     socket.resume();
-   });
-   }
-   catch(err){
-       console.log('Caught Metar Observation error')
-   }
-   // Get additional observations every hour
-   setInterval (function(){
-	   var Observation = ""; // Will store the contents of the file
-	   try{
-	      console.log('Retrieving METAR observation');
-          ftp.get(myMetarFilePath, (err, socket) => {
-             if (err) {
-               return;
-             }
-            
-             socket.on("data", d => {
-                Observation += d.toString();
-             });
-
-		     socket.on("close", err => {
-		        if (err) {
-		           console.error("METAR data retrieval error");
-		           return;
-		        }
-		        metarObservation = Observation;
-		        console.log("METAR observation retrieved");
-		      });
-		      socket.resume();
-		  });
-	   }
-		  catch(err){
-		      console.log('Caught Metar Observation error')
-	   }
-   },60*60*1000)
-}
-
-// Climacell forecast logic
-// Get initial Climacell forecast
-if (myClimacellApiKey.length > 0){
-   dt = new Date()
-   sdt = new Date()
-   edt = new Date()
-   sdt.setDate(dt.getDate()+1)
-   edt.setDate(dt.getDate()+3)
-   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T18:00:00Z';
-   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T18:00:00Z';
-   var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+myLatitude+"&lon="+myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+myClimacellApiKey
-   //console.log(ccreq)    
-   var req0 = https.get(ccreq,function(resp){
-	   var ccdata = '';
-	   resp.on('data',function(chunk){
-		   ccdata+=chunk
-	   })
-	   resp.on('end',function(){
-		   var forecastObjTmp = JSON.parse(ccdata);
-		   if (forecastObjTmp.length > 0)
-			   forecastObj = forecastObjTmp;
-		   req0.end();
-	   })
-   }).on('error',function(){
-	      console.log("Forecast initial request failure")
-	      req0.end();
-   })
-   // get additional forecast data every 30 minutes
-   setInterval(function(){
-	   dt = new Date()
-	   sdt = new Date()
-	   edt = new Date()
-	   sdt.setDate(dt.getDate()+1)
-	   edt.setDate(dt.getDate()+3)
-	   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T18:00:00Z';
-	   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T18:00:00Z';
-	   var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+myLatitude+"&lon="+myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+myClimacellApiKey
-	   var req0 = https.get(ccreq,function(resp){
-		   var ccdata = '';
-		   resp.on('data',function(chunk){
-			   ccdata+=chunk
-		   })
-		   resp.on('end',function(){
-			   var forecastObjTmp = JSON.parse(ccdata);
-			   if (forecastObjTmp.length > 0)
-				   forecastObj = forecastObjTmp;
-			   req0.end();
-		   })
-	   }).on('error',function(){
-		      console.log("ClimaCell Forecast request failure")
-		      req0.end();
-	   })
-
-	
-   },30*60*1000) 
-}
 
 
 // test code: make it night in 30 seconds
@@ -1285,7 +1337,7 @@ setTimeout(function(){
 
 setInterval(function(){
 	var now = new Date();
-	var obj = suncalc.getTimes(now,myLatitude,myLongitude)
+	var obj = suncalc.getTimes(now,us.myLatitude,us.myLongitude)
 	if ((now > obj.dusk && now > obj.dawn) || (now < obj.dawn && now < obj.dusk))
 		daytime = 0;
 	else
@@ -1297,10 +1349,11 @@ setInterval(function(){
 
 //Start up  Web server
 var arg3 = ''
-if (myWLLIp.length == 0)
+if (us.myWLLIp.length == 0)
 	arg3 = 'Searching for WLL'
 else
-   arg3 = "WLL is "+myWLLIp	
+   arg3 = "WLL is "+us.myWLLIp	
+
 http.createServer(app).listen(app.get('port'), function(){
     console.log("\nWeathersite is online at "+myUrl+'\n');
 	spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000',arg3]).on('error',function(){}); //toss error
