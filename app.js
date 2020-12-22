@@ -886,7 +886,7 @@ function makeCompassVector(direction){
 
 //process...
 app.get('/', function (req, res) {
-	if (us.myLatitude.length == 0 && us.myLongitude.length == 0)
+	if (us.myLatitude == 0 && us.myLongitude == 0)
 	   return(res.redirect('/settings?response=Initial Weathersite Setup'))
 	var directionObj = []
 	directionObj[0] = makeCompassVector(direction)
