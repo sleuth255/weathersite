@@ -1217,7 +1217,10 @@ app.get('/settings', function (req, res) {
 	if (IpAllowed) 
 		res.render('settings',{weatherSiteVersion: weatherSiteVersion,response: req.query.response,metricTemp: us.observationUnits.metricTemp,metricSpeed: us.observationUnits.metricSpeed,metricPressure: us.observationUnits.metricPressure, metricRain: us.observationUnits.metricRain,mySettingsCIDR: us.mySettingsCIDR,myClimacellApiKey: us.myClimacellApiKey,myMetarFilePath: us.myMetarFilePath,myMetarFtpSite: us.myMetarFtpSite,myWLLIp: us.myWLLIp,observationUnits: us.observationUnits,myRadarZoominPath: us.myRadarZoominPath,myRadarZoomoutPath: us.myRadarZoomoutPath,myLatitude: us.myLatitude,myLongitude: us.myLongitude,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath, loadstylesheet: true})
 	else{
-		return res.redirect('/?response=Not authorized from your location');
+		var response = req.query.response
+		if (response.length == 0)
+		   response = "Not authorized from your location"
+		return res.redirect('/?response='+response);
 	}
 
 })
