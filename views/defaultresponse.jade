@@ -77,6 +77,9 @@ block append content
        |  function charts(){
        |     window.location = getURL()+"/charts";
        |  }
+       |  function settings(){
+       |     window.location = getURL()+"/settings";
+       |  }
      span.small#response(style='position: absolute; left: 530Px; Top: 50px; font-weight: bold;color: red;')
          | #{response}
      div#wind(style='display: block; height: 700px; background-image: url("/images/compassrose.png"); background-repeat: no-repeat;')
@@ -202,3 +205,7 @@ block append content
         button.button(onClick='charts()') History
         if (zoominradarimage.length > 0)
              button.button2(onClick='radar()') Radar
+             button.button3(onClick='settings()') Settings
+        else
+             button.button2(onClick='settings()') Settings
+             

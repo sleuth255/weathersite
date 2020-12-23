@@ -19,7 +19,6 @@ var us = {
     }
 }
 	
-
 var weatherSiteVersion = '1.5'
 var express = require('express')
 , request = require('request')
@@ -243,7 +242,7 @@ function startMETARqueries(){
    catch(err){
        console.log('Caught Metar Observation error')
    }
-   // Get additional observations every hour
+   // Get additional observations every 15 minutes
    clearInterval(metarHandle);
    metarHandle = setInterval (function(){
 	   var Observation = ""; // Will store the contents of the file
@@ -272,7 +271,7 @@ function startMETARqueries(){
 		  catch(err){
 		      console.log('Caught Metar Observation error')
 	   }
-   },60*60*1000)
+   },15*60*1000)
 }
 function startWLLqueries(){
 	//Get initial conditions from WLL.
@@ -1206,23 +1205,19 @@ app.get('/testpattern', function (req, res) {
 
 app.get('/settings', function (req, res) {
 	res.locals.err = false;
-	if (us.mySettingsCIDR.length == 0){
-	   var myCIDR;
-	   for (var key in ifaces){
-		   var info = ifaces[key]
-		   for(var x=0;x<info.length;x++)
-			   if (info[x].address == myIpAddress)
-				   myCIDR = info[x].cidr
-	   }
-	   us.mySettingsCIDR = myCIDR
-       localStorage.setItem("userSettings",JSON.stringify(us))
+	var IpAllowed = true;
+ 	if (us.mySettingsCIDR.length > 0){
+	   var cidr = new ipcidr(us.mySettingsCIDR);
+	   var ip = req.ip.substring(req.ip.lastIndexOf(':')+1)
+	   if (cidr.contains(ip) || ip.length < 4)
+		  IpAllowed = true
+	   else
+		  IpAllowed = false;
 	}
-	var cidr = new ipcidr(us.mySettingsCIDR);
-	var ip = req.ip.substring(req.ip.lastIndexOf(':')+1)
-	if (cidr.contains(ip) || ip.length < 4) // localhost is always allowed
-		res.render('settings',{weatherSiteVersion: weatherSiteVersion,response: req.query.response,mySettingsCIDR: us.mySettingsCIDR,myClimacellApiKey: us.myClimacellApiKey,myMetarFilePath: us.myMetarFilePath,myMetarFtpSite: us.myMetarFtpSite,myWLLIp: us.myWLLIp,observationUnits: us.observationUnits,myRadarZoominPath: us.myRadarZoominPath,myRadarZoomoutPath: us.myRadarZoomoutPath,myLatitude: us.myLatitude,myLongitude: us.myLongitude,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath, loadstylesheet: true})
+	if (IpAllowed) 
+		res.render('settings',{weatherSiteVersion: weatherSiteVersion,response: req.query.response,metricTemp: us.observationUnits.metricTemp,metricSpeed: us.observationUnits.metricSpeed,metricPressure: us.observationUnits.metricPressure, metricRain: us.observationUnits.metricRain,mySettingsCIDR: us.mySettingsCIDR,myClimacellApiKey: us.myClimacellApiKey,myMetarFilePath: us.myMetarFilePath,myMetarFtpSite: us.myMetarFtpSite,myWLLIp: us.myWLLIp,observationUnits: us.observationUnits,myRadarZoominPath: us.myRadarZoominPath,myRadarZoomoutPath: us.myRadarZoomoutPath,myLatitude: us.myLatitude,myLongitude: us.myLongitude,rainStormRate: rainStormRate,skyconditions: makeSkyConditionsVector(),day: daytime,zoominradarimage: us.myRadarZoominPath,zoomoutradarimage: us.myRadarZoomoutPath, loadstylesheet: true})
 	else{
-		return res.redirect('/?response=Settings Not Authorized');
+		return res.redirect('/?response=Not authorized from your location');
 	}
 
 })
@@ -1232,6 +1227,10 @@ app.post('/dosettings', function (req, res) {
 	var oldLongitude = us.myLongitude;
 	var oldClimacellApiKey = us.myClimacellApiKey
 	var oldWLLIp = us.myWLLIp;
+	var oldMetricTemp = us.observationUnits.metricTemp;
+	var oldMetricSpeed = us.observationUnits.metricSpeed;
+	var oldMetricPressure = us.observationUnits.metricPressure;
+	var oldMetricRain = us.observationUnits.metricRain;
 	us.myLatitude = req.body.myLatitude;
 	us.myLongitude = req.body.myLongitude;
 	us.myWLLIp = req.body.myWLLIp;
@@ -1241,6 +1240,19 @@ app.post('/dosettings', function (req, res) {
 	us.myRadarZoomoutPath = req.body.myRadarZoomoutPath;
 	us.myClimacellApiKey = req.body.myClimacellApiKey;
 	us.mySettingsCIDR = req.body.mySettingsCIDR;
+	temp=speed=pressure=rain=false;
+	if (req.body.metricTemp == '1')
+	   temp = true
+	if (req.body.metricSpeed == '1')
+	   speed = true
+	if (req.body.metricPressure == '1')
+	   pressure = true
+	if (req.body.metricRain == '1')
+	   rain = true
+	us.observationUnits.metricTemp = temp;
+	us.observationUnits.metricSpeed = speed;
+	us.observationUnits.metricPressure = pressure;
+	us.observationUnits.metricRain = rain
 	localStorage.setItem("userSettings",JSON.stringify(us))
 	if (oldWLLIp != us.myWLLIp)
 		startWLLqueries();
@@ -1259,10 +1271,29 @@ app.post('/dosettings', function (req, res) {
 	   sunset = obj.sunset;
 	   moonsize = makeMoonPhaseVector();
 	}
+	if (oldMetricTemp != us.observationUnits.metricTemp || oldMetricSpeed != us.observationUnits.metricSpeed || oldMetricPressure != us.observationUnits.metricPressure || oldMetricRain != us.observationUnits.metricRain){
+		oDate = [];
+		oTemp = [];
+		oHum = [];
+		oDewpt = [];
+		oWindspd = [];
+		oWinddir = [];
+		oWindgust = [];
+		oBarometer = [];
+		localStorage.removeItem("oDate");
+		localStorage.removeItem("oTemp");
+		localStorage.removeItem("oHum");
+		localStorage.removeItem("oDewpt");
+		localStorage.removeItem("oWinsdspd");
+		localStorage.removeItem("oWinddir");
+		localStorage.removeItem("oWindguest");
+		localStorage.removeItem("oBarometer");
+		startWLLqueries();
+	}
 	return(res.redirect('/settings?response=Settings Updated'))
 })
 
-//Find my WLL if necessary 
+//Find my WLL if necessary and start WLL queries
 if (us.myWLLIp.length == 0)
     findWLL();
 else{

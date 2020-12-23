@@ -36,19 +36,20 @@ block append content
           tr
             td(style='text-align: center')
               img(src='/images/weathersitelogo.png')
-              span.smallerer(style = 'position: relative; left: -80px; top: -100px; color: #27485d;')
+              span.smaller(style = 'position: relative; left: -80px; top: -100px; color: #27485d;')
                 |v#{weatherSiteVersion}
             td
               span.bigger.fontcolor
                 |Weathersite Settings	  
-        table
-          tr
-            td(height='50px',valign='top')
-              span.small#response(style='font-weight: bold;color: red;')
-                | #{response}
+        span.small#response(style='position: absolute; left: 185px; Top: 250px; font-weight: bold;color: red;')
+           | #{response}
         form#editform(method="POST" , action="/dosettings")
           input(type='hidden', name='returnurl', value='/')
           table
+            tr
+              td(height="40px")
+                 span.smaller.fontcolor(style='font-weight: bold;')
+                    |General Settings
             tr
               td(width='165px')
                  span.smaller.fontcolor 
@@ -75,6 +76,19 @@ block append content
               td 
                  span.smaller.fontcolor 
                     | example: -87.234 (negative for west Longitude)
+            tr
+              td 
+                 span.smaller.fontcolor 
+                    | Settings Subnet
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 input#mySettingsCIDR(type='text', size=20, name='mySettingsCIDR', value='#{mySettingsCIDR}',onClick='$(this).select()')
+              td 
+                 span(style="display:block; width: 20px")
+              td 
+                 span.smaller.fontcolor 
+                    | Leave blank for no restrictions or enter in CIDR notation (example: 10.0.0.0/8)
           table
             tr
               td(width='165px')
@@ -124,14 +138,101 @@ block append content
                  span(style="display:block; width: 20px")
               td 
                  input#myClimacellApiKey(type='text', size=35, name='myClimacellApiKey', value='#{myClimacellApiKey}',onClick='$(this).select()')
+                 
+          table
             tr
-              td 
-                 span.smaller.fontcolor 
-                    | Settings Subnet
-              td 
-                 span(style="display:block; width: 20px")
-              td 
-                 input#mySettingsCIDR(type='text', size=20, name='mySettingsCIDR', value='#{mySettingsCIDR}',onClick='$(this).select()')
+              td(height="40px")
+                 span.smaller.fontcolor(style='font-weight: bold;')
+                    |Observation Units
+            tr
+              td(width="180px")
+                span.smaller.fontcolor
+                   |Temperature
+              td
+                if (metricTemp)
+                    input#fahrenheit(type='radio', name='metricTemp', value='0')
+                else
+                    input#fahrenheit(type='radio', name='metricTemp', checked=true, value='0')
+              td
+                label(for="fahrenheit")
+                   span.smaller.fontcolor
+                     |Fahrenheit
+              td                    
+                if (metricTemp)
+                    input#celcius(type="radio",name="metricTemp",checked=true,value='1')
+                else
+                    input#celcius(type="radio",name="metricTemp",value='1')
+              td
+                label(for="celcius")
+                   span.smaller.fontcolor
+                    |Celcius
+            tr
+              td
+                span.smaller.fontcolor
+                   |Wind
+              td
+                if (metricSpeed)                    
+                    input#celcius(type="radio",name="metricSpeed",value='0')
+                else
+                    input#celcius(type="radio",name="metricSpeed",checked=true,value='0')
+              td
+                label(for='mph')
+                   span.smaller.fontcolor
+                      |MPH
+              td
+                if (metricSpeed)
+                   input#kmhr(type='radio', name='metricSpeed', checked=true, value='1')
+                else
+                   input#kmhr(type='radio', name='metricSpeed', value='1')
+              td
+                label(for='kmhr')
+                   span.smaller.fontcolor
+                      |KM/H
+            tr
+              td
+                span.smaller.fontcolor
+                   |Pressure
+              td
+                if(metricPressure)                    
+                   input#inches(type='radio', name='metricPressure', value='0')
+                else
+                   input#inches(type='radio', name='metricPressure', checked=true, value='0')
+              td
+                label(for='inches')
+                   span.smaller.fontcolor
+                      |Inches
+              td
+                if (metricPressure)
+                    input#mb(type='radio', name='metricPressure', checked=true, value='1')
+                else                    
+                    input#mb(type='radio', name='metricPressure', value='1')
+              td
+                label(for='mb')
+                   span.smaller.fontcolor
+                      |Millibars
+            tr
+              td
+                span.smaller.fontcolor
+                   |Rainfall
+              td    
+                if (metricRain)                
+                   input#rinches(type='radio', name='metricRain', value='0')
+                else
+                   input#rinches(type='radio', name='metricRain', checked=true, value='0')
+              td
+                label(for='rinches')
+                   span.smaller.fontcolor
+                      |Inches
+              td
+                if (metricRain)
+                   input#mm(type='radio', name='metricRain', checked=true, value='1')
+                else
+                   input#mm(type='radio', name='metricRain', value='1')
+              td
+                label(for='mm')
+                   span.smaller.fontcolor
+                      |Millimeters
+                
              
 
           table                       
@@ -139,10 +240,10 @@ block append content
               td
                 span(style="display:block; width: 80px")
               td   
-                p: button(type="submit", value='1',name='changetype') Update
+                p: button.genericbutton(type="submit", value='1',name='changetype') Update
               td      
               td 
-                p: button(type="button", onclick="onBackClicked()") Reset
+                p: button.genericbutton(type="button", onclick="window.location = getURL()+'/settings'") Discard
               td      
               td 
-                p: button(type="button", onclick="window.location = getURL()+'/'") Exit Settings
+                p: button.genericbutton(type="button", onclick="window.location = getURL()+'/'") Exit

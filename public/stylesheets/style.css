@@ -114,7 +114,7 @@
 	height: 550px;
 	width: 650px;
 	border-radius: 0%;
-	background: no-repeat center;
+	background: no-repeat right;
 	background-size: contain;
 	position: absolute;
 	display: inline-block;
@@ -234,6 +234,51 @@
     font-size: 14px;
 }
 .button2:hover{
+	background-color: #0066B3;
+	
+}
+.button3 {
+	width: 120px;
+	position: absolute;
+    top: 607px; 
+    left: 280px;
+    border-radius: 7px 7px 7px 7px;
+	background-color: white;
+	border: 3px solid black;
+    color: black;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-family: "Open Sans", sans-serif;
+    text-transform: uppercase;
+    font-weight: 650;
+	letter-spacing: 1.3px;
+    margin: 4px 2px;
+    font-size: 14px;
+}
+.button3:hover{
+	background-color: #0066B3;
+	
+}
+.genericbutton {
+	width: 120px;
+    border-radius: 7px 7px 7px 7px;
+	background-color: white;
+	border: 3px solid black;
+    color: black;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-family: "Open Sans", sans-serif;
+    text-transform: uppercase;
+    font-weight: 650;
+	letter-spacing: 1.3px;
+    margin: 4px 2px;
+    font-size: 14px;
+}
+.genericbutton:hover{
 	background-color: #0066B3;
 	
 }
