@@ -316,35 +316,35 @@ function startWLLqueries(){
 		    if (us.observationUnits.metricPressure)
 			  inBarometer = (inBarometer * 33.8639).toFixed(1);
 			inBarometerTrend = obj.data.conditions[obj.data.conditions.length-1].bar_trend
-			if (oDate.length > 143)
+			while (oDate.length > 143)
 				oDate = shiftHist(oDate)
 			oDate.push(new Date());
 		    localStorage.setItem("oDate",JSON.stringify(oDate));
-			if (oTemp.length > 143)
+			while (oTemp.length > 143)
 				oTemp = shiftHist(oTemp)
 			oTemp.push(outTemp);
 		    localStorage.setItem("oTemp",JSON.stringify(oTemp));
-			if (oHum.length > 143)
+			while (oHum.length > 143)
 				oHum = shiftHist(oHum)
 			oHum.push(outHum);
 		    localStorage.setItem("oHum",JSON.stringify(oHum));
-			if (oDewpt.length > 143)
+			while (oDewpt.length > 143)
 				oDewpt = shiftHist(oDewpt)
 			oDewpt.push(outDewPt);
 		    localStorage.setItem("oDewpt",JSON.stringify(oDewpt));
-			if (oWindspd.length > 143)
+			while (oWindspd.length > 143)
 				oWindspd = shiftHist(oWindspd)
 			oWindspd.push(avgSpeed);
 		    localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
-			if (oWinddir.length > 143)
+			while (oWinddir.length > 143)
 				oWinddir = shiftHist(oWinddir)
 			oWinddir.push(avgDirection);
 		    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
-			if (oWindgust.length > 143)
+			while (oWindgust.length > 143)
 				oWindgust = shiftHist(oWindgust)
 			oWindgust.push(gust);
 		    localStorage.setItem("oWindgust",JSON.stringify(oWindgust));
-			if (oBarometer.length > 143)
+			while (oBarometer.length > 143)
 				oBarometer = shiftHist(oBarometer)
 			oBarometer.push(inBarometer);
 		    localStorage.setItem("oBarometer",JSON.stringify(oBarometer));
