@@ -489,6 +489,8 @@ function startWLLqueries(){
 			    })
 		   }).on('error',function(){
 			   console.log("Current conditions request failure")
+				    if (oDate.length > 143)
+					    oDate = shiftHist(oDate)
 				    oDate.push(new Date());
 			        localStorage.setItem("oDate",JSON.stringify(oDate));
 				    if (oTemp.length > 143)
@@ -581,7 +583,7 @@ function makeSkyConditionsVector(){
 	var skyconditions = [];
 	var obj = {
 			skyconditions: 1,
-			weather: 'Clear'
+			weather: 'Fair'
 	}
 	if (metarObservation.indexOf("CLR") != -1){
 		obj.skyconditions = 1;
