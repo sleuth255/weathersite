@@ -1,5 +1,5 @@
 //
-//
+//  User Settings: changed on the settings page and stored in userSettings local storage file
 
 var us = {
     myLatitude: 0,
