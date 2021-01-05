@@ -583,8 +583,9 @@ function analyze14ForecastObjs(start){
 	var conditionsArray = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	var skyConditions = [1,2,3,4,5,5,5,9,9,6,6,8,10,10,7,7,11,11,11,11,11,11,11]
 	var weatherCode = ["Clear","'Mostly Clear","Partly Cloudy","Mostly Cloudy","Overcast","Light Fog","Dense Fog","Light Rain","Drizzle","Rain","Heavy Rain","Thunderstorms","Snow Flurries","Light Snow","Snow","Heavy Snow","Lignt Icing","Ice Pellets","Heavy Icing","Freezing Drizzle","Light Freezing Rain","Freezing Rain","Heavy Freezing Rain"]
+	var x=0, amt=0, occ=0;
 
-	for(var x = start; x<(start+14); x++){
+	for(x = start; x<(start+14); x++){
 		   if (forecastObj[x].weather_code.value == 'clear')
 			   conditionsArray[0]++;
 		   else
@@ -656,10 +657,26 @@ function analyze14ForecastObjs(start){
 //  increase the weight of interesting conditions
 	if (conditionsArray[11] > 0) // T-Storms are really interesting
 		conditionsArray[11]+=5	
-    if (conditionsArray[12] > 0 || conditionsArray[13] > 0 || conditionsArray[14] > 0 || conditionsArray[15] > 0) // any Snow			
-	   conditionsArray[14]+= 4
-    if (conditionsArray[7] > 0 || conditionsArray[8] > 0 || conditionsArray[9] > 0 || conditionsArray[10] > 0) // any Rain			
-	   conditionsArray[9]+= 4
+    if (conditionsArray[12] > 0 || conditionsArray[13] > 0 || conditionsArray[14] > 0 || conditionsArray[15] > 0){ // any Snow			
+	   amt = 0
+	   occ = 14	
+	   for (x=12;x<16;x++)  // which Snow?
+		 if (conditionsArray[x] > amt){
+			amt = conditionsArray[x]
+			occ = x		
+		 }
+	   conditionsArray[occ]+= 4
+	}
+	if (conditionsArray[7] > 0 || conditionsArray[8] > 0 || conditionsArray[9] > 0 || conditionsArray[10] > 0){ // any Rain
+	   amt = 0
+	   occ = 9	
+	   for (x=7;x<11;x++)  // which Rain?
+		 if (conditionsArray[x] > amt){
+			amt = conditionsArray[x]
+			occ = x		
+		 }
+	   conditionsArray[occ]+= 4
+	}
 // pick the winner
 	var occurrence = 0
 	var amount = 0
