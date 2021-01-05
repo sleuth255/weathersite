@@ -146,12 +146,25 @@ else
 
 function startClimacellqueries(){
    dt = new Date()
+   var isoOffset=""
+   offset = dt.getTimezoneOffset();
+   if (offset < 0){
+	 isoOffset = '+'
+	 offset *= -1;
+   }
+   else
+	 isoOffset ='-';
+   offset = Math.floor(offset / 60)
+   if (offset < 10)
+	 isoOffset +="0"
+   isoOffset += offset.toString()+':00'
+   console.log('Timezone offset is '+isoOffset) 
    sdt = new Date()
    edt = new Date()
    sdt.setDate(dt.getDate()+1)
    edt.setDate(dt.getDate()+4)
-   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T18:00:00Z';
-   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T18:00:00Z';
+   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
+   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
    var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+us.myLatitude+"&lon="+us.myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+us.myClimacellApiKey
    //console.log(ccreq)    
    var req0 = https.get(ccreq,function(resp){
@@ -177,8 +190,8 @@ function startClimacellqueries(){
 	   edt = new Date()
 	   sdt.setDate(dt.getDate()+1)
 	   edt.setDate(dt.getDate()+4)
-	   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T12:00:00Z';
-	   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T12:00:00Z';
+	   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
+	   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
 	   var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+us.myLatitude+"&lon="+us.myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+us.myClimacellApiKey
 	   var req0 = https.get(ccreq,function(resp){
 		   var ccdata = '';
