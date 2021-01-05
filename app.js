@@ -149,7 +149,7 @@ function startClimacellqueries(){
    sdt = new Date()
    edt = new Date()
    sdt.setDate(dt.getDate()+1)
-   edt.setDate(dt.getDate()+3)
+   edt.setDate(dt.getDate()+4)
    sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T18:00:00Z';
    edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T18:00:00Z';
    var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+us.myLatitude+"&lon="+us.myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+us.myClimacellApiKey
@@ -176,9 +176,9 @@ function startClimacellqueries(){
 	   sdt = new Date()
 	   edt = new Date()
 	   sdt.setDate(dt.getDate()+1)
-	   edt.setDate(dt.getDate()+3)
-	   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T18:00:00Z';
-	   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T18:00:00Z';
+	   edt.setDate(dt.getDate()+4)
+	   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T12:00:00Z';
+	   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T12:00:00Z';
 	   var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+us.myLatitude+"&lon="+us.myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+us.myClimacellApiKey
 	   var req0 = https.get(ccreq,function(resp){
 		   var ccdata = '';
@@ -579,6 +579,97 @@ function shiftHist(array){
 		newArray.push(array[x])
 	return newArray;
 }
+function analyze14ForecastObjs(start){
+	var conditionsArray = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	var skyConditions = [1,2,3,4,5,5,5,9,9,6,6,8,10,10,7,7,11,11,11,11,11,11,11]
+	var weatherCode = ["Clear","'Mostly Clear","Partly Cloudy","Mostly Cloudy","Overcast","Light Fog","Dense Fog","Light Rain","Drizzle","Rain","Heavy Rain","Thunderstorms","Snow Flurries","Light Snow","Snow","Heavy Snow","Lignt Icing","Ice Pellets","Heavy Icing","Freezing Drizzle","Light Freezing Rain","Freezing Rain","Heavy Freezing Rain"]
+
+	for(var x = start; x<(start+14); x++){
+		   if (forecastObj[x].weather_code.value == 'clear')
+			   conditionsArray[0]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'mostly_clear')
+			   conditionsArray[1]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'partly_cloudy')
+			   conditionsArray[2]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'mostly_cloudy')
+			   conditionsArray[3]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'cloudy')
+			   conditionsArray[4]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'fog_light')
+			   conditionsArray[5]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'fog')
+			   conditionsArray[6]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'rain_light')
+			   conditionsArray[7]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'drizzle')
+			   conditionsArray[8]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'rain')
+			   conditionsArray[9]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'rain_heavy')
+			   conditionsArray[10]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'tstorm')
+			   conditionsArray[11]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'flurries')
+			   conditionsArray[12]++;
+		   else
+			if (forecastObj[x].weather_code.value == 'snow_light')
+			   conditionsArray[13]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'snow')
+			   conditionsArray[14]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'snow_heavy')
+			   conditionsArray[15]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'ice_pellets_light')
+			   conditionsArray[16]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'ice_pellets')
+			   conditionsArray[17]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'ice_pellets_heavy')
+			   conditionsArray[18]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'freezing_drizzle')
+			   conditionsArray[19]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'freezing_rain_light')
+			   conditionsArray[20]++;
+		   else
+		   if (forecastObj[x].weather_code.value == 'freezing_rain')
+			   conditionsArray[21]++;
+		   else
+			   conditionsArray[22]++;
+	}
+//  increase the weight of interesting conditions
+	if (conditionsArray[11] > 0) // T-Storms are really interesting
+		conditionsArray[11]+=5	
+    if (conditionsArray[12] > 0 || conditionsArray[13] > 0 || conditionsArray[14] > 0 || conditionsArray[15] > 0) // any Snow			
+	   conditionsArray[14]+= 4
+    if (conditionsArray[7] > 0 || conditionsArray[8] > 0 || conditionsArray[9] > 0 || conditionsArray[10] > 0) // any Rain			
+	   conditionsArray[9]+= 4
+// pick the winner
+	var occurrence = 0
+	var amount = 0
+	for (x=0;x<24;x++)
+	    if (conditionsArray[x] > amount){
+			occurrence = x;
+			amount = conditionsArray[x]
+		}
+	return({skyconditions: skyConditions[occurrence],weather: weatherCode[occurrence]})
+}
 function makeSkyConditionsVector(){
 	var skyconditions = [];
 	var obj = {
@@ -620,129 +711,9 @@ function makeSkyConditionsVector(){
 	skyconditions.push(obj);
 	
 // now get forecasts
-	if (forecastObj.length > 0){
-	   for(var x = 0; x<49;x+=24){
-			var obj = {
-					skyconditions: 1,
-					weather: 'Clear'
-			}
-		   if (forecastObj[x].weather_code.value == 'clear'){
-			   obj.skyconditions = 1;
-			   obj.weather = 'Clear';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'mostly_clear'){
-			   obj.skyconditions = 2;
-			   obj.weather = 'Mostly Clear';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'partly_cloudy'){
-			   obj.skyconditions = 3;
-			   obj.weather = 'Partly Cloudy';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'mostly_cloudy'){
-			   obj.skyconditions = 4;
-			   obj.weather = 'Mostly Cloudy';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'cloudy'){
-			   obj.skyconditions = 5;
- 			   obj.weather = 'Overcast';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'fog_light'){
-			   obj.skyconditions = 5;
- 			   obj.weather = 'Light Fog';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'fog'){
-			   obj.skyconditions = 5;
- 			   obj.weather = 'Dense Fog';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'rain_light'){
-			   obj.skyconditions = 9;
-			   obj.weather = 'Light Rain';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'drizzle'){
-			   obj.skyconditions = 9;
-			   obj.weather = 'Drizzle';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'rain'){
-			   obj.skyconditions = 6;
-			   obj.weather = 'Rain';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'rain_heavy'){
-			   obj.skyconditions = 6;
-			   obj.weather = 'Heavy Rain';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'tstorm'){
-			   obj.skyconditions = 8;
-			   obj.weather = 'Thunderstorms';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'flurries'){
-			   obj.skyconditions = 10;
-			   obj.weather = 'Snow Flurries';
-		   }
-		   else
-			   if (forecastObj[x].weather_code.value == 'snow_light'){
-				   obj.skyconditions = 10;
-				   obj.weather = 'Light Snow';
-			   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'snow'){
-			   obj.skyconditions = 7;
-   			   obj.weather = 'Snow';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'snow_heavy'){
-			   obj.skyconditions = 7;
-			   obj.weather = 'Heavy Snow';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'ice_pellets_light'){
-			   obj.skyconditions = 11;
-			   obj.weather = 'Light Icing';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'ice_pellets'){
-			   obj.skyconditions = 11;
-			   obj.weather = 'Ice Pellets';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'ice_pellets_heavy'){
-			   obj.skyconditions = 11;
-			   obj.weather = 'Heavy Icing';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'freezing_drizzle'){
-			   obj.skyconditions = 11;
-			   obj.weather = 'Freezing drizzle';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'freezing_rain_light'){
-			   obj.skyconditions = 11;
-			   obj.weather = 'Light Freezing Rain';
-		   }
-		   else
-		   if (forecastObj[x].weather_code.value == 'freezing_rain'){
-			   obj.skyconditions = 11;
-			   obj.weather = 'Freezing Rain';
-		   }
-		   else
-		   {
-			   obj.skyconditions = 11;
-			   obj.weather = 'Heavy Freezing Rain';
-		   }
-		   skyconditions.push(obj);
-	   }
-	}
+	if (forecastObj.length > 0)
+	    for(var x = 0; x<49;x+=24)
+		    skyconditions.push(analyze14ForecastObjs(x));
 	else{
 		var obj = {
 				skyconditions: 1,
