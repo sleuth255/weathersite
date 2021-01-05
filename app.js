@@ -667,7 +667,10 @@ function analyze14ForecastObjs(start){
 		   else
 			   conditionsArray[22]++;
 	}
-//  increase the weight of interesting conditions
+	//  decrease the weight of common conditions
+	if(conditionsArray[4] > 8) // lots of clouds may mean some precip too
+	   conditionsArray[4] -=4;
+	//  increase the weight of interesting conditions
 	if (conditionsArray[11] > 0) // T-Storms are really interesting
 		conditionsArray[11]+=5	
     if (conditionsArray[12] > 0 || conditionsArray[13] > 0 || conditionsArray[14] > 0 || conditionsArray[15] > 0){ // any Snow			
