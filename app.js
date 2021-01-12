@@ -129,6 +129,8 @@ var sunrise;
 var sunset;
 var gust;
 var ftp;
+var wndOccurrence = null;
+var rainOccurrence = null;
 var metarHandle = null;
 var climacellHandle = null;
 var WLLHandle = null;
@@ -1333,30 +1335,46 @@ server.on('message',function(msg,info){
 	  if (info.address != us.myWLLIp) // drop foreign broadcasts
 		  return
 	  var obj = JSON.parse(msg);
-	  direction=obj.conditions[0].wind_dir_last;
+	  if (wndOccurrence == null && rainOccurrence == null){  // first time: find wind and rain devices
+		  wndOccurrence = 0; 
+		  rainOccurrence = 0;
+		  for(var x = 0;x<obj.conditions.length;x++)
+		    if(obj.conditions[x].wind_dir_at_hi_speed_last_10_min > 0){
+				wndOccurrence = x;
+				console.log("Wind sensor array found on Device ID "+obj.conditions[x].txid)
+				break
+			}
+		  for(var x = 0;x<obj.conditions.length;x++)
+		    if(obj.conditions[x].rainfall_year > 0){
+				rainOccurrence = x;
+				console.log("Rain sensor array found on Device ID "+obj.conditions[x].txid)
+				break
+			}
+	  }
+	  direction=obj.conditions[wndOccurrence].wind_dir_last;
 	  if (direction != lastDirection){
 	     lastDirection3 = lastDirection2;
 	     lastDirection2 = lastDirection1;
 	     lastDirection1 = lastDirection;
 	     lastDirection = direction;
       }
-	  speed=Math.round(obj.conditions[0].wind_speed_last);
+	  speed=Math.round(obj.conditions[wndOccurrence].wind_speed_last);
 	  if (us.observationUnits.metricSpeed)
 		  speed = Math.round(speed * 1.60934)
-	  gustDirection=obj.conditions[0].wind_dir_at_hi_speed_last_10_min;
-	  gustSpeed=Math.round(obj.conditions[0].wind_speed_hi_last_10_min);
+	  gustDirection=obj.conditions[wndOccurrence].wind_dir_at_hi_speed_last_10_min;
+	  gustSpeed=Math.round(obj.conditions[wndOccurrence].wind_speed_hi_last_10_min);
 	  if (us.observationUnits.metricSpeed)
 		  gustSpeed = Math.round(gustSpeed * 1.60934)
 	  //rainStormStart='1603243501';
-	  rainStormStart=obj.conditions[0].rain_storm_start_at
+	  rainStormStart=obj.conditions[rainOccurrence].rain_storm_start_at
 	  if (us.observationUnits.metricRain){
-		  rainStormAmt=(obj.conditions[0].rain_storm *.2).toFixed(2);
-		  rainStormRate=obj.conditions[0].rain_rate_last *.2;
+		  rainStormAmt=(obj.conditions[rainOccurrence].rain_storm *.2).toFixed(2);
+		  rainStormRate=obj.conditions[rainOccurrence].rain_rate_last *.2;
 		  
 	  }
 	  else{
-	      rainStormAmt=(obj.conditions[0].rain_storm *.01).toFixed(2);
-	      rainStormRate=obj.conditions[0].rain_rate_last *.01
+	      rainStormAmt=(obj.conditions[rainOccurrence].rain_storm *.01).toFixed(2);
+	      rainStormRate=obj.conditions[rainOccurrence].rain_rate_last *.01
 	  }
 	  if (rainStormStart == null){
 		  rainStormStart = ''
