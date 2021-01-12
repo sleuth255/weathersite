@@ -129,7 +129,7 @@ var sunrise;
 var sunset;
 var gust;
 var ftp;
-var wndOccurrence = null;
+var wndOccurrence = null; var wndTCPOccurrence = null;
 var rainOccurrence = null;
 var metarHandle = null;
 var climacellHandle = null;
@@ -300,13 +300,21 @@ function startWLLqueries(){
 		resp.on('end',function(){
 			//console.log(data.toString())
 			var obj = JSON.parse(data);
-		    gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
+			if (wndTCPOccurrence == null){
+				wndTCPOccurrence = 0;
+				for(var x = 0;x< obj.data.conditions.length;x++)
+					if (obj.data.conditions[x].wind_speed_hi_last_10_min > 0){
+						wndTCPOccurrence = x;
+						break;
+				    }
+			}
+		    gust = Math.round(obj.data.conditions[wndTCPOccurrence].wind_speed_hi_last_10_min)
 		    if (us.observationUnits.metricSpeed)
 		    	gust = Math.round(gust * 1.60934)
-			avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
+			avgSpeed = Math.round(obj.data.conditions[wndTCPOccurrence].wind_speed_avg_last_10_min);
 		    if (us.observationUnits.metricSpeed)
 		    	avgSpeed = Math.round(avgSpeed * 1.60934) 
-			avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
+			avgDirection = Math.round(obj.data.conditions[wndTCPOccurrence].wind_dir_scalar_avg_last_10_min);
 			inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
 		    if (us.observationUnits.metricTemp)
 		    	inTemp = Math.round(((inTemp -32) *5)/9)
@@ -405,13 +413,13 @@ function startWLLqueries(){
 			   resp.on('end',function(){
 				    console.log('current conditions reply received')
 				    var obj = JSON.parse(data);
-				    var gust = Math.round(obj.data.conditions[0].wind_speed_hi_last_10_min)
+				    var gust = Math.round(obj.data.conditions[wndTCPOccurrence].wind_speed_hi_last_10_min)
 				    if (us.observationUnits.metricSpeed)
 				   	    gust = Math.round(gust * 1.60934)
-				    avgSpeed = Math.round(obj.data.conditions[0].wind_speed_avg_last_10_min);
+				    avgSpeed = Math.round(obj.data.conditions[wndTCPOccurrence].wind_speed_avg_last_10_min);
 				    if (us.observationUnits.metricSpeed)
 				        avgSpeed = Math.round(avgSpeed * 1.60934) 
-				    avgDirection = Math.round(obj.data.conditions[0].wind_dir_scalar_avg_last_10_min);
+				    avgDirection = Math.round(obj.data.conditions[wndTCPOccurrence].wind_dir_scalar_avg_last_10_min);
 					inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
 				    if (us.observationUnits.metricTemp)
 				    	inTemp = Math.round(((inTemp -32) *5)/9)
