@@ -19,7 +19,7 @@ var us = {
     }
 }
 	
-var weatherSiteVersion = '1.5'
+var weatherSiteVersion = '1.6'
 var express = require('express')
 , request = require('request')
 , http = require('http')
@@ -300,7 +300,7 @@ function startWLLqueries(){
 		resp.on('end',function(){
 			//console.log(data.toString())
 			var obj = JSON.parse(data);
-			if (wndTCPOccurrence == null){
+			if (wndTCPOccurrence == null){ // locate the wind sensor
 				wndTCPOccurrence = 0;
 				for(var x = 0;x< obj.data.conditions.length;x++)
 					if (obj.data.conditions[x].wind_speed_hi_last_10_min > 0){
