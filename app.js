@@ -1423,7 +1423,7 @@ else
    arg3 = "WLL is "+us.myWLLIp	
 
 http.createServer(app).listen(app.get('port'), function(){
-    console.log("\nWeathersite is online at "+myUrl+'\n');
+    console.log("\nWeathersite v"+weatherSiteVersion+" is online at "+myUrl+'\n');
 	spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000',arg3]).on('error',function(){}); //toss error
 });
 

@@ -34,6 +34,9 @@ You will be taken to the default conditions page
 
 ## Changelog:
 
+### v1.6
+* dynamically parse for sensors in WLL responses
+
 ### v1.5
 * add Settings Page
 
