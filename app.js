@@ -129,7 +129,8 @@ var sunrise;
 var sunset;
 var gust;
 var ftp;
-var wndOccurrence = null; var wndTCPOccurrence = null;
+var wndOccurrence = null; 
+var wndTCPOccurrence = null;
 var rainOccurrence = null;
 var metarHandle = null;
 var climacellHandle = null;
@@ -299,22 +300,24 @@ function startWLLqueries(){
 		})
 		resp.on('end',function(){
 			//console.log(data.toString())
+			var wndTCPOcc = 0;
 			var obj = JSON.parse(data);
 			if (wndTCPOccurrence == null){ // locate the wind sensor
-				wndTCPOccurrence = 0;
 				for(var x = 0;x< obj.data.conditions.length;x++)
 					if (obj.data.conditions[x].wind_speed_hi_last_10_min > 0){
 						wndTCPOccurrence = x;
 						break;
 				    }
 			}
-		    gust = Math.round(obj.data.conditions[wndTCPOccurrence].wind_speed_hi_last_10_min)
+			if (wndTCPOccurrence != null)
+			   wndTCPOcc = wndTCPOccurrence;
+		    gust = Math.round(obj.data.conditions[wndTCPOcc].wind_speed_hi_last_10_min)
 		    if (us.observationUnits.metricSpeed)
 		    	gust = Math.round(gust * 1.60934)
-			avgSpeed = Math.round(obj.data.conditions[wndTCPOccurrence].wind_speed_avg_last_10_min);
+			avgSpeed = Math.round(obj.data.conditions[wndTCPOcc].wind_speed_avg_last_10_min);
 		    if (us.observationUnits.metricSpeed)
 		    	avgSpeed = Math.round(avgSpeed * 1.60934) 
-			avgDirection = Math.round(obj.data.conditions[wndTCPOccurrence].wind_dir_scalar_avg_last_10_min);
+			avgDirection = Math.round(obj.data.conditions[wndTCPOcc].wind_dir_scalar_avg_last_10_min);
 			inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
 		    if (us.observationUnits.metricTemp)
 		    	inTemp = Math.round(((inTemp -32) *5)/9)
@@ -413,13 +416,24 @@ function startWLLqueries(){
 			   resp.on('end',function(){
 				    console.log('current conditions reply received')
 				    var obj = JSON.parse(data);
-				    var gust = Math.round(obj.data.conditions[wndTCPOccurrence].wind_speed_hi_last_10_min)
+			        var wndTCPOcc = 0;
+			        var obj = JSON.parse(data);
+			        if (wndTCPOccurrence == null){ // locate the wind sensor
+				        for(var x = 0;x< obj.data.conditions.length;x++)
+					        if (obj.data.conditions[x].wind_speed_hi_last_10_min > 0){
+						        wndTCPOccurrence = x;
+						        break;
+				            }
+			        }
+			        if (wndTCPOccurrence != null)
+			           wndTCPOcc = wndTCPOccurrence;
+				    var gust = Math.round(obj.data.conditions[wndTCPOcc].wind_speed_hi_last_10_min)
 				    if (us.observationUnits.metricSpeed)
 				   	    gust = Math.round(gust * 1.60934)
-				    avgSpeed = Math.round(obj.data.conditions[wndTCPOccurrence].wind_speed_avg_last_10_min);
+				    avgSpeed = Math.round(obj.data.conditions[wndTCPOcc].wind_speed_avg_last_10_min);
 				    if (us.observationUnits.metricSpeed)
 				        avgSpeed = Math.round(avgSpeed * 1.60934) 
-				    avgDirection = Math.round(obj.data.conditions[wndTCPOccurrence].wind_dir_scalar_avg_last_10_min);
+				    avgDirection = Math.round(obj.data.conditions[wndTCPOcc].wind_dir_scalar_avg_last_10_min);
 					inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
 				    if (us.observationUnits.metricTemp)
 				    	inTemp = Math.round(((inTemp -32) *5)/9)
@@ -1342,47 +1356,51 @@ server.on('message',function(msg,info){
 	  //console.log(msg.toString());
 	  if (info.address != us.myWLLIp) // drop foreign broadcasts
 		  return
+	  var wndOcc = 0;
+	  var rainOcc = 0;
 	  var obj = JSON.parse(msg);
-	  if (wndOccurrence == null && rainOccurrence == null){  // first time: find wind and rain devices
-		  wndOccurrence = 0; 
-		  rainOccurrence = 0;
+	  if (wndOccurrence == null)  // look for wind device
 		  for(var x = 0;x<obj.conditions.length;x++)
 		    if(obj.conditions[x].wind_dir_at_hi_speed_last_10_min > 0){
 				wndOccurrence = x;
 				console.log("Wind sensor array found on Device ID "+obj.conditions[x].txid)
 				break
 			}
+	  if (rainOccurrence == null)  // look for rain device
 		  for(var x = 0;x<obj.conditions.length;x++)
 		    if(obj.conditions[x].rainfall_year > 0){
 				rainOccurrence = x;
 				console.log("Rain sensor array found on Device ID "+obj.conditions[x].txid)
 				break
 			}
-	  }
-	  direction=obj.conditions[wndOccurrence].wind_dir_last;
+	  if (wndOccurrence != null)
+		 wndOcc = wndOccurrence;
+	  if (rainOccurrence != null)
+	     rainOcc = rainOccurrence;
+	  direction=obj.conditions[wndOcc].wind_dir_last;
 	  if (direction != lastDirection){
 	     lastDirection3 = lastDirection2;
 	     lastDirection2 = lastDirection1;
 	     lastDirection1 = lastDirection;
 	     lastDirection = direction;
       }
-	  speed=Math.round(obj.conditions[wndOccurrence].wind_speed_last);
+	  speed=Math.round(obj.conditions[wndOcc].wind_speed_last);
 	  if (us.observationUnits.metricSpeed)
 		  speed = Math.round(speed * 1.60934)
-	  gustDirection=obj.conditions[wndOccurrence].wind_dir_at_hi_speed_last_10_min;
-	  gustSpeed=Math.round(obj.conditions[wndOccurrence].wind_speed_hi_last_10_min);
+	  gustDirection=obj.conditions[wndOcc].wind_dir_at_hi_speed_last_10_min;
+	  gustSpeed=Math.round(obj.conditions[wndOcc].wind_speed_hi_last_10_min);
 	  if (us.observationUnits.metricSpeed)
 		  gustSpeed = Math.round(gustSpeed * 1.60934)
 	  //rainStormStart='1603243501';
-	  rainStormStart=obj.conditions[rainOccurrence].rain_storm_start_at
+	  rainStormStart=obj.conditions[rainOcc].rain_storm_start_at
 	  if (us.observationUnits.metricRain){
-		  rainStormAmt=(obj.conditions[rainOccurrence].rain_storm *.2).toFixed(2);
-		  rainStormRate=obj.conditions[rainOccurrence].rain_rate_last *.2;
+		  rainStormAmt=(obj.conditions[rainOcc].rain_storm *.2).toFixed(2);
+		  rainStormRate=obj.conditions[rainOcc].rain_rate_last *.2;
 		  
 	  }
 	  else{
-	      rainStormAmt=(obj.conditions[rainOccurrence].rain_storm *.01).toFixed(2);
-	      rainStormRate=obj.conditions[rainOccurrence].rain_rate_last *.01
+	      rainStormAmt=(obj.conditions[rainOcc].rain_storm *.01).toFixed(2);
+	      rainStormRate=obj.conditions[rainOcc].rain_rate_last *.01
 	  }
 	  if (rainStormStart == null){
 		  rainStormStart = ''
