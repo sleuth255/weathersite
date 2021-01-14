@@ -1,3 +1,4 @@
+/* eslint-disable */
 //
 //  User Settings: changed on the settings page and stored in userSettings local storage file
 
@@ -398,8 +399,8 @@ function startWLLqueries(){
 				   req2.end();
 			})
 		})
-	}).on('error',function(){
-		   console.log("Current conditions initial request failure")
+	}).on('error',function(err){
+		   console.log("Current conditions initial request failure: "+err)
 		   req1.end();
 	})
 	// Primary 5 minute weather conditions refresh code block follows
@@ -524,8 +525,8 @@ function startWLLqueries(){
 				 	    req2.end();
 				    })
 			    })
-		   }).on('error',function(){
-			   console.log("Current conditions request failure")
+		   }).on('error',function(err){
+			   console.log("Current conditions request failure: "+err)
 				    if (oDate.length > 143)
 					    oDate = shiftHist(oDate)
 				    oDate.push(new Date());
