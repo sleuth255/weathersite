@@ -13,8 +13,10 @@ block append content
    if (observationUnits.metricRain)
       - rainunit = "mm"
    - offset = 100
+   - errormsgoffset = 50
    if (rainStormStart.length > 0)
       - offset = 50
+      - errormsgoffset = 15
    body()
      script(type='text/javascript')
        |  var timeactive = 0;
@@ -80,7 +82,7 @@ block append content
        |  function settings(){
        |     window.location = getURL()+"/settings";
        |  }
-     span.small#response(style='position: absolute; left: 530Px; Top: 15px; font-weight: bold;color: red;')
+     span.small#response(style='position: absolute; left: 530Px; Top: #{errormsgoffset}px; font-weight: bold;color: red;')
          | #{response}
      div#wind(style='display: block; height: 700px; background-image: url("/images/compassrose.png"); background-repeat: no-repeat;')
        if (directionObj[0].left > 0 && directionObj[0].top > 0)
