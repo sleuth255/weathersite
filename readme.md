@@ -29,7 +29,7 @@ You will be taken to the default conditions page
 
 
 ## Known issues/Todos
-* no issues currently
+* Intermittent HTTP socket hangup error during WLL current conditions retrieval.
  
 
 ## Changelog:
