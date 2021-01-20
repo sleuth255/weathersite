@@ -1442,13 +1442,13 @@ if (us.myWLLIp.length == 0)
 else
    arg3 = "WLL is "+us.myWLLIp	
 
-const server = http.createServer(app).listen(app.get('port'), function(){
+const wsServer = http.createServer(app).listen(app.get('port'), function(){
     console.log("\nWeathersite v"+weatherSiteVersion+" is online at "+myUrl+'\n');
 	spawn('python3',[__dirname+'/pidisplay.py','Weathersite is Online',myIpAddress+':5000',arg3]).on('error',function(){}); //toss error
 });
 
 process.on('SIGTERM', () => {
-  server.close(() => {
+  wsServer.close(() => {
     console.log('Process terminated')
   })
 })
