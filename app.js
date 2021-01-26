@@ -406,7 +406,8 @@ function startWLLqueries(){
 	// Primary 5 minute weather conditions refresh code block follows
 	// get local conditions from WLL  
 	// Tell WLL server to continue to send UDP packets
-    clearInterval(WLLHandle)
+	clearInterval(WLLHandle)
+	req1.shouldKeepAlive = false;
 	WLLHandle = setInterval(function(){
 		   console.log(app.locals.moment(Date.now()).format('MM/DD/YY h:mm:ss a')+': Retrieving current conditions')
 		   var req1 = http.get('http://'+us.myWLLIp+'/v1/current_conditions',function(resp){
@@ -570,6 +571,7 @@ function startWLLqueries(){
 			   req1.destroy();
 			   startWLLqueries();
 		   })
+		req1.shouldKeepAlive = false;
 	}, 5*60*1000); 
 }
 
