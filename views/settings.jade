@@ -31,6 +31,47 @@ block append content
        |     url = url.substring(0,idx);
        |     return url;
        |  }
+   script.
+      var validLatitude = true;
+      var validLongitude = true;
+      function validateLatitude(){
+        var x = $('#myLatitude').val();
+        x = x.trim();
+       
+        if(!$.isNumeric(x) || parseFloat(x) < -90 || parseFloat(x) > 90){
+          $('#lattext').hide();
+          $('#laterror').show();
+          validLatitude = false;
+        }
+        else{
+          $('#laterror').hide();
+          $('#lattext').show();
+          validLatitude = true;
+        }
+      }
+      function validateLongitude(){
+        var x = $('#myLongitude').val();
+        x = x.trim();
+       
+        if(!$.isNumeric(x) || parseFloat(x) < -180 || parseFloat(x) > 180){
+          $('#longtext').hide();
+          $('#longerror').show();
+          validLongitude = false;
+        }
+        else{
+          $('#longerror').hide();
+          $('#longtext').show();
+          validLongitude = true;
+        }
+      }
+      function submitForm(){
+        if (validLatitude && validLongitude)
+           $('#editform').submit()
+        else{
+           $('#response').text('Please correct your errors')
+           $('#response').show();
+           setTimeout(function(){$('#response').hide();}, 3*1000);        }
+      }
    body()
         table
           tr
@@ -57,12 +98,14 @@ block append content
               td 
                  span(style="display:block; width: 20px")
               td 
-                 input#myLatitude(type='text', size=20, name='myLatitude', value='#{myLatitude}',onClick='$(this).select()')
+                 input#myLatitude(type='text', size=20, name='myLatitude', value='#{myLatitude}',onClick='$(this).select()',onChange='validateLatitude()')
               td 
                  span(style="display:block; width: 20px")
               td 
-                 span.smaller.fontcolor 
+                 span#lattext.smaller.fontcolor 
                     | example: 84.532 (negative for south latitude)
+                 span#laterror.smaller(style='color:red;font-weight:bold;display:none')
+                    | Error: A numeric value between -90 and 90 is required here
             tr
               td 
                  span.smaller.fontcolor 
@@ -70,12 +113,14 @@ block append content
               td 
                  span(style="display:block; width: 20px")
               td 
-                 input#myLongitude(type='text', size=20, name='myLongitude', value='#{myLongitude}',onClick='$(this).select()')
+                 input#myLongitude(type='text', size=20, name='myLongitude', value='#{myLongitude}',onClick='$(this).select()',onChange='validateLongitude()')
               td 
                  span(style="display:block; width: 20px")
               td 
-                 span.smaller.fontcolor 
+                 span#longtext.smaller.fontcolor 
                     | example: -87.234 (negative for west Longitude)
+                 span#longerror.smaller(style='color:red;font-weight:bold;display:none')
+                    | Error: A numeric value between -180 and 180 is required here
             tr
               td 
                  span.smaller.fontcolor 
@@ -240,7 +285,7 @@ block append content
               td
                 span(style="display:block; width: 80px")
               td   
-                p: button.genericbutton(type="submit", value='1',name='changetype') Update
+                p: button.genericbutton(type="button", onclick='submitForm()') Update
               td      
               td 
                 p: button.genericbutton(type="button", onclick="window.location = getURL()+'/settings?response=Changes Discarded'") Discard

@@ -1266,15 +1266,15 @@ app.post('/dosettings', function (req, res) {
 	var oldMetricSpeed = us.observationUnits.metricSpeed;
 	var oldMetricPressure = us.observationUnits.metricPressure;
 	var oldMetricRain = us.observationUnits.metricRain;
-	us.myLatitude = req.body.myLatitude;
-	us.myLongitude = req.body.myLongitude;
-	us.myWLLIp = req.body.myWLLIp;
-	us.myMetarFtpSite = req.body.myMetarFtpSite;
-	us.myMetarFilePath = req.body.myMetarFilePath;
-	us.myRadarZoominPath = req.body.myRadarZoominPath;
-	us.myRadarZoomoutPath = req.body.myRadarZoomoutPath;
-	us.myClimacellApiKey = req.body.myClimacellApiKey;
-	us.mySettingsCIDR = req.body.mySettingsCIDR;
+	us.myLatitude = req.body.myLatitude.trim();
+	us.myLongitude = req.body.myLongitude.trim();
+	us.myWLLIp = req.body.myWLLIp.trim();
+	us.myMetarFtpSite = req.body.myMetarFtpSite.trim();
+	us.myMetarFilePath = req.body.myMetarFilePath.trim();
+	us.myRadarZoominPath = req.body.myRadarZoominPath.trim();
+	us.myRadarZoomoutPath = req.body.myRadarZoomoutPath.trim();
+	us.myClimacellApiKey = req.body.myClimacellApiKey.trim();
+	us.mySettingsCIDR = req.body.mySettingsCIDR.trim();
 	temp=speed=pressure=rain=false;
 	if (req.body.metricTemp == '1')
 	   temp = true
