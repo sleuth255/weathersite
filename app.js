@@ -567,6 +567,7 @@ function startWLLqueries(){
 				    else
 					    inBarometerTrend = 'Steady'
 			   req1.end();
+			   req1.destroy();
 			   startWLLqueries();
 		   })
 	}, 5*60*1000); 
