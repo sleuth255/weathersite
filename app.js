@@ -704,6 +704,7 @@ function analyze14ForecastObjs(start){
 		conditionsArray[11]+=5	
     if (conditionsArray[12] > 0 || conditionsArray[13] > 0 || conditionsArray[14] > 0 || conditionsArray[15] > 0){ // any Snow			
 	   amt = 0
+/*	   
 	   occ = 14	
 	   for (x=12;x<16;x++)  // which Snow?
 		 if (conditionsArray[x] > amt){
@@ -711,16 +712,31 @@ function analyze14ForecastObjs(start){
 			occ = x		
 		 }
 	   conditionsArray[occ]+= 4
+*/	   
+	   for (x=12;x<16;x++){  // aggregate Snow
+		   amt += conditionsArray[x];
+		   conditionsArray[x] = 0;
+	   }
+	   conditionsArray[14] = amt;
 	}
+
+
 	if (conditionsArray[7] > 0 || conditionsArray[8] > 0 || conditionsArray[9] > 0 || conditionsArray[10] > 0){ // any Rain
 	   amt = 0
+/*	   
 	   occ = 9	
 	   for (x=7;x<11;x++)  // which Rain?
 		 if (conditionsArray[x] > amt){
 			amt = conditionsArray[x]
-			occ = x		
+			occ = x
 		 }
 	   conditionsArray[occ]+= 4
+*/
+	   for (x=7;x<11;x++){  // aggregate Rain
+		   amt += conditionsArray[x];
+		   conditionsArray[x] = 0;
+	   }
+	   conditionsArray[9] = amt;
 	}
 // pick the winner
 	var occurrence = 0
