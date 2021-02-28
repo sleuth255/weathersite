@@ -180,7 +180,7 @@ block append content
                |Current Conditions
           tr
             td(height=30)
-          if (rainStormStart.length > 0)
+          if (rainStormStart.length > 0 || rainStormRate > 0)
              tr
                td.big.fontcolor(height=26)
                  |START:

@@ -701,7 +701,7 @@ function analyze14ForecastObjs(start){
 	   conditionsArray[4] -=4;
 	//  increase the weight of interesting conditions
 	if (conditionsArray[11] > 0) // T-Storms are really interesting
-		conditionsArray[11]+=5	
+		conditionsArray[11]+=8	
     if (conditionsArray[12] > 0 || conditionsArray[13] > 0 || conditionsArray[14] > 0 || conditionsArray[15] > 0){ // any Snow			
 	   amt = 0
 /*	   
