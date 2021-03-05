@@ -129,8 +129,7 @@ block append content
                 tr
                   td.bigger.fontcolor
                     if (outTempTrend == 0)
-                      | #{outTemp}&deg<span style='font-size: 18px'>#{tempunit}</span>
-                      |<span style='display: inline-block; width: .1px'></span>
+                      | #{outTemp}&deg<span style='font-size: 18px; width: 18px; display: inline-block'>#{tempunit}</span>
                     else if (outTempTrend) > 0
                       | #{outTemp}&deg<img src='images/warming-md.png'>
                     else
