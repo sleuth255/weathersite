@@ -33,6 +33,24 @@ block append content
             td(height=30)
           tr
             td.big.fontcolor(height=26)
+              |OUTSIDE:
+            td
+              table(cellspacing=0,cellpadding=0)
+                tr
+                  td.bigger.fontcolor
+                    if (outTempTrend == 0)
+                      | #{outTemp}&deg<span style='font-size: 18px'>#{tempunit}</span>
+                      |<span style='display: inline-block; width: .1px'></span>
+                    else if (outTempTrend) > 0
+                      | #{outTemp}&deg<img src='images/warming-md.png'>
+                    else
+                      | #{outTemp}&deg<img src='images/cooling-md.png'>
+                  td
+                    |<span style='display: inline-block; width: 15px'></span>
+                  td.bigger.fontcolor
+                    | #{outHum}<span style='font-size: 18px'>%</span>   
+          tr
+            td.big.fontcolor(height=26)
               |INSIDE:
             td
               table(cellspacing=0,cellpadding=0)
@@ -40,26 +58,9 @@ block append content
                   td.big.fontcolor
                     | #{inTemp}&deg<span style='font-size: 18px'>#{tempunit}</span>
                   td
-                    |<span style='display: inline-block; width: 20px'></span>
+                    |<span style='display: inline-block; width: 40px'></span>
                   td.big.fontcolor
                     | #{inHum}<span style='font-size: 18px'>%</span>   
-          tr
-            td.big.fontcolor(height=26)
-              |OUTSIDE:
-            td
-              table(cellspacing=0,cellpadding=0)
-                tr
-                  td.big.fontcolor
-                    if (outTempTrend == 0)
-                      | #{outTemp}&deg<span style='font-size: 18px'>#{tempunit}</span>
-                    else if (outTempTrend) > 0
-                      | #{outTemp}&deg<img src='images/warming-sm.png'>
-                    else
-                      | #{outTemp}&deg<img src='images/cooling-sm.png'>
-                  td
-                    |<span style='display: inline-block; width: 20px'></span>
-                  td.big.fontcolor
-                    | #{outHum}<span style='font-size: 18px'>%</span>   
           tr
             td.small.fontcolor(colspan=2,style='text-align: center;')
                |Temperature, Humidity
