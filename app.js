@@ -20,7 +20,7 @@ var us = {
     }
 }
 	
-var weatherSiteVersion = '1.6'
+var weatherSiteVersion = '1.7'
 var express = require('express')
 , request = require('request')
 , http = require('http')
@@ -169,7 +169,7 @@ function startClimacellqueries(){
    edt.setDate(dt.getDate()+4)
    sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
    edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
-   var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+us.myLatitude+"&lon="+us.myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+us.myClimacellApiKey
+   var ccreq = "https://data.climacell.co/v4/timelines?location="+us.myLatitude+"%2C"+us.myLongitude+"&startTime="+sdt+"&endTime="+edt+"&fields=weatherCode&timesteps=1h&apikey="+us.myClimacellApiKey;
    //console.log(ccreq)    
    var req0 = https.get(ccreq,function(resp){
 	   var ccdata = '';
@@ -177,8 +177,14 @@ function startClimacellqueries(){
 		   ccdata+=chunk
 	   })
 	   resp.on('end',function(){
-		   var forecastObjTmp = JSON.parse(ccdata);
-		   if (forecastObjTmp.length > 0)
+		   var valid = true;
+		   try{
+			  var forecastObjTmp = JSON.parse(ccdata);
+		   }
+		   catch(e){
+			   valid = false;
+		   }
+		   if (valid)
 			   forecastObj = forecastObjTmp;
 		   req0.end();
 	   })
@@ -196,17 +202,23 @@ function startClimacellqueries(){
 	   edt.setDate(dt.getDate()+4)
 	   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
 	   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
-	   var ccreq = "https://api.climacell.co/v3/weather/forecast/hourly?unit_system=si&lat="+us.myLatitude+"&lon="+us.myLongitude+"&start_time="+sdt+"&end_time="+edt+"&fields=weather_code&apikey="+us.myClimacellApiKey
+       var ccreq = "https://data.climacell.co/v4/timelines?location="+us.myLatitude+"%2C"+us.myLongitude+"&startTime="+sdt+"&endTime="+edt+"&fields=weatherCode&timesteps=1h&apikey="+us.myClimacellApiKey;
 	   var req0 = https.get(ccreq,function(resp){
 		   var ccdata = '';
 		   resp.on('data',function(chunk){
 			   ccdata+=chunk
 		   })
 		   resp.on('end',function(){
-			   var forecastObjTmp = JSON.parse(ccdata);
-			   if (forecastObjTmp.length > 0)
+   		      var valid = true;
+		      try{
+			     var forecastObjTmp = JSON.parse(ccdata);
+		      }
+		      catch(e){
+			      valid = false;
+		      }
+		      if (valid)
 				   forecastObj = forecastObjTmp;
-			   req0.end();
+			  req0.end();
 		   })
 	   }).on('error',function(){
 		      console.log("ClimaCell Forecast request failure")
@@ -628,70 +640,70 @@ function analyze14ForecastObjs(start){
 	var x=0, amt=0, occ=0;
 
 	for(x = start; x<(start+14); x++){
-		   if (forecastObj[x].weather_code.value == 'clear')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '1000')
 			   conditionsArray[0]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'mostly_clear')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '1100')
 			   conditionsArray[1]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'partly_cloudy')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '1101')
 			   conditionsArray[2]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'mostly_cloudy')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '1102')
 			   conditionsArray[3]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'cloudy')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '1001')
 			   conditionsArray[4]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'fog_light')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '2100')
 			   conditionsArray[5]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'fog')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '2000')
 			   conditionsArray[6]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'rain_light')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '4200')
 			   conditionsArray[7]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'drizzle')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '4000')
 			   conditionsArray[8]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'rain')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '4001')
 			   conditionsArray[9]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'rain_heavy')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '4201')
 			   conditionsArray[10]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'tstorm')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '8000')
 			   conditionsArray[11]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'flurries')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '5001')
 			   conditionsArray[12]++;
 		   else
-			if (forecastObj[x].weather_code.value == 'snow_light')
+			if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '5100')
 			   conditionsArray[13]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'snow')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '5000')
 			   conditionsArray[14]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'snow_heavy')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '5101')
 			   conditionsArray[15]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'ice_pellets_light')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '7102')
 			   conditionsArray[16]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'ice_pellets')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '7000')
 			   conditionsArray[17]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'ice_pellets_heavy')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '7101')
 			   conditionsArray[18]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'freezing_drizzle')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '6000')
 			   conditionsArray[19]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'freezing_rain_light')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '6200')
 			   conditionsArray[20]++;
 		   else
-		   if (forecastObj[x].weather_code.value == 'freezing_rain')
+		   if (forecastObj.data.timelines[0].intervals[x].values.weatherCode == '6001')
 			   conditionsArray[21]++;
 		   else
 			   conditionsArray[22]++;
@@ -789,7 +801,7 @@ function makeSkyConditionsVector(){
 	skyconditions.push(obj);
 	
 // now get forecasts
-	if (forecastObj.length > 0)
+	if (typeof forecastObj.data !== 'undefined')
 	    for(var x = 0; x<49;x+=24)
 		    skyconditions.push(analyze14ForecastObjs(x));
 	else{

@@ -34,6 +34,9 @@ You will be taken to the default conditions page
 
 ## Changelog:
 
+### v1.7
+* Upgrade to ClimaCell api v4.0.  ***Note***: a new v4.0 api key is required.  Re-register for a free v4.0 developer key at https://climacell.co/weather-api
+
 ### v1.6
 * dynamically parse for sensors in WLL responses
 
