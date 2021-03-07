@@ -764,7 +764,7 @@ function makeSkyConditionsVector(){
 	var skyconditions = [];
 	var obj = {
 			skyconditions: 1,
-			weather: 'Fair'
+			weather: 'Unavailable'
 	}
 	if (metarObservation.indexOf("CLR") != -1){
 		obj.skyconditions = 1;
