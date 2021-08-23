@@ -179,11 +179,14 @@ function startClimacellqueries(){
 	   resp.on('end',function(){
 		   var valid = true;
 		   try{
+			  //console.log(ccdata);
 			  var forecastObjTmp = JSON.parse(ccdata);
 		   }
 		   catch(e){
 			   valid = false;
 		   }
+		   if (forecastObjTmp.data.timelines[0].intervals.length == 0)
+			    valid = false;
 		   if (valid)
 			   forecastObj = forecastObjTmp;
 		   req0.end();
@@ -215,7 +218,9 @@ function startClimacellqueries(){
 		      }
 		      catch(e){
 			      valid = false;
-		      }
+			  }
+			  if (forecastObjTmp.data.timelines[0].intervals.length == 0)
+			      valid = false;
 		      if (valid)
 				   forecastObj = forecastObjTmp;
 			  req0.end();
