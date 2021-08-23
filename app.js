@@ -49,6 +49,7 @@ app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.logger('dev'));
 app.locals.moment = require('moment');
+app.locals.moment_tz = require('moment-timezone');
 
 
 process.on('uncaughtException', function(err){
@@ -151,6 +152,7 @@ else
 function startClimacellqueries(){
    dt = new Date()
    var isoOffset=""
+   var tzName ="";
    offset = dt.getTimezoneOffset();
    if (offset < 0){
 	 isoOffset = '+'
@@ -162,15 +164,18 @@ function startClimacellqueries(){
    if (offset < 10)
 	 isoOffset +="0"
    isoOffset += offset.toString()+':00'
-   console.log('Timezone offset is '+isoOffset) 
+   tzName = app.locals.moment_tz.tz.guess();
+   console.log('Timezone offset is '+isoOffset + ' ('+tzName+')') 
    sdt = new Date()
    edt = new Date()
    sdt.setDate(dt.getDate()+1)
    edt.setDate(dt.getDate()+4)
-   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
-   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
-   var ccreq = "https://data.climacell.co/v4/timelines?location="+us.myLatitude+"%2C"+us.myLongitude+"&startTime="+sdt+"&endTime="+edt+"&fields=weatherCode&timesteps=1h&apikey="+us.myClimacellApiKey;
-   //console.log(ccreq)    
+//   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
+//   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
+   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T06:00:00Z';
+   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T06:00:00Z';
+   var ccreq = "https://data.climacell.co/v4/timelines?location="+us.myLatitude+"%2C"+us.myLongitude+"&startTime="+sdt+"&endTime="+edt+"&timezone="+tzName+"&fields=weatherCode&timesteps=1h&apikey="+us.myClimacellApiKey;
+   console.log(ccreq)    
    var req0 = https.get(ccreq,function(resp){
 	   var ccdata = '';
 	   resp.on('data',function(chunk){
@@ -203,9 +208,11 @@ function startClimacellqueries(){
 	   edt = new Date()
 	   sdt.setDate(dt.getDate()+1)
 	   edt.setDate(dt.getDate()+4)
-	   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
-	   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
-       var ccreq = "https://data.climacell.co/v4/timelines?location="+us.myLatitude+"%2C"+us.myLongitude+"&startTime="+sdt+"&endTime="+edt+"&fields=weatherCode&timesteps=1h&apikey="+us.myClimacellApiKey;
+//	   sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
+//	   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
+       sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T06:00:00Z';
+       edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T06:00:00Z';
+       var ccreq = "https://data.climacell.co/v4/timelines?location="+us.myLatitude+"%2C"+us.myLongitude+"&startTime="+sdt+"&endTime="+edt+"&timezone="+tzName+"&fields=weatherCode&timesteps=1h&apikey="+us.myClimacellApiKey;
 	   var req0 = https.get(ccreq,function(resp){
 		   var ccdata = '';
 		   resp.on('data',function(chunk){
