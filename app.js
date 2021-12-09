@@ -1217,7 +1217,7 @@ app.get('/chartrefresh', function (req, res) {
        		if (avgDir == 112.5)
        			dirArray.push('ese')
     		else
-       		if (avgDir == 135.5)
+       		if (avgDir == 135)
        			dirArray.push('se')
     		else
        		if (avgDir == 157.5)
