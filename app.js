@@ -343,6 +343,8 @@ function startWLLqueries(){
 		    if (us.observationUnits.metricSpeed)
 		    	avgSpeed = Math.round(avgSpeed * 1.60934) 
 			avgDirection = Math.round(obj.data.conditions[wndTCPOcc].wind_dir_scalar_avg_last_10_min);
+			if (avgDirection == 0 && oWinddir.length > 0)
+			    avgDirection = oWinddir[oWinddir.length -1] // use last wind direction if there is one and windspeed avg is zero
 			inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
 		    if (us.observationUnits.metricTemp)
 		    	inTemp = Math.round(((inTemp -32) *5)/9)
@@ -460,6 +462,8 @@ function startWLLqueries(){
 				    if (us.observationUnits.metricSpeed)
 				        avgSpeed = Math.round(avgSpeed * 1.60934) 
 				    avgDirection = Math.round(obj.data.conditions[wndTCPOcc].wind_dir_scalar_avg_last_10_min);
+					if (avgDirection == 0 && oWinddir.length > 0)
+			    		avgDirection = oWinddir[oWinddir.length -1] // use last wind direction if there is one and windspeed avg is zero
 					inTemp = Math.round(obj.data.conditions[obj.data.conditions.length-2].temp_in);
 				    if (us.observationUnits.metricTemp)
 				    	inTemp = Math.round(((inTemp -32) *5)/9)
@@ -505,8 +509,8 @@ function startWLLqueries(){
 				    oWindspd.push(avgSpeed);
 				    localStorage.setItem("oWindspd",JSON.stringify(oWindspd));
 				    if (oWinddir.length > 143)
-					    oWinddir = shiftHist(oWinddir)
-				    oWinddir.push(avgDirection);
+						oWinddir = shiftHist(oWinddir)
+					oWinddir.push(avgDirection);
 				    localStorage.setItem("oWinddir",JSON.stringify(oWinddir));
 				    if (oWindgust.length > 143)
 					    oWindgust = shiftHist(oWindgust)
