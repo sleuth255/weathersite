@@ -174,7 +174,7 @@ function startClimacellqueries(){
 //   edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T06:00:00'+isoOffset;
    sdt = app.locals.moment(sdt).format('YYYY-MM-DD')+'T06:00:00Z';
    edt = app.locals.moment(edt).format('YYYY-MM-DD')+'T06:00:00Z';
-   var ccreq = "https://data.climacell.co/v4/timelines?location="+us.myLatitude+"%2C"+us.myLongitude+"&startTime="+sdt+"&endTime="+edt+"&timezone="+tzName+"&fields=weatherCode&timesteps=1h&apikey="+us.myClimacellApiKey;
+   var ccreq = "https://api.tomorrow.io/v4/timelines?location="+us.myLatitude+"%2C"+us.myLongitude+"&startTime="+sdt+"&endTime="+edt+"&timezone="+tzName+"&fields=weatherCode&timesteps=1h&apikey="+us.myClimacellApiKey;
    //console.log(ccreq)    
    var req0 = https.get(ccreq,function(resp){
 	   var ccdata = '';
