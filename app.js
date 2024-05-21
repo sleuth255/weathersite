@@ -814,6 +814,10 @@ function makeSkyConditionsVector(){
 		obj.skyconditions = 8;
 		obj.weather = 'Thunderstorms';
 	}
+	if (metarObservation.indexOf("FG") != -1){
+		obj.skyconditions = 5;
+		obj.weather = 'Dense Fog';
+	}
 	skyconditions.push(obj);
 	
 // now get forecasts
