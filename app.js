@@ -1448,12 +1448,12 @@ server.on('message',function(msg,info){
 	  rainStormStart=obj.conditions[rainOcc].rain_storm_start_at
 	  if (us.observationUnits.metricRain){
 		  rainStormAmt=(obj.conditions[rainOcc].rain_storm *.2).toFixed(2);
-		  rainStormRate=obj.conditions[rainOcc].rain_rate_last *.2;
+		  rainStormRate=(obj.conditions[rainOcc].rain_rate_last *.2).toFixed(2);
 		  
 	  }
 	  else{
 	      rainStormAmt=(obj.conditions[rainOcc].rain_storm *.01).toFixed(2);
-	      rainStormRate=obj.conditions[rainOcc].rain_rate_last *.01
+	      rainStormRate=(obj.conditions[rainOcc].rain_rate_last *.01).toFixed(2)
 	  }
 	  if (rainStormStart == null){
 		  rainStormStart = ''
